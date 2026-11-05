@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Расписание класса</title>
+  <!-- Подключаем скрипт Telegram Mini App -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    :root {
+      --bg: var(--tg-theme-bg-color, #f4f5f7);
+      --card-bg: var(--tg-theme-secondary-bg-color, #ffffff);
+      --text: var(--tg-theme-text-color, #1c1c1e);
+      --hint: var(--tg-theme-hint-color, #8e8e93);
+      --accent: var(--tg-theme-button-color, #2481cc);
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      margin: 0;
+      padding: 16px;
+      box-sizing: border-box;
+    }
+    h2 {
+      margin-top: 0;
+      font-size: 20px;
+    }
+    .loader {
+      text-align: center;
+      padding: 40px;
+      color: var(--hint);
+      font-size: 15px;
+    }
+    .card {
+      background: var(--card-bg);
+      border-radius: 14px;
+      padding: 14px 16px;
+      margin-bottom: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 8px;
+    }
+    .subject {
+      font-weight: 600;
+      font-size: 16px;
+    }
+    .date {
+      font-size: 13px;
+      color: var(--hint);
+    }
+    .homework {
+      font-size: 14px;
+      line-height: 1.4;
+      margin-bottom: 6px;
+    }
+    .deadline {
+      font-size: 12px;
+      color: #e04848;
+      font-weight: 500;
+    }
+  </style>
+</head>
+<body>
+  <h2>Расписание и ДЗ</h2>
+  <div id="loader" class="loader">Загрузка данных...</div>
+  <div id="schedule-list"></div>
+
+  <script>
+    // Инициализация Telegram Web App
+    const tg = window.Telegram.WebApp;
+    tg.ready();
+    tg.expand();
+
+    // ВСТАВЬ СЮДА СВОЮ ССЫЛКУ ИЗ APPS SCRIPT:
+    const API_URL = 'https://script.google.com/macros/s/AKfycbzoRZ_Fd9Yv2FJq79lpF4HPg-NETJm4gSCqLVxU7_6pp2CHNON2A09U1X0eYRE4cyQ5/exec';
+
+    async function loadSchedule() {
+      const loader = document.getElementById('loader');
+      const container = document.getElementById('schedule-list');
+
+      try {
+        const response = await fetch(API_URL);
+        const data = await response.json();
+
+        loader.style.display = 'none';
+
+        if (!data || data.length === 0) {
+          container.innerHTML = '<div style="color:var(--hint)">Расписание пока пустое.</div>';
+          return;
+        }
+
+        // Рендерим каждую строчку из таблицы
+        data.forEach(item => {
+          const card = document.createElement('div');
+          card.className = 'card';
+
+          // Обрати внимание: ключи соответствуют заголовкам твоих колонок
+          const date = item['Дата'] || item['Date'] || '';
+          const subject = item['Предмет'] || item['Subject'] || 'Урок';
+          const homework = item['Задание'] || item['Homework'] || 'Нет задания';
+          const deadline = item['Дедлайн'] || item['Deadline'] || '';
+
+          card.innerHTML = `
+            <div class="card-header">
+              <span class="subject">${subject}</span>
+              <span class="date">${date}</span>
+            </div>
+            <div class="homework">${homework}</div>
+            ${deadline ? `<div class="deadline">Сдать до: ${deadline}</div>` : ''}
+          `;
+          container.appendChild(card);
+        });
+
+      } catch (err) {
+        loader.innerText = 'Не удалось загрузить расписание. Проверь таблицу или доступ.';
+      }
+    }
+
+    loadSchedule();
+  </script>
+</body>
+</html>
