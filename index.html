@@ -33,6 +33,63 @@
       margin: 0;
       padding: 16px 12px 40px 12px;
       min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* АНИМАЦИЯ ПАДАЮЩИХ ЛИСТЬЕВ */
+    .leaves-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    .leaf {
+      position: absolute;
+      top: -40px;
+      user-select: none;
+      opacity: 0.35;
+      animation-name: fallAnimation, swayAnimation;
+      animation-iteration-count: infinite;
+      animation-timing-function: linear, ease-in-out;
+    }
+
+    @keyframes fallAnimation {
+      0% {
+        top: -40px;
+      }
+      100% {
+        top: 105vh;
+      }
+    }
+
+    @keyframes swayAnimation {
+      0%, 100% {
+        transform: translateX(0) rotate(0deg);
+      }
+      50% {
+        transform: translateX(35px) rotate(45deg);
+      }
+    }
+
+    /* Настройки для каждого отдельного листика */
+    .leaf:nth-child(1) { left: 8%; font-size: 18px; animation-duration: 14s, 4s; animation-delay: 0s, 0s; }
+    .leaf:nth-child(2) { left: 24%; font-size: 24px; animation-duration: 18s, 5s; animation-delay: 3s, 1s; opacity: 0.25; }
+    .leaf:nth-child(3) { left: 45%; font-size: 16px; animation-duration: 13s, 3.5s; animation-delay: 6s, 0.5s; }
+    .leaf:nth-child(4) { left: 63%; font-size: 22px; animation-duration: 16s, 4.5s; animation-delay: 1s, 2s; opacity: 0.3; }
+    .leaf:nth-child(5) { left: 82%; font-size: 19px; animation-duration: 15s, 4s; animation-delay: 5s, 1.5s; }
+    .leaf:nth-child(6) { left: 93%; font-size: 15px; animation-duration: 20s, 6s; animation-delay: 8s, 0s; opacity: 0.2; }
+    .leaf:nth-child(7) { left: 35%; font-size: 20px; animation-duration: 17s, 4s; animation-delay: 10s, 2.5s; }
+
+    /* Оставляем контент поверх падающих листьев */
+    .header-top, .week-segmented, .days-grid, #cards-container, #loader {
+      position: relative;
+      z-index: 1;
     }
 
     .header-top {
@@ -43,20 +100,57 @@
       padding: 0 4px;
     }
 
+    .header-title-box {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
     .header-top h2 {
       margin: 0;
       font-size: 21px;
       font-weight: 700;
       letter-spacing: -0.3px;
       color: #fff;
-      display: flex;
-      align-items: center;
-      gap: 8px;
     }
 
-    .header-top h2::after {
-      content: '🍁';
-      font-size: 18px;
+    /* Кнопка с рупором в углу */
+    .news-trigger-btn {
+      position: relative;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      color: var(--text);
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 19px;
+      cursor: pointer;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
+      transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+      user-select: none;
+    }
+
+    .news-trigger-btn:active {
+      transform: scale(0.9);
+      box-shadow: 0 0 12px var(--gold-glow);
+    }
+
+    .news-badge {
+      position: absolute;
+      top: -4px;
+      right: -4px;
+      background: var(--accent);
+      color: #fff;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 10px;
+      border: 2px solid var(--bg);
+      box-shadow: 0 0 8px var(--accent-glow);
+      display: none;
     }
 
     /* Переключатель недели */
@@ -109,9 +203,8 @@
       padding: 9px 2px;
       text-align: center;
       cursor: pointer;
-      transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.2s, box-shadow 0.2s, border-color 0.2s;
+      transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.2s, box-shadow 0.2s;
       user-select: none;
-      position: relative;
     }
 
     .day-cell:active {
@@ -124,17 +217,14 @@
       text-transform: uppercase;
       margin-bottom: 4px;
       font-weight: 600;
-      transition: color 0.2s;
     }
 
     .day-cell .day-num {
       font-size: 14px;
       font-weight: 700;
       color: var(--text);
-      transition: color 0.2s;
     }
 
-    /* Светящийся выбранный день */
     .day-cell.active {
       background: linear-gradient(145deg, #e76f51, #d45d3e);
       border-color: #f4a261;
@@ -147,7 +237,6 @@
 
     .day-cell.active .day-num {
       color: #ffffff;
-      text-shadow: 0 1px 2px rgba(0,0,0,0.25);
     }
 
     .loader {
@@ -174,14 +263,8 @@
     }
 
     @keyframes cardAppear {
-      from {
-        opacity: 0;
-        transform: translateY(6px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     .card-header {
@@ -244,12 +327,135 @@
       border: 1px dashed var(--card-border);
       border-radius: 14px;
     }
+
+    /* МОДАЛЬНОЕ ОКНО ОБЪЯВЛЕНИЙ */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(6px);
+      display: none;
+      align-items: flex-end;
+      z-index: 1000;
+      opacity: 0;
+      transition: opacity 0.25s ease;
+    }
+
+    .modal-overlay.open {
+      display: flex;
+      opacity: 1;
+    }
+
+    .modal-sheet {
+      background: #181416;
+      border-top: 1px solid #3c3033;
+      border-radius: 20px 20px 0 0;
+      width: 100%;
+      max-height: 80vh;
+      padding: 20px 16px 32px 16px;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 -4px 24px rgba(0,0,0,0.6);
+      transform: translateY(100%);
+      transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    .modal-overlay.open .modal-sheet {
+      transform: translateY(0);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .modal-header h3 {
+      margin: 0;
+      font-size: 19px;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .close-btn {
+      background: #2b2225;
+      border: none;
+      color: var(--hint);
+      font-size: 16px;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .close-btn:active {
+      transform: scale(0.9);
+    }
+
+    .announcements-list {
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding-right: 2px;
+    }
+
+    .news-card {
+      background: #211b1e;
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 14px;
+    }
+
+    .news-date {
+      font-size: 11px;
+      color: var(--gold);
+      font-weight: 700;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .news-text {
+      font-size: 14px;
+      line-height: 1.45;
+      color: #f7ede2;
+      white-space: pre-wrap;
+    }
   </style>
 </head>
 <body>
 
+  <!-- Контейнер с медленно падающими листьями -->
+  <div class="leaves-container">
+    <div class="leaf">🍁</div>
+    <div class="leaf">🍂</div>
+    <div class="leaf">🍁</div>
+    <div class="leaf">🍃</div>
+    <div class="leaf">🍂</div>
+    <div class="leaf">🍁</div>
+    <div class="leaf">🍂</div>
+  </div>
+
   <div class="header-top">
-    <h2>Расписание</h2>
+    <div class="header-title-box">
+      <h2>Расписание</h2>
+      <span style="font-size: 18px;">🍁</span>
+    </div>
+    
+    <div class="news-trigger-btn" onclick="openAnnouncements()" title="Объявления">
+      📢
+      <div id="news-badge" class="news-badge">0</div>
+    </div>
   </div>
 
   <div class="week-segmented">
@@ -263,6 +469,17 @@
 
   <div id="cards-container" class="cards-container"></div>
 
+  <!-- Модальное окно объявлений -->
+  <div id="modal-overlay" class="modal-overlay" onclick="closeAnnouncements(event)">
+    <div class="modal-sheet" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <h3>📢 Объявления</h3>
+        <button class="close-btn" onclick="closeAnnouncements()">✕</button>
+      </div>
+      <div id="announcements-list" class="announcements-list"></div>
+    </div>
+  </div>
+
   <script>
     if (window.Telegram && window.Telegram.WebApp) {
       window.Telegram.WebApp.ready();
@@ -270,9 +487,10 @@
     }
 
     // ТВОЙ URL ИЗ GOOGLE APPS SCRIPT:
-    const API_URL = 'https://script.google.com/macros/s/AKfycbzoRZ_Fd9Yv2FJq79lpF4HPg-NETJm4gSCqLVxU7_6pp2CHNON2A09U1X0eYRE4cyQ5/exec';
+    const API_URL = 'СЮДА_ВСТАВЬ_ТВОЙ_APPS_SCRIPT_URL';
 
     let allItems = [];
+    let allNews = [];
     let twoWeeks = [];
     let currentWeekIndex = 0;
     let selectedDateInfo = null;
@@ -315,8 +533,18 @@
       const loader = document.getElementById('loader');
       try {
         const res = await fetch(API_URL);
-        allItems = await res.json();
+        const data = await res.json();
         loader.style.display = 'none';
+
+        if (Array.isArray(data)) {
+          allItems = data;
+          allNews = [];
+        } else {
+          allItems = data.schedule || [];
+          allNews = data.announcements || [];
+        }
+
+        updateNewsBadge();
 
         twoWeeks = generate14Days();
 
@@ -337,13 +565,51 @@
       }
     }
 
+    function updateNewsBadge() {
+      const badge = document.getElementById('news-badge');
+      if (allNews && allNews.length > 0) {
+        badge.innerText = allNews.length;
+        badge.style.display = 'block';
+      } else {
+        badge.style.display = 'none';
+      }
+    }
+
+    function openAnnouncements() {
+      const modal = document.getElementById('modal-overlay');
+      const list = document.getElementById('announcements-list');
+      list.innerHTML = '';
+
+      if (!allNews || allNews.length === 0) {
+        list.innerHTML = '<div class="empty-state">Пока нет активных объявлений ✨</div>';
+      } else {
+        allNews.forEach(item => {
+          const date = item['Дата'] || item['дата'] || item['Date'] || '';
+          const text = item['Текст'] || item['текст'] || item['Объявление'] || item['Заголовок'] || '';
+
+          const card = document.createElement('div');
+          card.className = 'news-card';
+          card.innerHTML = `
+            ${date ? `<div class="news-date">📌 ${date}</div>` : ''}
+            <div class="news-text">${text}</div>
+          `;
+          list.appendChild(card);
+        });
+      }
+
+      modal.classList.add('open');
+    }
+
+    function closeAnnouncements(e) {
+      if (e && e.target !== e.currentTarget && !e.target.classList.contains('close-btn')) return;
+      document.getElementById('modal-overlay').classList.remove('open');
+    }
+
     function switchWeek(weekIndex) {
       currentWeekIndex = weekIndex;
       updateWeekButtons();
-      
       const startDay = currentWeekIndex === 0 ? twoWeeks[0] : twoWeeks[7];
       selectedDateInfo = startDay;
-
       renderDaysGrid();
       renderLessons();
     }
