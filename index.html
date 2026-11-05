@@ -3,125 +3,441 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>Расписание класса</title>
-  <!-- Подключаем скрипт Telegram Mini App -->
+  <title>Расписание уроков</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     :root {
-      --bg: var(--tg-theme-bg-color, #f4f5f7);
-      --card-bg: var(--tg-theme-secondary-bg-color, #ffffff);
-      --text: var(--tg-theme-text-color, #1c1c1e);
-      --hint: var(--tg-theme-hint-color, #8e8e93);
-      --accent: var(--tg-theme-button-color, #2481cc);
+      --bg: #141113;
+      --card-bg: #1e191b;
+      --card-border: #322829;
+      --text: #f7ede2;
+      --hint: #9e8d89;
+      --accent: #e76f51;
+      --accent-glow: rgba(231, 111, 81, 0.45);
+      --accent-soft: rgba(231, 111, 81, 0.15);
+      --gold: #f4a261;
+      --gold-glow: rgba(244, 162, 97, 0.4);
+      --danger: #e63946;
     }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, sans-serif;
       background-color: var(--bg);
+      background-image: radial-gradient(circle at 50% 0%, rgba(231, 111, 81, 0.08), transparent 70%);
       color: var(--text);
       margin: 0;
-      padding: 16px;
-      box-sizing: border-box;
+      padding: 16px 12px 40px 12px;
+      min-height: 100vh;
     }
-    h2 {
-      margin-top: 0;
-      font-size: 20px;
+
+    .header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      padding: 0 4px;
     }
+
+    .header-top h2 {
+      margin: 0;
+      font-size: 21px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .header-top h2::after {
+      content: '🍁';
+      font-size: 18px;
+    }
+
+    /* Переключатель недели */
+    .week-segmented {
+      display: flex;
+      background: #1a1517;
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 4px;
+      margin-bottom: 14px;
+      gap: 4px;
+    }
+
+    .week-btn {
+      flex: 1;
+      padding: 9px 0;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--hint);
+      border-radius: 9px;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      user-select: none;
+    }
+
+    .week-btn:active {
+      transform: scale(0.96);
+    }
+
+    .week-btn.active {
+      background: #2b2123;
+      color: var(--gold);
+      border: 1px solid rgba(244, 162, 97, 0.25);
+      box-shadow: 0 0 14px var(--gold-glow);
+    }
+
+    /* Сетка 7 дней недели */
+    .days-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 6px;
+      margin-bottom: 18px;
+    }
+
+    .day-cell {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 9px 2px;
+      text-align: center;
+      cursor: pointer;
+      transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.2s, box-shadow 0.2s, border-color 0.2s;
+      user-select: none;
+      position: relative;
+    }
+
+    .day-cell:active {
+      transform: scale(0.91);
+    }
+
+    .day-cell .day-name {
+      font-size: 11px;
+      color: var(--hint);
+      text-transform: uppercase;
+      margin-bottom: 4px;
+      font-weight: 600;
+      transition: color 0.2s;
+    }
+
+    .day-cell .day-num {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
+      transition: color 0.2s;
+    }
+
+    /* Светящийся выбранный день */
+    .day-cell.active {
+      background: linear-gradient(145deg, #e76f51, #d45d3e);
+      border-color: #f4a261;
+      box-shadow: 0 0 18px var(--accent-glow), 0 2px 8px rgba(0,0,0,0.5);
+    }
+
+    .day-cell.active .day-name {
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    .day-cell.active .day-num {
+      color: #ffffff;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.25);
+    }
+
     .loader {
       text-align: center;
-      padding: 40px;
+      padding: 40px 0;
       color: var(--hint);
-      font-size: 15px;
+      font-size: 14px;
     }
+
+    /* Карточки уроков */
+    .cards-container {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
     .card {
       background: var(--card-bg);
+      border: 1px solid var(--card-border);
       border-radius: 14px;
       padding: 14px 16px;
-      margin-bottom: 12px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+      box-shadow: 0 3px 12px rgba(0, 0, 0, 0.25);
+      animation: cardAppear 0.25s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
     }
+
+    @keyframes cardAppear {
+      from {
+        opacity: 0;
+        transform: translateY(6px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
     .card-header {
       display: flex;
       justify-content: space-between;
-      align-items: baseline;
+      align-items: center;
       margin-bottom: 8px;
     }
+
     .subject {
-      font-weight: 600;
       font-size: 16px;
+      font-weight: 700;
+      color: #ffffff;
     }
-    .date {
-      font-size: 13px;
-      color: var(--hint);
-    }
-    .homework {
-      font-size: 14px;
-      line-height: 1.4;
-      margin-bottom: 6px;
-    }
-    .deadline {
+
+    .lesson-date {
       font-size: 12px;
-      color: #e04848;
-      font-weight: 500;
+      color: var(--gold);
+      background: rgba(244, 162, 97, 0.12);
+      border: 1px solid rgba(244, 162, 97, 0.25);
+      padding: 3px 9px;
+      border-radius: 8px;
+      font-weight: 600;
+    }
+
+    .homework-block {
+      margin-top: 6px;
+    }
+
+    .homework-title {
+      font-size: 11px;
+      color: var(--hint);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 3px;
+    }
+
+    .homework-text {
+      font-size: 14px;
+      line-height: 1.45;
+      color: #e8ded8;
+    }
+
+    .deadline-row {
+      margin-top: 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--danger);
+      font-weight: 600;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px 16px;
+      color: var(--hint);
+      font-size: 14px;
+      background: var(--card-bg);
+      border: 1px dashed var(--card-border);
+      border-radius: 14px;
     }
   </style>
 </head>
 <body>
-  <h2>Расписание и ДЗ</h2>
-  <div id="loader" class="loader">Загрузка данных...</div>
-  <div id="schedule-list"></div>
+
+  <div class="header-top">
+    <h2>Расписание</h2>
+  </div>
+
+  <div class="week-segmented">
+    <div id="btn-week-1" class="week-btn active" onclick="switchWeek(0)">Текущая неделя</div>
+    <div id="btn-week-2" class="week-btn" onclick="switchWeek(1)">Следующая неделя</div>
+  </div>
+
+  <div id="days-grid" class="days-grid"></div>
+
+  <div id="loader" class="loader">Синхронизация с таблицей...</div>
+
+  <div id="cards-container" class="cards-container"></div>
 
   <script>
-    // Инициализация Telegram Web App
-    const tg = window.Telegram.WebApp;
-    tg.ready();
-    tg.expand();
+    if (window.Telegram && window.Telegram.WebApp) {
+      window.Telegram.WebApp.ready();
+      window.Telegram.WebApp.expand();
+    }
 
-    // ВСТАВЬ СЮДА СВОЮ ССЫЛКУ ИЗ APPS SCRIPT:
+    // ТВОЙ URL ИЗ GOOGLE APPS SCRIPT:
     const API_URL = 'https://script.google.com/macros/s/AKfycbzoRZ_Fd9Yv2FJq79lpF4HPg-NETJm4gSCqLVxU7_6pp2CHNON2A09U1X0eYRE4cyQ5/exec';
 
-    async function loadSchedule() {
+    let allItems = [];
+    let twoWeeks = [];
+    let currentWeekIndex = 0;
+    let selectedDateInfo = null;
+
+    function generate14Days() {
+      const now = new Date();
+      const currentDay = now.getDay();
+      const diffToMonday = currentDay === 0 ? -6 : 1 - currentDay;
+      
+      const monday = new Date(now);
+      monday.setDate(now.getDate() + diffToMonday);
+      monday.setHours(0, 0, 0, 0);
+
+      const daysOfWeekNames = ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
+      const days = [];
+
+      for (let i = 0; i < 14; i++) {
+        const d = new Date(monday);
+        d.setDate(monday.getDate() + i);
+
+        const dayNum = d.getDate();
+        const monthNum = d.getMonth() + 1;
+
+        const paddedDay = String(dayNum).padStart(2, '0');
+        const paddedMonth = String(monthNum).padStart(2, '0');
+
+        days.push({
+          dateObj: d,
+          name: daysOfWeekNames[d.getDay()],
+          dayNumber: dayNum,
+          padded: `${paddedDay}.${paddedMonth}`,
+          unpadded: `${dayNum}.${monthNum}`,
+          isToday: d.toDateString() === now.toDateString()
+        });
+      }
+      return days;
+    }
+
+    async function loadData() {
       const loader = document.getElementById('loader');
-      const container = document.getElementById('schedule-list');
-
       try {
-        const response = await fetch(API_URL);
-        const data = await response.json();
-
+        const res = await fetch(API_URL);
+        allItems = await res.json();
         loader.style.display = 'none';
 
-        if (!data || data.length === 0) {
-          container.innerHTML = '<div style="color:var(--hint)">Расписание пока пустое.</div>';
-          return;
+        twoWeeks = generate14Days();
+
+        const todayItem = twoWeeks.find(d => d.isToday);
+        if (todayItem) {
+          selectedDateInfo = todayItem;
+          currentWeekIndex = twoWeeks.indexOf(todayItem) >= 7 ? 1 : 0;
+        } else {
+          selectedDateInfo = twoWeeks[0];
+          currentWeekIndex = 0;
         }
 
-        // Рендерим каждую строчку из таблицы
-        data.forEach(item => {
-          const card = document.createElement('div');
-          card.className = 'card';
-
-          // Обрати внимание: ключи соответствуют заголовкам твоих колонок
-          const date = item['Дата'] || item['Date'] || '';
-          const subject = item['Предмет'] || item['Subject'] || 'Урок';
-          const homework = item['Задание'] || item['Homework'] || 'Нет задания';
-          const deadline = item['Дедлайн'] || item['Deadline'] || '';
-
-          card.innerHTML = `
-            <div class="card-header">
-              <span class="subject">${subject}</span>
-              <span class="date">${date}</span>
-            </div>
-            <div class="homework">${homework}</div>
-            ${deadline ? `<div class="deadline">Сдать до: ${deadline}</div>` : ''}
-          `;
-          container.appendChild(card);
-        });
-
+        updateWeekButtons();
+        renderDaysGrid();
+        renderLessons();
       } catch (err) {
-        loader.innerText = 'Не удалось загрузить расписание. Проверь таблицу или доступ.';
+        loader.innerText = 'Не удалось загрузить данные из таблицы.';
       }
     }
 
-    loadSchedule();
+    function switchWeek(weekIndex) {
+      currentWeekIndex = weekIndex;
+      updateWeekButtons();
+      
+      const startDay = currentWeekIndex === 0 ? twoWeeks[0] : twoWeeks[7];
+      selectedDateInfo = startDay;
+
+      renderDaysGrid();
+      renderLessons();
+    }
+
+    function updateWeekButtons() {
+      document.getElementById('btn-week-1').className = `week-btn ${currentWeekIndex === 0 ? 'active' : ''}`;
+      document.getElementById('btn-week-2').className = `week-btn ${currentWeekIndex === 1 ? 'active' : ''}`;
+    }
+
+    function renderDaysGrid() {
+      const grid = document.getElementById('days-grid');
+      grid.innerHTML = '';
+
+      const weekDays = currentWeekIndex === 0 ? twoWeeks.slice(0, 7) : twoWeeks.slice(7, 14);
+
+      weekDays.forEach(day => {
+        const cell = document.createElement('div');
+        const isActive = day.padded === selectedDateInfo.padded;
+        cell.className = `day-cell ${isActive ? 'active' : ''}`;
+
+        cell.innerHTML = `
+          <div class="day-name">${day.name}</div>
+          <div class="day-num">${day.dayNumber}</div>
+        `;
+
+        cell.onclick = () => {
+          selectedDateInfo = day;
+          renderDaysGrid();
+          renderLessons();
+        };
+
+        grid.appendChild(cell);
+      });
+    }
+
+    function renderLessons() {
+      const container = document.getElementById('cards-container');
+      container.innerHTML = '';
+
+      const monthsRu = [
+        'января', 'февраля', 'марта', 'апреля', 'мая', 'июня',
+        'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'
+      ];
+
+      const dayNum = selectedDateInfo.dayNumber;
+      const monthWord = monthsRu[selectedDateInfo.dateObj.getMonth()];
+      const textDateVariant = `${dayNum} ${monthWord}`.toLowerCase();
+
+      const dayLessons = allItems.filter(item => {
+        const rawDate = String(
+          item['Дата'] || item['дата'] || item['Date'] || item['date'] || ''
+        ).trim().toLowerCase();
+
+        return rawDate === textDateVariant ||
+               rawDate.startsWith(selectedDateInfo.padded) ||
+               rawDate.startsWith(selectedDateInfo.unpadded) ||
+               rawDate.includes(selectedDateInfo.padded) ||
+               rawDate.includes(textDateVariant);
+      });
+
+      if (dayLessons.length === 0) {
+        container.innerHTML = '<div class="empty-state">На этот день уроков нет ☕🍂</div>';
+        return;
+      }
+
+      dayLessons.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'card';
+
+        const subject = item['Предмет'] || item['предмет'] || item['Subject'] || 'Урок';
+        const homework = item['Задание'] || item['задание'] || item['Homework'] || 'Нет задания';
+        const deadline = item['Дедлайн'] || item['дедлайн'] || item['Срок сдачи'] || item['Срок сдачи:'] || item['Deadline'] || '';
+        const lessonDate = item['Дата'] || item['дата'] || textDateVariant;
+
+        card.innerHTML = `
+          <div class="card-header">
+            <span class="subject">${subject}</span>
+            <span class="lesson-date">${lessonDate}</span>
+          </div>
+          <div class="homework-block">
+            <div class="homework-title">Домашнее задание:</div>
+            <div class="homework-text">${homework}</div>
+          </div>
+          ${deadline ? `
+            <div class="deadline-row">
+              <span>⏳ Срок сдачи: ${deadline}</span>
+            </div>
+          ` : ''}
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    loadData();
   </script>
 </body>
 </html>
