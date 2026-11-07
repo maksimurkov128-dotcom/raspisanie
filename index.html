@@ -14,10 +14,10 @@
       --hint: #9e8d89;
       --accent: #e76f51;
       --accent-glow: rgba(231, 111, 81, 0.45);
-      --accent-soft: rgba(231, 111, 81, 0.15);
       --gold: #f4a261;
       --gold-glow: rgba(244, 162, 97, 0.4);
       --danger: #e63946;
+      --green: #2a9d8f;
     }
 
     * {
@@ -60,34 +60,22 @@
     }
 
     @keyframes fallAnimation {
-      0% {
-        top: -40px;
-      }
-      100% {
-        top: 105vh;
-      }
+      0% { top: -40px; }
+      100% { top: 105vh; }
     }
 
     @keyframes swayAnimation {
-      0%, 100% {
-        transform: translateX(0) rotate(0deg);
-      }
-      50% {
-        transform: translateX(35px) rotate(45deg);
-      }
+      0%, 100% { transform: translateX(0) rotate(0deg); }
+      50% { transform: translateX(35px) rotate(45deg); }
     }
 
-    /* Настройки для каждого отдельного листика */
-    .leaf:nth-child(1) { left: 8%; font-size: 18px; animation-duration: 14s, 4s; animation-delay: 0s, 0s; }
-    .leaf:nth-child(2) { left: 24%; font-size: 24px; animation-duration: 18s, 5s; animation-delay: 3s, 1s; opacity: 0.25; }
-    .leaf:nth-child(3) { left: 45%; font-size: 16px; animation-duration: 13s, 3.5s; animation-delay: 6s, 0.5s; }
-    .leaf:nth-child(4) { left: 63%; font-size: 22px; animation-duration: 16s, 4.5s; animation-delay: 1s, 2s; opacity: 0.3; }
-    .leaf:nth-child(5) { left: 82%; font-size: 19px; animation-duration: 15s, 4s; animation-delay: 5s, 1.5s; }
-    .leaf:nth-child(6) { left: 93%; font-size: 15px; animation-duration: 20s, 6s; animation-delay: 8s, 0s; opacity: 0.2; }
-    .leaf:nth-child(7) { left: 35%; font-size: 20px; animation-duration: 17s, 4s; animation-delay: 10s, 2.5s; }
+    .leaf:nth-child(1) { left: 8%; font-size: 18px; animation-duration: 14s, 4s; }
+    .leaf:nth-child(2) { left: 25%; font-size: 24px; animation-duration: 18s, 5s; animation-delay: 2s; opacity: 0.25; }
+    .leaf:nth-child(3) { left: 45%; font-size: 16px; animation-duration: 13s, 3.5s; animation-delay: 5s; }
+    .leaf:nth-child(4) { left: 65%; font-size: 22px; animation-duration: 16s, 4.5s; animation-delay: 1s; opacity: 0.3; }
+    .leaf:nth-child(5) { left: 85%; font-size: 19px; animation-duration: 15s, 4s; animation-delay: 4s; }
 
-    /* Оставляем контент поверх падающих листьев */
-    .header-top, .week-segmented, .days-grid, #cards-container, #loader {
+    .header-top, .vacation-banner, .week-segmented, .days-grid, #cards-container, #loader {
       position: relative;
       z-index: 1;
     }
@@ -96,7 +84,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 16px;
+      margin-bottom: 12px;
       padding: 0 4px;
     }
 
@@ -110,30 +98,33 @@
       margin: 0;
       font-size: 21px;
       font-weight: 700;
-      letter-spacing: -0.3px;
       color: #fff;
     }
 
-    /* Кнопка с рупором в углу */
-    .news-trigger-btn {
+    .top-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .icon-btn {
       position: relative;
       background: var(--card-bg);
       border: 1px solid var(--card-border);
       color: var(--text);
-      width: 40px;
-      height: 40px;
+      width: 38px;
+      height: 38px;
       border-radius: 12px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 19px;
+      font-size: 17px;
       cursor: pointer;
       box-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
       transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
       user-select: none;
     }
 
-    .news-trigger-btn:active {
+    .icon-btn:active {
       transform: scale(0.9);
       box-shadow: 0 0 12px var(--gold-glow);
     }
@@ -149,11 +140,29 @@
       padding: 2px 6px;
       border-radius: 10px;
       border: 2px solid var(--bg);
-      box-shadow: 0 0 8px var(--accent-glow);
       display: none;
     }
 
-    /* Переключатель недели */
+    /* БАННЕР КАНИКУЛ */
+    .vacation-banner {
+      background: linear-gradient(90deg, rgba(231, 111, 81, 0.15), rgba(244, 162, 97, 0.1));
+      border: 1px solid rgba(244, 162, 97, 0.25);
+      border-radius: 12px;
+      padding: 10px 14px;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 13px;
+    }
+
+    .vacation-days {
+      font-weight: 700;
+      color: var(--gold);
+      text-shadow: 0 0 10px var(--gold-glow);
+    }
+
+    /* ПЕРЕКЛЮЧАТЕЛЬ НЕДЕЛИ */
     .week-segmented {
       display: flex;
       background: #1a1517;
@@ -166,19 +175,15 @@
 
     .week-btn {
       flex: 1;
-      padding: 9px 0;
+      padding: 8px 0;
       text-align: center;
       font-size: 13px;
       font-weight: 600;
       color: var(--hint);
       border-radius: 9px;
       cursor: pointer;
-      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: all 0.2s;
       user-select: none;
-    }
-
-    .week-btn:active {
-      transform: scale(0.96);
     }
 
     .week-btn.active {
@@ -188,7 +193,7 @@
       box-shadow: 0 0 14px var(--gold-glow);
     }
 
-    /* Сетка 7 дней недели */
+    /* СЕТКА ДНЕЙ */
     .days-grid {
       display: grid;
       grid-template-columns: repeat(7, 1fr);
@@ -203,13 +208,11 @@
       padding: 9px 2px;
       text-align: center;
       cursor: pointer;
-      transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.2s, box-shadow 0.2s;
+      transition: transform 0.15s, background 0.2s, box-shadow 0.2s;
       user-select: none;
     }
 
-    .day-cell:active {
-      transform: scale(0.91);
-    }
+    .day-cell:active { transform: scale(0.91); }
 
     .day-cell .day-name {
       font-size: 11px;
@@ -228,16 +231,10 @@
     .day-cell.active {
       background: linear-gradient(145deg, #e76f51, #d45d3e);
       border-color: #f4a261;
-      box-shadow: 0 0 18px var(--accent-glow), 0 2px 8px rgba(0,0,0,0.5);
+      box-shadow: 0 0 18px var(--accent-glow);
     }
 
-    .day-cell.active .day-name {
-      color: rgba(255, 255, 255, 0.9);
-    }
-
-    .day-cell.active .day-num {
-      color: #ffffff;
-    }
+    .day-cell.active .day-name, .day-cell.active .day-num { color: #fff; }
 
     .loader {
       text-align: center;
@@ -246,7 +243,7 @@
       font-size: 14px;
     }
 
-    /* Карточки уроков */
+    /* КАРТОЧКИ УРОКОВ */
     .cards-container {
       display: flex;
       flex-direction: column;
@@ -259,12 +256,17 @@
       border-radius: 14px;
       padding: 14px 16px;
       box-shadow: 0 3px 12px rgba(0, 0, 0, 0.25);
-      animation: cardAppear 0.25s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+      transition: opacity 0.2s, border-color 0.2s;
     }
 
-    @keyframes cardAppear {
-      from { opacity: 0; transform: translateY(6px); }
-      to { opacity: 1; transform: translateY(0); }
+    .card.completed {
+      opacity: 0.55;
+      border-color: #263328;
+    }
+
+    .card.completed .homework-text {
+      text-decoration: line-through;
+      color: var(--hint);
     }
 
     .card-header {
@@ -280,26 +282,77 @@
       color: #ffffff;
     }
 
-    .lesson-date {
-      font-size: 12px;
-      color: var(--gold);
-      background: rgba(244, 162, 97, 0.12);
-      border: 1px solid rgba(244, 162, 97, 0.25);
-      padding: 3px 9px;
+    .badge-group {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .room-badge {
+      font-size: 11px;
+      color: #8be9fd;
+      background: rgba(139, 233, 253, 0.12);
+      border: 1px solid rgba(139, 233, 253, 0.25);
+      padding: 3px 7px;
       border-radius: 8px;
       font-weight: 600;
     }
 
-    .homework-block {
+    .lesson-date {
+      font-size: 11px;
+      color: var(--gold);
+      background: rgba(244, 162, 97, 0.12);
+      border: 1px solid rgba(244, 162, 97, 0.25);
+      padding: 3px 8px;
+      border-radius: 8px;
+      font-weight: 600;
+    }
+
+    .homework-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
       margin-top: 6px;
     }
+
+    .custom-check {
+      margin-top: 3px;
+      width: 18px;
+      height: 18px;
+      border: 2px solid var(--hint);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: all 0.2s;
+    }
+
+    .card.completed .custom-check {
+      background: var(--green);
+      border-color: var(--green);
+    }
+
+    .custom-check::after {
+      content: '✓';
+      color: #fff;
+      font-size: 12px;
+      display: none;
+    }
+
+    .card.completed .custom-check::after {
+      display: block;
+    }
+
+    .homework-content { flex: 1; }
 
     .homework-title {
       font-size: 11px;
       color: var(--hint);
       text-transform: uppercase;
       letter-spacing: 0.5px;
-      margin-bottom: 3px;
+      margin-bottom: 2px;
     }
 
     .homework-text {
@@ -328,44 +381,46 @@
       border-radius: 14px;
     }
 
-    /* МОДАЛЬНОЕ ОКНО ОБЪЯВЛЕНИЙ */
+    /* МОДАЛЬНЫЕ ОКНА ПО ЦЕНТРУ */
     .modal-overlay {
       position: fixed;
       top: 0;
       left: 0;
       width: 100vw;
       height: 100vh;
-      background: rgba(0, 0, 0, 0.7);
-      backdrop-filter: blur(6px);
-      display: none;
-      align-items: flex-end;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(8px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
       z-index: 1000;
       opacity: 0;
+      pointer-events: none;
       transition: opacity 0.25s ease;
+      padding: 20px;
     }
 
     .modal-overlay.open {
-      display: flex;
       opacity: 1;
+      pointer-events: auto;
     }
 
     .modal-sheet {
-      background: #181416;
-      border-top: 1px solid #3c3033;
-      border-radius: 20px 20px 0 0;
+      background: #191417;
+      border: 1px solid #3c3033;
+      border-radius: 20px;
       width: 100%;
+      max-width: 420px;
       max-height: 80vh;
-      padding: 20px 16px 32px 16px;
+      padding: 20px 18px;
       display: flex;
       flex-direction: column;
-      box-shadow: 0 -4px 24px rgba(0,0,0,0.6);
-      transform: translateY(100%);
-      transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.8), 0 0 20px rgba(231, 111, 81, 0.15);
+      transform: scale(0.92);
+      transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
 
-    .modal-overlay.open .modal-sheet {
-      transform: translateY(0);
-    }
+    .modal-overlay.open .modal-sheet { transform: scale(1); }
 
     .modal-header {
       display: flex;
@@ -376,44 +431,68 @@
 
     .modal-header h3 {
       margin: 0;
-      font-size: 19px;
+      font-size: 18px;
       color: #fff;
-      display: flex;
-      align-items: center;
-      gap: 8px;
     }
 
     .close-btn {
       background: #2b2225;
-      border: none;
+      border: 1px solid var(--card-border);
       color: var(--hint);
-      font-size: 16px;
       width: 32px;
       height: 32px;
       border-radius: 50%;
       cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
     }
 
-    .close-btn:active {
-      transform: scale(0.9);
-    }
-
-    .announcements-list {
-      overflow-y: auto;
+    /* Форма отсутствия */
+    .form-group {
+      margin-bottom: 12px;
       display: flex;
       flex-direction: column;
-      gap: 12px;
-      padding-right: 2px;
+      gap: 6px;
     }
 
+    .form-group label {
+      font-size: 12px;
+      color: var(--hint);
+      font-weight: 600;
+    }
+
+    .form-input {
+      background: #221c1f;
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 10px 12px;
+      color: #fff;
+      font-size: 14px;
+      outline: none;
+    }
+
+    .form-input:focus {
+      border-color: var(--gold);
+    }
+
+    .submit-btn {
+      background: linear-gradient(145deg, #e76f51, #d45d3e);
+      border: none;
+      color: #fff;
+      font-weight: 700;
+      padding: 12px;
+      border-radius: 12px;
+      cursor: pointer;
+      margin-top: 8px;
+      box-shadow: 0 0 14px var(--accent-glow);
+    }
+
+    .submit-btn:active { transform: scale(0.97); }
+
     .news-card {
-      background: #211b1e;
+      background: #221c1f;
       border: 1px solid var(--card-border);
       border-radius: 12px;
       padding: 14px;
+      margin-bottom: 10px;
     }
 
     .news-date {
@@ -421,8 +500,6 @@
       color: var(--gold);
       font-weight: 700;
       margin-bottom: 6px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
     }
 
     .news-text {
@@ -435,14 +512,12 @@
 </head>
 <body>
 
-  <!-- Контейнер с медленно падающими листьями -->
+  <!-- Падающие листики -->
   <div class="leaves-container">
     <div class="leaf">🍁</div>
     <div class="leaf">🍂</div>
     <div class="leaf">🍁</div>
     <div class="leaf">🍃</div>
-    <div class="leaf">🍂</div>
-    <div class="leaf">🍁</div>
     <div class="leaf">🍂</div>
   </div>
 
@@ -452,10 +527,23 @@
       <span style="font-size: 18px;">🍁</span>
     </div>
     
-    <div class="news-trigger-btn" onclick="openAnnouncements()" title="Объявления">
-      📢
-      <div id="news-badge" class="news-badge">0</div>
+    <div class="top-actions">
+      <!-- Кнопка "Не буду в школе" -->
+      <div class="icon-btn" onclick="openAbsenceModal()" title="Отметиться об отсутствии">
+        📝
+      </div>
+      <!-- Кнопка объявлений -->
+      <div class="icon-btn" onclick="openAnnouncements()" title="Объявления">
+        📢
+        <div id="news-badge" class="news-badge">0</div>
+      </div>
     </div>
+  </div>
+
+  <!-- Виджет каникул -->
+  <div class="vacation-banner">
+    <span>❄️ До зимних каникул:</span>
+    <span id="vacation-countdown" class="vacation-days">считаем...</span>
   </div>
 
   <div class="week-segmented">
@@ -469,31 +557,77 @@
 
   <div id="cards-container" class="cards-container"></div>
 
-  <!-- Модальное окно объявлений -->
+  <!-- МОДАЛКА ОБЪЯВЛЕНИЙ -->
   <div id="modal-overlay" class="modal-overlay" onclick="closeAnnouncements(event)">
     <div class="modal-sheet" onclick="event.stopPropagation()">
       <div class="modal-header">
         <h3>📢 Объявления</h3>
         <button class="close-btn" onclick="closeAnnouncements()">✕</button>
       </div>
-      <div id="announcements-list" class="announcements-list"></div>
+      <div id="announcements-list" style="overflow-y:auto; max-height: 60vh;"></div>
+    </div>
+  </div>
+
+  <!-- МОДАЛКА ОТМЕТКИ ОБ ОТСУТСТВИИ -->
+  <div id="absence-overlay" class="modal-overlay" onclick="closeAbsenceModal(event)">
+    <div class="modal-sheet" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <h3>📝 Отметиться об отсутствии</h3>
+        <button class="close-btn" onclick="closeAbsenceModal()">✕</button>
+      </div>
+      <form id="absence-form" onsubmit="submitAbsence(event)">
+        <div class="form-group">
+          <label>Фамилия и Имя</label>
+          <input type="text" id="abs-name" class="form-input" placeholder="Иванов Иван" required>
+        </div>
+        <div class="form-group">
+          <label>Когда не будет в школе?</label>
+          <input type="text" id="abs-date" class="form-input" placeholder="Сегодня / 10 ноября" required>
+        </div>
+        <div class="form-group">
+          <label>Причина</label>
+          <input type="text" id="abs-reason" class="form-input" placeholder="Болею / по семейным..." required>
+        </div>
+        <button type="submit" id="abs-submit" class="submit-btn">Отправить старосте</button>
+      </form>
     </div>
   </div>
 
   <script>
+    let tgUser = null;
     if (window.Telegram && window.Telegram.WebApp) {
       window.Telegram.WebApp.ready();
       window.Telegram.WebApp.expand();
+      tgUser = window.Telegram.WebApp.initDataUnsafe?.user;
     }
 
     // ТВОЙ URL ИЗ GOOGLE APPS SCRIPT:
-    const API_URL = 'СЮДА_ВСТАВЬ_ТВОЙ_APPS_SCRIPT_URL';
+    const API_URL = 'https://script.google.com/macros/s/AKfycbzoRZ_Fd9Yv2FJq79lpF4HPg-NETJm4gSCqLVxU7_6pp2CHNON2A09U1X0eYRE4cyQ5/exec';
+
+    // ДАТА НАЧАЛА ЗИМНИХ КАНИКУЛ (Год, Месяц - 1, День): например, 28 декабря
+    const VACATION_DATE = new Date(2026, 11, 28); 
 
     let allItems = [];
     let allNews = [];
     let twoWeeks = [];
     let currentWeekIndex = 0;
     let selectedDateInfo = null;
+
+    // СЧЕТЧИК КАНИКУЛ
+    function updateVacationCountdown() {
+      const today = new Date();
+      today.setHours(0,0,0,0);
+      const diffTime = VACATION_DATE - today;
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      const counterEl = document.getElementById('vacation-countdown');
+      if (diffDays > 0) {
+        counterEl.innerText = `${diffDays} дн.`;
+      } else if (diffDays === 0) {
+        counterEl.innerText = `Ура, уже сегодня! 🎉`;
+      } else {
+        counterEl.innerText = `Каникулы идут! ⛷️`;
+      }
+    }
 
     function generate14Days() {
       const now = new Date();
@@ -545,6 +679,7 @@
         }
 
         updateNewsBadge();
+        updateVacationCountdown();
 
         twoWeeks = generate14Days();
 
@@ -605,6 +740,55 @@
       document.getElementById('modal-overlay').classList.remove('open');
     }
 
+    // ОТМЕТКА ОБ ОТСУТСТВИИ
+    function openAbsenceModal() {
+      const modal = document.getElementById('absence-overlay');
+      if (tgUser && !document.getElementById('abs-name').value) {
+        const fullName = [tgUser.first_name, tgUser.last_name].filter(Boolean).join(' ');
+        document.getElementById('abs-name').value = fullName || tgUser.username || '';
+      }
+      modal.classList.add('open');
+    }
+
+    function closeAbsenceModal(e) {
+      if (e && e.target !== e.currentTarget && !e.target.classList.contains('close-btn')) return;
+      document.getElementById('absence-overlay').classList.remove('open');
+    }
+
+    async function submitAbsence(e) {
+      e.preventDefault();
+      const btn = document.getElementById('abs-submit');
+      btn.innerText = 'Отправка...';
+      btn.disabled = true;
+
+      const payload = {
+        name: document.getElementById('abs-name').value,
+        date: document.getElementById('abs-date').value,
+        reason: document.getElementById('abs-reason').value
+      };
+
+      try {
+        await fetch(API_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        btn.innerText = 'Успешно отправлено! ✓';
+        setTimeout(() => {
+          closeAbsenceModal();
+          btn.innerText = 'Отправить старосте';
+          btn.disabled = false;
+          document.getElementById('absence-form').reset();
+        }, 1200);
+      } catch (err) {
+        alert('Ошибка при отправке. Попробуй позже.');
+        btn.innerText = 'Отправить старосте';
+        btn.disabled = false;
+      }
+    }
+
     function switchWeek(weekIndex) {
       currentWeekIndex = weekIndex;
       updateWeekButtons();
@@ -645,6 +829,18 @@
       });
     }
 
+    // ПЕРЕКЛЮЧЕНИЕ СТАТУСА ДЗ ("СДЕЛАНО")
+    function toggleHomework(lessonKey, cardEl) {
+      const isDone = localStorage.getItem(lessonKey) === 'true';
+      if (isDone) {
+        localStorage.removeItem(lessonKey);
+        cardEl.classList.remove('completed');
+      } else {
+        localStorage.setItem(lessonKey, 'true');
+        cardEl.classList.add('completed');
+      }
+    }
+
     function renderLessons() {
       const container = document.getElementById('cards-container');
       container.innerHTML = '';
@@ -675,23 +871,34 @@
         return;
       }
 
-      dayLessons.forEach(item => {
+      dayLessons.forEach((item, idx) => {
         const card = document.createElement('div');
-        card.className = 'card';
-
         const subject = item['Предмет'] || item['предмет'] || item['Subject'] || 'Урок';
         const homework = item['Задание'] || item['задание'] || item['Homework'] || 'Нет задания';
-        const deadline = item['Дедлайн'] || item['дедлайн'] || item['Срок сдачи'] || item['Срок сдачи:'] || item['Deadline'] || '';
+        const deadline = item['Дедлайн'] || item['дедлайн'] || item['Срок сдачи'] || item['Deadline'] || '';
+        const room = item['Кабинет'] || item['кабинет'] || item['Каб'] || item['Room'] || '';
         const lessonDate = item['Дата'] || item['дата'] || textDateVariant;
+
+        // Уникальный ключ для сохранения галочки ДЗ в телефоне
+        const lessonKey = `hw_${lessonDate}_${subject}_${idx}`;
+        const isDone = localStorage.getItem(lessonKey) === 'true';
+
+        card.className = `card ${isDone ? 'completed' : ''}`;
 
         card.innerHTML = `
           <div class="card-header">
             <span class="subject">${subject}</span>
-            <span class="lesson-date">${lessonDate}</span>
+            <div class="badge-group">
+              ${room ? `<span class="room-badge">🚪 ${room}</span>` : ''}
+              <span class="lesson-date">${lessonDate}</span>
+            </div>
           </div>
-          <div class="homework-block">
-            <div class="homework-title">Домашнее задание:</div>
-            <div class="homework-text">${homework}</div>
+          <div class="homework-row">
+            <div class="custom-check" onclick="toggleHomework('${lessonKey}', this.closest('.card'))" title="Отметить как сделанное"></div>
+            <div class="homework-content" onclick="toggleHomework('${lessonKey}', this.closest('.card'))">
+              <div class="homework-title">Домашнее задание:</div>
+              <div class="homework-text">${homework}</div>
+            </div>
           </div>
           ${deadline ? `
             <div class="deadline-row">
