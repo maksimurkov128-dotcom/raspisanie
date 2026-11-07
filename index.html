@@ -75,7 +75,7 @@
     .leaf:nth-child(4) { left: 65%; font-size: 22px; animation-duration: 16s, 4.5s; animation-delay: 1s; opacity: 0.3; }
     .leaf:nth-child(5) { left: 85%; font-size: 19px; animation-duration: 15s, 4s; animation-delay: 4s; }
 
-    .header-top, .vacation-banner, .week-segmented, .days-grid, #cards-container, #loader {
+    .header-top, .info-banners, .week-segmented, .days-grid, #cards-container, #loader, #duty-banner {
       position: relative;
       z-index: 1;
     }
@@ -143,20 +143,44 @@
       display: none;
     }
 
-    /* БАННЕР КАНИКУЛ */
-    .vacation-banner {
-      background: linear-gradient(90deg, rgba(231, 111, 81, 0.15), rgba(244, 162, 97, 0.1));
-      border: 1px solid rgba(244, 162, 97, 0.25);
-      border-radius: 12px;
-      padding: 10px 14px;
+    /* БАННЕРЫ ВЕРХА (КАНИКУЛЫ И ДР) */
+    .info-banners {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
       margin-bottom: 14px;
+    }
+
+    .banner-pill {
+      border-radius: 12px;
+      padding: 9px 12px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       font-size: 13px;
     }
 
-    .vacation-days {
+    .vacation-banner {
+      background: linear-gradient(90deg, rgba(231, 111, 81, 0.15), rgba(244, 162, 97, 0.1));
+      border: 1px solid rgba(244, 162, 97, 0.25);
+    }
+
+    .bday-banner {
+      background: linear-gradient(90deg, rgba(244, 162, 97, 0.18), rgba(231, 111, 81, 0.12));
+      border: 1px solid rgba(244, 162, 97, 0.35);
+      color: #ffeedb;
+      display: none;
+    }
+
+    .bday-banner.today-bday {
+      background: linear-gradient(135deg, #e76f51, #d45d3e);
+      border-color: #f4a261;
+      color: #fff;
+      box-shadow: 0 0 16px var(--accent-glow);
+      font-weight: 600;
+    }
+
+    .gold-text {
       font-weight: 700;
       color: var(--gold);
       text-shadow: 0 0 10px var(--gold-glow);
@@ -198,7 +222,7 @@
       display: grid;
       grid-template-columns: repeat(7, 1fr);
       gap: 6px;
-      margin-bottom: 18px;
+      margin-bottom: 14px;
     }
 
     .day-cell {
@@ -235,6 +259,25 @@
     }
 
     .day-cell.active .day-name, .day-cell.active .day-num { color: #fff; }
+
+    /* БАННЕР ДЕЖУРСТВА */
+    .duty-card {
+      background: #1c181a;
+      border: 1px dashed rgba(244, 162, 97, 0.3);
+      border-radius: 12px;
+      padding: 8px 12px;
+      font-size: 13px;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #ebdcd5;
+    }
+
+    .duty-card span.names {
+      font-weight: 700;
+      color: var(--gold);
+    }
 
     .loader {
       text-align: center;
@@ -341,9 +384,7 @@
       display: none;
     }
 
-    .card.completed .custom-check::after {
-      display: block;
-    }
+    .card.completed .custom-check::after { display: block; }
 
     .homework-content { flex: 1; }
 
@@ -445,7 +486,6 @@
       cursor: pointer;
     }
 
-    /* Форма отсутствия */
     .form-group {
       margin-bottom: 12px;
       display: flex;
@@ -469,9 +509,7 @@
       outline: none;
     }
 
-    .form-input:focus {
-      border-color: var(--gold);
-    }
+    .form-input:focus { border-color: var(--gold); }
 
     .submit-btn {
       background: linear-gradient(145deg, #e76f51, #d45d3e);
@@ -512,7 +550,6 @@
 </head>
 <body>
 
-  <!-- Падающие листики -->
   <div class="leaves-container">
     <div class="leaf">🍁</div>
     <div class="leaf">🍂</div>
@@ -528,11 +565,9 @@
     </div>
     
     <div class="top-actions">
-      <!-- Кнопка "Не буду в школе" -->
       <div class="icon-btn" onclick="openAbsenceModal()" title="Отметиться об отсутствии">
         📝
       </div>
-      <!-- Кнопка объявлений -->
       <div class="icon-btn" onclick="openAnnouncements()" title="Объявления">
         📢
         <div id="news-badge" class="news-badge">0</div>
@@ -540,10 +575,17 @@
     </div>
   </div>
 
-  <!-- Виджет каникул -->
-  <div class="vacation-banner">
-    <span>❄️ До зимних каникул:</span>
-    <span id="vacation-countdown" class="vacation-days">считаем...</span>
+  <!-- Верхние баннеры -->
+  <div class="info-banners">
+    <div class="banner-pill vacation-banner">
+      <span>❄️ До зимних каникул:</span>
+      <span id="vacation-countdown" class="gold-text">считаем...</span>
+    </div>
+
+    <!-- Баннер Дня Рождения -->
+    <div id="bday-banner" class="banner-pill bday-banner">
+      <span id="bday-text">🎂 Дни рождения...</span>
+    </div>
   </div>
 
   <div class="week-segmented">
@@ -552,6 +594,12 @@
   </div>
 
   <div id="days-grid" class="days-grid"></div>
+
+  <!-- Плашка дежурных выбранного дня -->
+  <div id="duty-banner" class="duty-card" style="display: none;">
+    <span>🧹 Дежурные:</span>
+    <span id="duty-names" class="names">—</span>
+  </div>
 
   <div id="loader" class="loader">Синхронизация с таблицей...</div>
 
@@ -568,7 +616,7 @@
     </div>
   </div>
 
-  <!-- МОДАЛКА ОТМЕТКИ ОБ ОТСУТСТВИИ -->
+  <!-- МОДАЛКА ОТСУТСТВИЯ -->
   <div id="absence-overlay" class="modal-overlay" onclick="closeAbsenceModal(event)">
     <div class="modal-sheet" onclick="event.stopPropagation()">
       <div class="modal-header">
@@ -609,11 +657,12 @@
 
     let allItems = [];
     let allNews = [];
+    let allDuty = [];
+    let allBirthdays = [];
     let twoWeeks = [];
     let currentWeekIndex = 0;
     let selectedDateInfo = null;
 
-    // СЧЕТЧИК КАНИКУЛ
     function updateVacationCountdown() {
       const today = new Date();
       today.setHours(0,0,0,0);
@@ -626,6 +675,40 @@
         counterEl.innerText = `Ура, уже сегодня! 🎉`;
       } else {
         counterEl.innerText = `Каникулы идут! ⛷️`;
+      }
+    }
+
+    function checkBirthdays() {
+      const banner = document.getElementById('bday-banner');
+      const textEl = document.getElementById('bday-text');
+      if (!allBirthdays || allBirthdays.length === 0) {
+        banner.style.display = 'none';
+        return;
+      }
+
+      const now = new Date();
+      const currentDay = now.getDate();
+      const currentMonth = now.getMonth() + 1;
+      const todayStr = `${String(currentDay).padStart(2,'0')}.${String(currentMonth).padStart(2,'0')}`;
+
+      // Ищем, есть ли именинник сегодня
+      const todayBday = allBirthdays.find(b => {
+        const rawDate = String(b['Дата'] || b['дата'] || '').trim();
+        return rawDate.startsWith(todayStr) || rawDate.startsWith(`${currentDay}.${currentMonth}`);
+      });
+
+      banner.style.display = 'flex';
+      if (todayBday) {
+        banner.className = 'banner-pill bday-banner today-bday';
+        const name = todayBday['Имя'] || todayBday['ФИО'] || 'Одноклассника';
+        textEl.innerHTML = `🎉 Сегодня день рождения у: <b>${name}</b>! 🎂🎈`;
+      } else {
+        banner.className = 'banner-pill bday-banner';
+        // Показываем первую ближайшую запись из таблицы
+        const first = allBirthdays[0];
+        const date = first['Дата'] || first['дата'] || '';
+        const name = first['Имя'] || first['ФИО'] || '';
+        textEl.innerHTML = `🎂 Ближайший ДР: <b>${name}</b> (${date})`;
       }
     }
 
@@ -673,13 +756,18 @@
         if (Array.isArray(data)) {
           allItems = data;
           allNews = [];
+          allDuty = [];
+          allBirthdays = [];
         } else {
           allItems = data.schedule || [];
           allNews = data.announcements || [];
+          allDuty = data.duty || [];
+          allBirthdays = data.birthdays || [];
         }
 
         updateNewsBadge();
         updateVacationCountdown();
+        checkBirthdays();
 
         twoWeeks = generate14Days();
 
@@ -740,7 +828,6 @@
       document.getElementById('modal-overlay').classList.remove('open');
     }
 
-    // ОТМЕТКА ОБ ОТСУТСТВИИ
     function openAbsenceModal() {
       const modal = document.getElementById('absence-overlay');
       if (tgUser && !document.getElementById('abs-name').value) {
@@ -829,7 +916,6 @@
       });
     }
 
-    // ПЕРЕКЛЮЧЕНИЕ СТАТУСА ДЗ ("СДЕЛАНО")
     function toggleHomework(lessonKey, cardEl) {
       const isDone = localStorage.getItem(lessonKey) === 'true';
       if (isDone) {
@@ -854,6 +940,22 @@
       const monthWord = monthsRu[selectedDateInfo.dateObj.getMonth()];
       const textDateVariant = `${dayNum} ${monthWord}`.toLowerCase();
 
+      // Обновляем плашку дежурства на выбранный день
+      const dutyBanner = document.getElementById('duty-banner');
+      const dutyNamesEl = document.getElementById('duty-names');
+      const currentDuty = allDuty.find(d => {
+        const rawDate = String(d['Дата'] || d['дата'] || '').trim().toLowerCase();
+        return rawDate === textDateVariant || rawDate.startsWith(selectedDateInfo.padded) || rawDate.startsWith(selectedDateInfo.unpadded);
+      });
+
+      if (currentDuty) {
+        dutyBanner.style.display = 'flex';
+        dutyNamesEl.innerText = currentDuty['Дежурные'] || currentDuty['дежурные'] || 'Не указаны';
+      } else {
+        dutyBanner.style.display = 'none';
+      }
+
+      // Фильтруем уроки
       const dayLessons = allItems.filter(item => {
         const rawDate = String(
           item['Дата'] || item['дата'] || item['Date'] || item['date'] || ''
@@ -879,7 +981,6 @@
         const room = item['Кабинет'] || item['кабинет'] || item['Каб'] || item['Room'] || '';
         const lessonDate = item['Дата'] || item['дата'] || textDateVariant;
 
-        // Уникальный ключ для сохранения галочки ДЗ в телефоне
         const lessonKey = `hw_${lessonDate}_${subject}_${idx}`;
         const isDone = localStorage.getItem(lessonKey) === 'true';
 
