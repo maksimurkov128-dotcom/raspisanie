@@ -1,1 +1,16 @@
-
+{
+  "name": "Расписание 8А",
+  "short_name": "Расписание",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#141113",
+  "theme_color": "#141113",
+  "icons": [
+    {
+      "src": "icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
