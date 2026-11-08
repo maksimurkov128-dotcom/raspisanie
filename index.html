@@ -6,12 +6,12 @@
   <title>Школьное расписание</title>
   
   <!-- Иконка и PWA режим для главного экрана -->
-  <link rel="icon" type="image/png" href="icon.png">
-  <link rel="apple-touch-icon" href="icon.png">
+  <link rel="icon" type="image/png" href="./icon.png">
+  <link rel="apple-touch-icon" href="./icon.png">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Расписание">
-  <link rel="manifest" href="manifest.json">
+  <link rel="manifest" href="./manifest.json">
   <meta name="theme-color" content="#141113">
 
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
@@ -174,7 +174,7 @@
       display: none;
     }
 
-    /* БАННЕРЫ */
+    /* БАННЕРЫ ВЕРХА */
     .info-banners {
       display: flex;
       flex-direction: column;
@@ -189,6 +189,12 @@
       align-items: center;
       justify-content: space-between;
       font-size: 13px;
+    }
+
+    .lesson-timer-banner {
+      background: linear-gradient(90deg, rgba(42, 157, 143, 0.15), rgba(244, 162, 97, 0.12));
+      border: 1px solid rgba(42, 157, 143, 0.35);
+      color: #e8f7f5;
     }
 
     .vacation-banner {
@@ -339,7 +345,11 @@
       transform: scale(0.985);
     }
 
-    /* ВЫДЕЛЕНИЕ ЕСЛИ ЕСТЬ ЗАМЕТКА */
+    .card.now-active {
+      border: 1px solid var(--green);
+      box-shadow: 0 0 16px rgba(42, 157, 143, 0.3);
+    }
+
     .card.has-note {
       border: 1px solid var(--gold);
       box-shadow: 0 0 14px rgba(244, 162, 97, 0.25);
@@ -358,8 +368,39 @@
     .card-header {
       display: flex;
       justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 6px;
+    }
+
+    .subject-box {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .lesson-time-sub {
+      font-size: 11px;
+      color: var(--hint);
+      font-weight: 600;
+      display: flex;
       align-items: center;
-      margin-bottom: 8px;
+      gap: 5px;
+    }
+
+    .now-indicator-pill {
+      font-size: 10px;
+      background: rgba(42, 157, 143, 0.2);
+      border: 1px solid rgba(42, 157, 143, 0.4);
+      color: #64dfdf;
+      padding: 1px 6px;
+      border-radius: 6px;
+      font-weight: 700;
+      animation: pulseAnim 2s infinite;
+    }
+
+    @keyframes pulseAnim {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.55; }
     }
 
     .subject {
@@ -388,16 +429,6 @@
       background: rgba(139, 233, 253, 0.12);
       border: 1px solid rgba(139, 233, 253, 0.25);
       padding: 3px 7px;
-      border-radius: 8px;
-      font-weight: 600;
-    }
-
-    .lesson-date {
-      font-size: 11px;
-      color: var(--gold);
-      background: rgba(244, 162, 97, 0.12);
-      border: 1px solid rgba(244, 162, 97, 0.25);
-      padding: 3px 8px;
       border-radius: 8px;
       font-weight: 600;
     }
@@ -549,7 +580,7 @@
       cursor: pointer;
     }
 
-    /* ПОДРОБНОСТИ УРОКА */
+    /* ДЕТАЛИ УРОКА */
     .detail-item {
       background: #221c1f;
       border: 1px solid var(--card-border);
@@ -602,9 +633,7 @@
       margin-top: 6px;
     }
 
-    .note-textarea:focus {
-      border-color: var(--gold);
-    }
+    .note-textarea:focus { border-color: var(--gold); }
 
     /* ВЫБОР КЛАССА */
     .picker-label {
@@ -708,7 +737,6 @@
 </head>
 <body>
 
-  <!-- Падающие листики -->
   <div class="leaves-container">
     <div class="leaf">🍁</div>
     <div class="leaf">🍂</div>
@@ -738,6 +766,11 @@
 
   <!-- Верхние баннеры -->
   <div class="info-banners">
+    <!-- ЖИВОЙ ТАЙМЕР ЗВОНКОВ -->
+    <div class="banner-pill lesson-timer-banner">
+      <span id="timer-status">🔔 Звонки: загрузка...</span>
+    </div>
+
     <div class="banner-pill vacation-banner">
       <span>❄️ До зимних каникул:</span>
       <span id="vacation-countdown" class="gold-text">считаем...</span>
@@ -766,7 +799,7 @@
 
   <div id="cards-container" class="cards-container"></div>
 
-  <!-- МОДАЛКА ПОДРОБНОСТЕЙ УРОКА -->
+  <!-- МОДАЛКА ДЕТАЛЕЙ УРОКА -->
   <div id="lesson-modal" class="modal-overlay" onclick="closeLessonModal(event)">
     <div class="modal-sheet" onclick="event.stopPropagation()">
       <div class="modal-header">
@@ -775,6 +808,11 @@
       </div>
 
       <div style="overflow-y: auto; max-height: 65vh; padding-right: 2px;">
+        <div class="detail-item">
+          <div class="detail-label">⏰ Время урока</div>
+          <div id="modal-time" class="detail-val">—</div>
+        </div>
+
         <div class="detail-item">
           <div class="detail-label">📖 Тема урока</div>
           <div id="modal-topic" class="detail-val">Не указана</div>
@@ -796,7 +834,6 @@
           <div id="modal-homework" class="detail-val">—</div>
         </div>
 
-        <!-- БЛОК ЛИЧНЫХ ЗАМЕТОК -->
         <div class="detail-item">
           <div class="detail-label">📌 Моя личная заметка к уроку</div>
           <textarea id="modal-note" class="note-textarea" placeholder="Например: взять циркуль, сдать тетрадь..."></textarea>
@@ -868,6 +905,18 @@
     }
 
     const API_URL = 'https://script.google.com/macros/s/AKfycbzoRZ_Fd9Yv2FJq79lpF4HPg-NETJm4gSCqLVxU7_6pp2CHNON2A09U1X0eYRE4cyQ5/exec';
+
+    // РАСПИСАНИЕ ЗВОНКОВ ШКОЛЫ
+    const BELL_SCHEDULE = [
+      { num: 1, start: '08:30', end: '09:10', startM: 8 * 60 + 30, endM: 9 * 60 + 10 },
+      { num: 2, start: '09:20', end: '10:00', startM: 9 * 60 + 20, endM: 10 * 60 + 0 },
+      { num: 3, start: '10:15', end: '10:55', startM: 10 * 60 + 15, endM: 10 * 60 + 55 },
+      { num: 4, start: '11:10', end: '11:50', startM: 11 * 60 + 10, endM: 11 * 60 + 50 },
+      { num: 5, start: '12:00', end: '12:40', startM: 12 * 60 + 0,  endM: 12 * 60 + 40 },
+      { num: 6, start: '12:55', end: '13:35', startM: 12 * 60 + 55, endM: 13 * 60 + 35 },
+      { num: 7, start: '13:50', end: '14:30', startM: 13 * 60 + 50, endM: 14 * 60 + 30 },
+      { num: 8, start: '14:40', end: '15:20', startM: 14 * 60 + 40, endM: 15 * 60 + 20 }
+    ];
 
     const SCHOOL_CLASSES = {
       '1':  ['А', 'Б', 'В', 'Г'],
@@ -963,6 +1012,7 @@
       document.getElementById('class-overlay').classList.remove('open');
       updateNewsBadge();
       checkBirthdays();
+      updateBellTimer();
       renderLessons();
     }
 
@@ -975,6 +1025,56 @@
 
     function getFilteredNews() {
       return allNews.filter(item => matchesCurrentClass(item, true));
+    }
+
+    /* ЖИВОЙ СТАТУС ЗВОНКОВ */
+    function updateBellTimer() {
+      const timerEl = document.getElementById('timer-status');
+      const now = new Date();
+      const dayOfWeek = now.getDay();
+
+      if (dayOfWeek === 0 || dayOfWeek === 6) {
+        timerEl.innerHTML = `🎉 Выходной день • Отдыхаем!`;
+        return;
+      }
+
+      const currentMinutes = now.getHours() * 60 + now.getMinutes();
+
+      // До первого урока
+      if (currentMinutes < BELL_SCHEDULE[0].startM) {
+        const wait = BELL_SCHEDULE[0].startM - currentMinutes;
+        timerEl.innerHTML = `☕ Уроки еще не начались (до 1-го урока: <b>${wait} мин</b>)`;
+        return;
+      }
+
+      // После всех уроков
+      const lastBell = BELL_SCHEDULE[BELL_SCHEDULE.length - 1];
+      if (currentMinutes >= lastBell.endM) {
+        timerEl.innerHTML = `✨ Учебный день завершен! Отличного вечера`;
+        return;
+      }
+
+      // Проверяем: идет урок или перемена
+      for (let i = 0; i < BELL_SCHEDULE.length; i++) {
+        const bell = BELL_SCHEDULE[i];
+
+        // Идет урок
+        if (currentMinutes >= bell.startM && currentMinutes < bell.endM) {
+          const left = bell.endM - currentMinutes;
+          timerEl.innerHTML = `🔔 <b>${bell.num}-й урок</b> • До звонка с урока: <b>${left} мин</b>`;
+          return;
+        }
+
+        // Перемена между текущим и следующим уроком (показывается только после первого)
+        if (i < BELL_SCHEDULE.length - 1) {
+          const nextBell = BELL_SCHEDULE[i + 1];
+          if (currentMinutes >= bell.endM && currentMinutes < nextBell.startM) {
+            const left = nextBell.startM - currentMinutes;
+            timerEl.innerHTML = `☕ <b>Перемена</b> • До начала ${nextBell.num}-го урока: <b>${left} мин</b>`;
+            return;
+          }
+        }
+      }
     }
 
     function updateVacationCountdown() {
@@ -1087,6 +1187,10 @@
         updateNewsBadge();
         updateVacationCountdown();
         checkBirthdays();
+        updateBellTimer();
+
+        // Запуск живого таймера звонков раз в 30 секунд
+        setInterval(updateBellTimer, 30000);
 
         twoWeeks = generate14Days();
 
@@ -1200,7 +1304,7 @@
     }
 
     /* МОДАЛКА ДЕТАЛЕЙ УРОКА И ЗАМЕТОК */
-    function openLessonDetails(item, lessonKey) {
+    function openLessonDetails(item, lessonKey, timeString) {
       currentEditingLessonKey = lessonKey;
 
       const subject = item['Предмет'] || item['предмет'] || 'Урок';
@@ -1210,12 +1314,12 @@
       const homework = item['Задание'] || item['задание'] || 'Нет задания';
 
       document.getElementById('modal-subject-title').innerText = subject;
+      document.getElementById('modal-time').innerText = timeString;
       document.getElementById('modal-topic').innerText = topic;
       document.getElementById('modal-room').innerText = room;
       document.getElementById('modal-teacher').innerText = teacher;
       document.getElementById('modal-homework').innerText = homework;
 
-      // Проверка на ссылку или никнейм учителя (@nick или https://...)
       const linkBox = document.getElementById('modal-teacher-link-box');
       linkBox.innerHTML = '';
       const matchUsername = teacher.match(/@([a-zA-Z0-9_]+)/);
@@ -1227,7 +1331,6 @@
         linkBox.innerHTML = `<a href="https://t.me/${matchUsername[1]}" target="_blank" class="teacher-link">💬 Написать в Telegram (@${matchUsername[1]})</a>`;
       }
 
-      // Загружаем сохраненную заметку
       const savedNote = localStorage.getItem(`note_${lessonKey}`) || '';
       document.getElementById('modal-note').value = savedNote;
 
@@ -1248,7 +1351,7 @@
         localStorage.removeItem(`note_${currentEditingLessonKey}`);
       }
       closeLessonModal();
-      renderLessons(); // перерисовываем карточки, чтобы появился/исчез значок 📌 и обводка
+      renderLessons();
     }
 
     function switchWeek(weekIndex) {
@@ -1292,7 +1395,7 @@
     }
 
     function toggleHomework(e, lessonKey, cardEl) {
-      e.stopPropagation(); // Чтобы при клике на галочку не всплывало окно подробностей
+      e.stopPropagation();
       const isDone = localStorage.getItem(lessonKey) === 'true';
       if (isDone) {
         localStorage.removeItem(lessonKey);
@@ -1355,6 +1458,10 @@
         return;
       }
 
+      const now = new Date();
+      const isTodaySelected = selectedDateInfo.isToday;
+      const currentMinutes = now.getHours() * 60 + now.getMinutes();
+
       dayLessons.forEach((item, idx) => {
         const card = document.createElement('div');
         const subject = item['Предмет'] || item['предмет'] || item['Subject'] || 'Урок';
@@ -1363,24 +1470,42 @@
         const room = item['Кабинет'] || item['кабинет'] || item['Каб'] || item['Room'] || '';
         const lessonDate = item['Дата'] || item['дата'] || textDateVariant;
 
+        // ВРЕМЯ УРОКА ПО ЗВОНКАМ
+        const bellInfo = BELL_SCHEDULE[idx] || null;
+        let timeString = '';
+        let isNowActive = false;
+
+        if (bellInfo) {
+          timeString = `${idx + 1} урок • ${bellInfo.start} – ${bellInfo.end}`;
+          if (isTodaySelected && currentMinutes >= bellInfo.startM && currentMinutes < bellInfo.endM) {
+            isNowActive = true;
+          }
+        } else {
+          timeString = `${idx + 1} урок`;
+        }
+
         const lessonKey = `hw_${getFullClassName()}_${lessonDate}_${subject}_${idx}`;
         const isDone = localStorage.getItem(lessonKey) === 'true';
         const hasNote = Boolean(localStorage.getItem(`note_${lessonKey}`));
 
-        card.className = `card ${isDone ? 'completed' : ''} ${hasNote ? 'has-note' : ''}`;
+        card.className = `card ${isDone ? 'completed' : ''} ${hasNote ? 'has-note' : ''} ${isNowActive ? 'now-active' : ''}`;
 
-        // Клик по всей карточке открывает подробности
-        card.onclick = () => openLessonDetails(item, lessonKey);
+        card.onclick = () => openLessonDetails(item, lessonKey, timeString);
 
         card.innerHTML = `
           <div class="card-header">
-            <span class="subject">
-              ${subject}
-              ${hasNote ? `<span class="note-indicator" title="Есть личная заметка">📌</span>` : ''}
-            </span>
+            <div class="subject-box">
+              <span class="subject">
+                ${subject}
+                ${hasNote ? `<span class="note-indicator" title="Есть личная заметка">📌</span>` : ''}
+              </span>
+              <div class="lesson-time-sub">
+                <span>⏰ ${timeString}</span>
+                ${isNowActive ? `<span class="now-indicator-pill">Сейчас идет</span>` : ''}
+              </div>
+            </div>
             <div class="badge-group">
               ${room ? `<span class="room-badge">🚪 ${room}</span>` : ''}
-              <span class="lesson-date">${lessonDate}</span>
             </div>
           </div>
           <div class="homework-row">
@@ -1403,4 +1528,4 @@
     loadData();
   </script>
 </body>
-</html>
+    </html>
