@@ -111,7 +111,6 @@
       color: #fff;
     }
 
-    /* Кнопка выбора класса в шапке */
     .class-badge-btn {
       background: linear-gradient(145deg, #2b2123, #1e181a);
       border: 1px solid rgba(244, 162, 97, 0.4);
@@ -175,7 +174,7 @@
       display: none;
     }
 
-    /* БАННЕРЫ ВЕРХА */
+    /* БАННЕРЫ */
     .info-banners {
       display: flex;
       flex-direction: column;
@@ -331,7 +330,19 @@
       border-radius: 14px;
       padding: 14px 16px;
       box-shadow: 0 3px 12px rgba(0, 0, 0, 0.25);
-      transition: opacity 0.2s, border-color 0.2s;
+      transition: opacity 0.2s, border-color 0.2s, transform 0.15s;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .card:active {
+      transform: scale(0.985);
+    }
+
+    /* ВЫДЕЛЕНИЕ ЕСЛИ ЕСТЬ ЗАМЕТКА */
+    .card.has-note {
+      border: 1px solid var(--gold);
+      box-shadow: 0 0 14px rgba(244, 162, 97, 0.25);
     }
 
     .card.completed {
@@ -355,6 +366,14 @@
       font-size: 16px;
       font-weight: 700;
       color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .note-indicator {
+      font-size: 12px;
+      color: var(--gold);
     }
 
     .badge-group {
@@ -455,7 +474,18 @@
       border-radius: 14px;
     }
 
-    /* МОДАЛЬНЫЕ ОКНА ПО ЦЕНТРУ */
+    .weekend-state {
+      text-align: center;
+      padding: 40px 16px;
+      color: var(--gold);
+      font-size: 15px;
+      font-weight: 600;
+      background: linear-gradient(145deg, rgba(244, 162, 97, 0.08), rgba(231, 111, 81, 0.05));
+      border: 1px dashed rgba(244, 162, 97, 0.35);
+      border-radius: 14px;
+    }
+
+    /* МОДАЛЬНЫЕ ОКНА */
     .modal-overlay {
       position: fixed;
       top: 0;
@@ -485,7 +515,7 @@
       border-radius: 20px;
       width: 100%;
       max-width: 420px;
-      max-height: 82vh;
+      max-height: 85vh;
       padding: 20px 18px;
       display: flex;
       flex-direction: column;
@@ -519,7 +549,64 @@
       cursor: pointer;
     }
 
-    /* СЕТКА ВЫБОРА КЛАССА */
+    /* ПОДРОБНОСТИ УРОКА */
+    .detail-item {
+      background: #221c1f;
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 10px;
+    }
+
+    .detail-label {
+      font-size: 11px;
+      color: var(--hint);
+      text-transform: uppercase;
+      margin-bottom: 4px;
+      font-weight: 600;
+    }
+
+    .detail-val {
+      font-size: 14px;
+      color: #fff;
+      line-height: 1.4;
+      white-space: pre-line;
+    }
+
+    .teacher-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: #58a6ff;
+      text-decoration: none;
+      font-weight: 600;
+      margin-top: 4px;
+      background: rgba(88, 166, 255, 0.1);
+      padding: 4px 10px;
+      border-radius: 8px;
+      border: 1px solid rgba(88, 166, 255, 0.25);
+    }
+
+    .note-textarea {
+      width: 100%;
+      height: 70px;
+      background: #141113;
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 8px 10px;
+      color: #fff;
+      font-family: inherit;
+      font-size: 13px;
+      resize: none;
+      outline: none;
+      margin-top: 6px;
+    }
+
+    .note-textarea:focus {
+      border-color: var(--gold);
+    }
+
+    /* ВЫБОР КЛАССА */
     .picker-label {
       font-size: 12px;
       color: var(--hint);
@@ -529,14 +616,7 @@
       font-weight: 600;
     }
 
-    .grades-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 8px;
-      margin-bottom: 18px;
-    }
-
-    .letters-grid {
+    .grades-grid, .letters-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       gap: 8px;
@@ -640,7 +720,6 @@
   <div class="header-top">
     <div class="header-title-box">
       <h2>Расписание</h2>
-      <!-- Кнопка переключения класса -->
       <div id="current-class-btn" class="class-badge-btn" onclick="openClassModal()">
         <span id="current-class-text">8А</span> ▾
       </div>
@@ -677,7 +756,7 @@
 
   <div id="days-grid" class="days-grid"></div>
 
-  <!-- Дежурные выбранного дня -->
+  <!-- Дежурные дня -->
   <div id="duty-banner" class="duty-card" style="display: none;">
     <span>🧹 Дежурные:</span>
     <span id="duty-names" class="names">—</span>
@@ -686,6 +765,46 @@
   <div id="loader" class="loader">Синхронизация с таблицей...</div>
 
   <div id="cards-container" class="cards-container"></div>
+
+  <!-- МОДАЛКА ПОДРОБНОСТЕЙ УРОКА -->
+  <div id="lesson-modal" class="modal-overlay" onclick="closeLessonModal(event)">
+    <div class="modal-sheet" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <h3 id="modal-subject-title">Урок</h3>
+        <button class="close-btn" onclick="closeLessonModal()">✕</button>
+      </div>
+
+      <div style="overflow-y: auto; max-height: 65vh; padding-right: 2px;">
+        <div class="detail-item">
+          <div class="detail-label">📖 Тема урока</div>
+          <div id="modal-topic" class="detail-val">Не указана</div>
+        </div>
+
+        <div class="detail-item">
+          <div class="detail-label">🚪 Кабинет</div>
+          <div id="modal-room" class="detail-val">—</div>
+        </div>
+
+        <div class="detail-item">
+          <div class="detail-label">👩‍🏫 Учитель</div>
+          <div id="modal-teacher" class="detail-val">—</div>
+          <div id="modal-teacher-link-box"></div>
+        </div>
+
+        <div class="detail-item">
+          <div class="detail-label">📚 Домашнее задание</div>
+          <div id="modal-homework" class="detail-val">—</div>
+        </div>
+
+        <!-- БЛОК ЛИЧНЫХ ЗАМЕТОК -->
+        <div class="detail-item">
+          <div class="detail-label">📌 Моя личная заметка к уроку</div>
+          <textarea id="modal-note" class="note-textarea" placeholder="Например: взять циркуль, сдать тетрадь..."></textarea>
+          <button class="submit-btn" style="margin-top: 8px; padding: 8px; width: 100%; font-size: 13px;" onclick="saveLessonNote()">Сохранить заметку</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- МОДАЛКА ВЫБОРА КЛАССА -->
   <div id="class-overlay" class="modal-overlay" onclick="closeClassModal(event)">
@@ -748,15 +867,8 @@
       tgUser = window.Telegram.WebApp.initDataUnsafe?.user;
     }
 
-    // =========================================================
-    // 1. ТВОЙ URL ИЗ GOOGLE APPS SCRIPT:
-    // =========================================================
-    const API_URL = 'https://script.google.com/macros/s/AKfycbzoRZ_Fd9Yv2FJq79lpF4HPg-NETJm4gSCqLVxU7_6pp2CHNON2A09U1X0eYRE4cyQ5/exec';
+    const API_URL = 'СЮДА_ВСТАВЬ_ТВОЙ_APPS_SCRIPT_URL';
 
-    // =========================================================
-    // 2. КОНФИГУРАЦИЯ КЛАССОВ ШКОЛЫ:
-    // Если в какой-то параллели нет буквы 'Г', просто сотри 'Г' из списка!
-    // =========================================================
     const SCHOOL_CLASSES = {
       '1':  ['А', 'Б', 'В', 'Г'],
       '2':  ['А', 'Б', 'В', 'Г'],
@@ -781,11 +893,11 @@
     let currentWeekIndex = 0;
     let selectedDateInfo = null;
 
-    // Текущий выбранный класс (по умолчанию 8А, если еще не выбирали)
     let savedGrade = localStorage.getItem('user_grade') || '8';
     let savedLetter = localStorage.getItem('user_letter') || 'А';
     let tempGrade = savedGrade;
     let tempLetter = savedLetter;
+    let currentEditingLessonKey = null;
 
     function getFullClassName() {
       return `${savedGrade}${savedLetter}`;
@@ -795,7 +907,6 @@
       document.getElementById('current-class-text').innerText = getFullClassName();
     }
 
-    // Логика окна выбора класса
     function openClassModal() {
       tempGrade = savedGrade;
       tempLetter = savedLetter;
@@ -855,10 +966,8 @@
       renderLessons();
     }
 
-    // Проверка: принадлежит ли запись из таблицы выбранному классу
     function matchesCurrentClass(item, allowAll = false) {
       const rawClass = String(item['Класс'] || item['класс'] || item['Class'] || '').trim().toUpperCase();
-      // Если в таблице колонка "Класс" вообще не заполнена:
       if (!rawClass) return true; 
       if (allowAll && (rawClass === 'ВСЕ' || rawClass === 'ОБЩЕЕ')) return true;
       return rawClass === getFullClassName().toUpperCase();
@@ -953,7 +1062,6 @@
 
     async function loadData() {
       updateClassHeader();
-      // Если ученик зашел первый раз — сразу спрашиваем его класс
       if (!localStorage.getItem('has_selected_class')) {
         openClassModal();
       }
@@ -1063,10 +1171,10 @@
       btn.disabled = true;
 
       const payload = {
-        name: document.getElementById('abs-name').value,
-        date: document.getElementById('abs-date').value,
-        reason: document.getElementById('abs-reason').value,
-        className: getFullClassName()
+        className: getFullClassName(),
+        name: document.getElementById('abs-name').value.trim(),
+        date: document.getElementById('abs-date').value.trim(),
+        reason: document.getElementById('abs-reason').value.trim()
       };
 
       try {
@@ -1089,6 +1197,58 @@
         btn.innerText = 'Отправить старосте';
         btn.disabled = false;
       }
+    }
+
+    /* МОДАЛКА ДЕТАЛЕЙ УРОКА И ЗАМЕТОК */
+    function openLessonDetails(item, lessonKey) {
+      currentEditingLessonKey = lessonKey;
+
+      const subject = item['Предмет'] || item['предмет'] || 'Урок';
+      const topic = item['Тема'] || item['тема'] || item['Topic'] || 'Не указана';
+      const room = item['Кабинет'] || item['кабинет'] || 'Не указан';
+      const teacher = item['Учитель'] || item['учитель'] || item['Преподаватель'] || 'Не указан';
+      const homework = item['Задание'] || item['задание'] || 'Нет задания';
+
+      document.getElementById('modal-subject-title').innerText = subject;
+      document.getElementById('modal-topic').innerText = topic;
+      document.getElementById('modal-room').innerText = room;
+      document.getElementById('modal-teacher').innerText = teacher;
+      document.getElementById('modal-homework').innerText = homework;
+
+      // Проверка на ссылку или никнейм учителя (@nick или https://...)
+      const linkBox = document.getElementById('modal-teacher-link-box');
+      linkBox.innerHTML = '';
+      const matchUsername = teacher.match(/@([a-zA-Z0-9_]+)/);
+      const matchHttp = teacher.match(/(https?:\/\/[^\s]+)/);
+
+      if (matchHttp) {
+        linkBox.innerHTML = `<a href="${matchHttp[0]}" target="_blank" class="teacher-link">💬 Написать учителю</a>`;
+      } else if (matchUsername) {
+        linkBox.innerHTML = `<a href="https://t.me/${matchUsername[1]}" target="_blank" class="teacher-link">💬 Написать в Telegram (@${matchUsername[1]})</a>`;
+      }
+
+      // Загружаем сохраненную заметку
+      const savedNote = localStorage.getItem(`note_${lessonKey}`) || '';
+      document.getElementById('modal-note').value = savedNote;
+
+      document.getElementById('lesson-modal').classList.add('open');
+    }
+
+    function closeLessonModal(e) {
+      if (e && e.target !== e.currentTarget && !e.target.classList.contains('close-btn')) return;
+      document.getElementById('lesson-modal').classList.remove('open');
+    }
+
+    function saveLessonNote() {
+      if (!currentEditingLessonKey) return;
+      const noteVal = document.getElementById('modal-note').value.trim();
+      if (noteVal) {
+        localStorage.setItem(`note_${currentEditingLessonKey}`, noteVal);
+      } else {
+        localStorage.removeItem(`note_${currentEditingLessonKey}`);
+      }
+      closeLessonModal();
+      renderLessons(); // перерисовываем карточки, чтобы появился/исчез значок 📌 и обводка
     }
 
     function switchWeek(weekIndex) {
@@ -1131,7 +1291,8 @@
       });
     }
 
-    function toggleHomework(lessonKey, cardEl) {
+    function toggleHomework(e, lessonKey, cardEl) {
+      e.stopPropagation(); // Чтобы при клике на галочку не всплывало окно подробностей
       const isDone = localStorage.getItem(lessonKey) === 'true';
       if (isDone) {
         localStorage.removeItem(lessonKey);
@@ -1155,7 +1316,6 @@
       const monthWord = monthsRu[selectedDateInfo.dateObj.getMonth()];
       const textDateVariant = `${dayNum} ${monthWord}`.toLowerCase();
 
-      // Дежурные выбранного дня и выбранного класса
       const dutyBanner = document.getElementById('duty-banner');
       const dutyNamesEl = document.getElementById('duty-names');
       const currentDuty = allDuty.find(d => {
@@ -1171,7 +1331,6 @@
         dutyBanner.style.display = 'none';
       }
 
-      // Фильтруем уроки по выбранному классу И дате
       const dayLessons = allItems.filter(item => {
         if (!matchesCurrentClass(item, false)) return false;
 
@@ -1187,7 +1346,12 @@
       });
 
       if (dayLessons.length === 0) {
-        container.innerHTML = `<div class="empty-state">Для ${getFullClassName()} на этот день уроков нет ☕🍂</div>`;
+        const dayOfWeek = selectedDateInfo.dateObj.getDay();
+        if (dayOfWeek === 6 || dayOfWeek === 0) {
+          container.innerHTML = `<div class="weekend-state">Выходной! Отдыхаем 🎉🍂</div>`;
+        } else {
+          container.innerHTML = `<div class="empty-state">Для ${getFullClassName()} на этот день уроков нет ☕🍂</div>`;
+        }
         return;
       }
 
@@ -1201,20 +1365,27 @@
 
         const lessonKey = `hw_${getFullClassName()}_${lessonDate}_${subject}_${idx}`;
         const isDone = localStorage.getItem(lessonKey) === 'true';
+        const hasNote = Boolean(localStorage.getItem(`note_${lessonKey}`));
 
-        card.className = `card ${isDone ? 'completed' : ''}`;
+        card.className = `card ${isDone ? 'completed' : ''} ${hasNote ? 'has-note' : ''}`;
+
+        // Клик по всей карточке открывает подробности
+        card.onclick = () => openLessonDetails(item, lessonKey);
 
         card.innerHTML = `
           <div class="card-header">
-            <span class="subject">${subject}</span>
+            <span class="subject">
+              ${subject}
+              ${hasNote ? `<span class="note-indicator" title="Есть личная заметка">📌</span>` : ''}
+            </span>
             <div class="badge-group">
               ${room ? `<span class="room-badge">🚪 ${room}</span>` : ''}
               <span class="lesson-date">${lessonDate}</span>
             </div>
           </div>
           <div class="homework-row">
-            <div class="custom-check" onclick="toggleHomework('${lessonKey}', this.closest('.card'))" title="Отметить как сделанное"></div>
-            <div class="homework-content" onclick="toggleHomework('${lessonKey}', this.closest('.card'))">
+            <div class="custom-check" onclick="toggleHomework(event, '${lessonKey}', this.closest('.card'))" title="Отметить как сделанное"></div>
+            <div class="homework-content">
               <div class="homework-title">Домашнее задание:</div>
               <div class="homework-text">${homework}</div>
             </div>
