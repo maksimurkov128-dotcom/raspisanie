@@ -3,7 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>Расписание уроков</title>
+  <title>Школьное расписание</title>
+  
+  <!-- Иконка и PWA режим для главного экрана -->
+  <link rel="icon" type="image/png" href="icon.png">
+  <link rel="apple-touch-icon" href="icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Расписание">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#141113">
+
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     :root {
@@ -91,14 +101,36 @@
     .header-title-box {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 10px;
     }
 
     .header-top h2 {
       margin: 0;
-      font-size: 21px;
+      font-size: 20px;
       font-weight: 700;
       color: #fff;
+    }
+
+    /* Кнопка выбора класса в шапке */
+    .class-badge-btn {
+      background: linear-gradient(145deg, #2b2123, #1e181a);
+      border: 1px solid rgba(244, 162, 97, 0.4);
+      color: var(--gold);
+      font-weight: 700;
+      font-size: 14px;
+      padding: 5px 11px;
+      border-radius: 10px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      box-shadow: 0 0 12px rgba(244, 162, 97, 0.2);
+      transition: transform 0.15s;
+      user-select: none;
+    }
+
+    .class-badge-btn:active {
+      transform: scale(0.92);
     }
 
     .top-actions {
@@ -143,7 +175,7 @@
       display: none;
     }
 
-    /* БАННЕРЫ ВЕРХА (КАНИКУЛЫ И ДР) */
+    /* БАННЕРЫ ВЕРХА */
     .info-banners {
       display: flex;
       flex-direction: column;
@@ -398,8 +430,9 @@
 
     .homework-text {
       font-size: 14px;
-      line-height: 1.45;
+      line-height: 1.5;
       color: #e8ded8;
+      white-space: pre-line;
     }
 
     .deadline-row {
@@ -429,7 +462,7 @@
       left: 0;
       width: 100vw;
       height: 100vh;
-      background: rgba(0, 0, 0, 0.75);
+      background: rgba(0, 0, 0, 0.78);
       backdrop-filter: blur(8px);
       display: flex;
       justify-content: center;
@@ -438,7 +471,7 @@
       opacity: 0;
       pointer-events: none;
       transition: opacity 0.25s ease;
-      padding: 20px;
+      padding: 18px;
     }
 
     .modal-overlay.open {
@@ -452,7 +485,7 @@
       border-radius: 20px;
       width: 100%;
       max-width: 420px;
-      max-height: 80vh;
+      max-height: 82vh;
       padding: 20px 18px;
       display: flex;
       flex-direction: column;
@@ -484,6 +517,51 @@
       height: 32px;
       border-radius: 50%;
       cursor: pointer;
+    }
+
+    /* СЕТКА ВЫБОРА КЛАССА */
+    .picker-label {
+      font-size: 12px;
+      color: var(--hint);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+
+    .grades-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+
+    .letters-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+
+    .pick-btn {
+      background: #221c1f;
+      border: 1px solid var(--card-border);
+      color: var(--text);
+      padding: 11px 0;
+      text-align: center;
+      border-radius: 11px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s;
+      user-select: none;
+    }
+
+    .pick-btn.active {
+      background: linear-gradient(145deg, #e76f51, #d45d3e);
+      border-color: var(--gold);
+      color: #fff;
+      box-shadow: 0 0 12px var(--accent-glow);
     }
 
     .form-group {
@@ -550,6 +628,7 @@
 </head>
 <body>
 
+  <!-- Падающие листики -->
   <div class="leaves-container">
     <div class="leaf">🍁</div>
     <div class="leaf">🍂</div>
@@ -561,7 +640,10 @@
   <div class="header-top">
     <div class="header-title-box">
       <h2>Расписание</h2>
-      <span style="font-size: 18px;">🍁</span>
+      <!-- Кнопка переключения класса -->
+      <div id="current-class-btn" class="class-badge-btn" onclick="openClassModal()">
+        <span id="current-class-text">8А</span> ▾
+      </div>
     </div>
     
     <div class="top-actions">
@@ -582,12 +664,12 @@
       <span id="vacation-countdown" class="gold-text">считаем...</span>
     </div>
 
-    <!-- Баннер Дня Рождения -->
     <div id="bday-banner" class="banner-pill bday-banner">
       <span id="bday-text">🎂 Дни рождения...</span>
     </div>
   </div>
 
+  <!-- Выбор недели -->
   <div class="week-segmented">
     <div id="btn-week-1" class="week-btn active" onclick="switchWeek(0)">Текущая неделя</div>
     <div id="btn-week-2" class="week-btn" onclick="switchWeek(1)">Следующая неделя</div>
@@ -595,7 +677,7 @@
 
   <div id="days-grid" class="days-grid"></div>
 
-  <!-- Плашка дежурных выбранного дня -->
+  <!-- Дежурные выбранного дня -->
   <div id="duty-banner" class="duty-card" style="display: none;">
     <span>🧹 Дежурные:</span>
     <span id="duty-names" class="names">—</span>
@@ -604,6 +686,23 @@
   <div id="loader" class="loader">Синхронизация с таблицей...</div>
 
   <div id="cards-container" class="cards-container"></div>
+
+  <!-- МОДАЛКА ВЫБОРА КЛАССА -->
+  <div id="class-overlay" class="modal-overlay" onclick="closeClassModal(event)">
+    <div class="modal-sheet" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <h3>🏫 Выбери свой класс</h3>
+        <button class="close-btn" onclick="closeClassModal()">✕</button>
+      </div>
+      <div class="picker-label">Параллель (1–11):</div>
+      <div id="grades-grid" class="grades-grid"></div>
+
+      <div class="picker-label">Буква класса:</div>
+      <div id="letters-grid" class="letters-grid"></div>
+
+      <button class="submit-btn" onclick="saveSelectedClass()">Сохранить класс</button>
+    </div>
+  </div>
 
   <!-- МОДАЛКА ОБЪЯВЛЕНИЙ -->
   <div id="modal-overlay" class="modal-overlay" onclick="closeAnnouncements(event)">
@@ -649,10 +748,29 @@
       tgUser = window.Telegram.WebApp.initDataUnsafe?.user;
     }
 
-    // ТВОЙ URL ИЗ GOOGLE APPS SCRIPT:
+    // =========================================================
+    // 1. ТВОЙ URL ИЗ GOOGLE APPS SCRIPT:
+    // =========================================================
     const API_URL = 'https://script.google.com/macros/s/AKfycbzoRZ_Fd9Yv2FJq79lpF4HPg-NETJm4gSCqLVxU7_6pp2CHNON2A09U1X0eYRE4cyQ5/exec';
 
-    // ДАТА НАЧАЛА ЗИМНИХ КАНИКУЛ (Год, Месяц - 1, День): например, 28 декабря
+    // =========================================================
+    // 2. КОНФИГУРАЦИЯ КЛАССОВ ШКОЛЫ:
+    // Если в какой-то параллели нет буквы 'Г', просто сотри 'Г' из списка!
+    // =========================================================
+    const SCHOOL_CLASSES = {
+      '1':  ['А', 'Б', 'В', 'Г'],
+      '2':  ['А', 'Б', 'В', 'Г'],
+      '3':  ['А', 'Б', 'В', 'Г'],
+      '4':  ['А', 'Б', 'В', 'Г'],
+      '5':  ['А', 'Б', 'В', 'Г'],
+      '6':  ['А', 'Б', 'В', 'Г'],
+      '7':  ['А', 'Б', 'В', 'Г'],
+      '8':  ['А', 'Б', 'В', 'Г'],
+      '9':  ['А', 'Б', 'В', 'Г'],
+      '10': ['А', 'Б', 'В', 'Г'],
+      '11': ['А', 'Б', 'В', 'Г']
+    };
+
     const VACATION_DATE = new Date(2026, 11, 28); 
 
     let allItems = [];
@@ -662,6 +780,93 @@
     let twoWeeks = [];
     let currentWeekIndex = 0;
     let selectedDateInfo = null;
+
+    // Текущий выбранный класс (по умолчанию 8А, если еще не выбирали)
+    let savedGrade = localStorage.getItem('user_grade') || '8';
+    let savedLetter = localStorage.getItem('user_letter') || 'А';
+    let tempGrade = savedGrade;
+    let tempLetter = savedLetter;
+
+    function getFullClassName() {
+      return `${savedGrade}${savedLetter}`;
+    }
+
+    function updateClassHeader() {
+      document.getElementById('current-class-text').innerText = getFullClassName();
+    }
+
+    // Логика окна выбора класса
+    function openClassModal() {
+      tempGrade = savedGrade;
+      tempLetter = savedLetter;
+      renderClassPicker();
+      document.getElementById('class-overlay').classList.add('open');
+    }
+
+    function closeClassModal(e) {
+      if (e && e.target !== e.currentTarget && !e.target.classList.contains('close-btn')) return;
+      document.getElementById('class-overlay').classList.remove('open');
+    }
+
+    function renderClassPicker() {
+      const gradesGrid = document.getElementById('grades-grid');
+      const lettersGrid = document.getElementById('letters-grid');
+      gradesGrid.innerHTML = '';
+      lettersGrid.innerHTML = '';
+
+      Object.keys(SCHOOL_CLASSES).forEach(grade => {
+        const btn = document.createElement('div');
+        btn.className = `pick-btn ${grade === tempGrade ? 'active' : ''}`;
+        btn.innerText = grade;
+        btn.onclick = () => {
+          tempGrade = grade;
+          const availableLetters = SCHOOL_CLASSES[tempGrade];
+          if (!availableLetters.includes(tempLetter)) {
+            tempLetter = availableLetters[0];
+          }
+          renderClassPicker();
+        };
+        gradesGrid.appendChild(btn);
+      });
+
+      const letters = SCHOOL_CLASSES[tempGrade] || ['А'];
+      letters.forEach(letter => {
+        const btn = document.createElement('div');
+        btn.className = `pick-btn ${letter === tempLetter ? 'active' : ''}`;
+        btn.innerText = letter;
+        btn.onclick = () => {
+          tempLetter = letter;
+          renderClassPicker();
+        };
+        lettersGrid.appendChild(btn);
+      });
+    }
+
+    function saveSelectedClass() {
+      savedGrade = tempGrade;
+      savedLetter = tempLetter;
+      localStorage.setItem('user_grade', savedGrade);
+      localStorage.setItem('user_letter', savedLetter);
+      localStorage.setItem('has_selected_class', 'true');
+      updateClassHeader();
+      document.getElementById('class-overlay').classList.remove('open');
+      updateNewsBadge();
+      checkBirthdays();
+      renderLessons();
+    }
+
+    // Проверка: принадлежит ли запись из таблицы выбранному классу
+    function matchesCurrentClass(item, allowAll = false) {
+      const rawClass = String(item['Класс'] || item['класс'] || item['Class'] || '').trim().toUpperCase();
+      // Если в таблице колонка "Класс" вообще не заполнена:
+      if (!rawClass) return true; 
+      if (allowAll && (rawClass === 'ВСЕ' || rawClass === 'ОБЩЕЕ')) return true;
+      return rawClass === getFullClassName().toUpperCase();
+    }
+
+    function getFilteredNews() {
+      return allNews.filter(item => matchesCurrentClass(item, true));
+    }
 
     function updateVacationCountdown() {
       const today = new Date();
@@ -681,7 +886,9 @@
     function checkBirthdays() {
       const banner = document.getElementById('bday-banner');
       const textEl = document.getElementById('bday-text');
-      if (!allBirthdays || allBirthdays.length === 0) {
+      const classBirthdays = allBirthdays.filter(b => matchesCurrentClass(b, false));
+
+      if (!classBirthdays || classBirthdays.length === 0) {
         banner.style.display = 'none';
         return;
       }
@@ -691,8 +898,7 @@
       const currentMonth = now.getMonth() + 1;
       const todayStr = `${String(currentDay).padStart(2,'0')}.${String(currentMonth).padStart(2,'0')}`;
 
-      // Ищем, есть ли именинник сегодня
-      const todayBday = allBirthdays.find(b => {
+      const todayBday = classBirthdays.find(b => {
         const rawDate = String(b['Дата'] || b['дата'] || '').trim();
         return rawDate.startsWith(todayStr) || rawDate.startsWith(`${currentDay}.${currentMonth}`);
       });
@@ -704,11 +910,10 @@
         textEl.innerHTML = `🎉 Сегодня день рождения у: <b>${name}</b>! 🎂🎈`;
       } else {
         banner.className = 'banner-pill bday-banner';
-        // Показываем первую ближайшую запись из таблицы
-        const first = allBirthdays[0];
+        const first = classBirthdays[0];
         const date = first['Дата'] || first['дата'] || '';
         const name = first['Имя'] || first['ФИО'] || '';
-        textEl.innerHTML = `🎂 Ближайший ДР: <b>${name}</b> (${date})`;
+        textEl.innerHTML = `🎂 Ближайший ДР (${getFullClassName()}): <b>${name}</b> (${date})`;
       }
     }
 
@@ -747,6 +952,12 @@
     }
 
     async function loadData() {
+      updateClassHeader();
+      // Если ученик зашел первый раз — сразу спрашиваем его класс
+      if (!localStorage.getItem('has_selected_class')) {
+        openClassModal();
+      }
+
       const loader = document.getElementById('loader');
       try {
         const res = await fetch(API_URL);
@@ -790,8 +1001,9 @@
 
     function updateNewsBadge() {
       const badge = document.getElementById('news-badge');
-      if (allNews && allNews.length > 0) {
-        badge.innerText = allNews.length;
+      const filteredNews = getFilteredNews();
+      if (filteredNews.length > 0) {
+        badge.innerText = filteredNews.length;
         badge.style.display = 'block';
       } else {
         badge.style.display = 'none';
@@ -803,10 +1015,12 @@
       const list = document.getElementById('announcements-list');
       list.innerHTML = '';
 
-      if (!allNews || allNews.length === 0) {
-        list.innerHTML = '<div class="empty-state">Пока нет активных объявлений ✨</div>';
+      const filteredNews = getFilteredNews();
+
+      if (filteredNews.length === 0) {
+        list.innerHTML = `<div class="empty-state">Для ${getFullClassName()} пока нет объявлений ✨</div>`;
       } else {
-        allNews.forEach(item => {
+        filteredNews.forEach(item => {
           const date = item['Дата'] || item['дата'] || item['Date'] || '';
           const text = item['Текст'] || item['текст'] || item['Объявление'] || item['Заголовок'] || '';
 
@@ -851,7 +1065,8 @@
       const payload = {
         name: document.getElementById('abs-name').value,
         date: document.getElementById('abs-date').value,
-        reason: document.getElementById('abs-reason').value
+        reason: document.getElementById('abs-reason').value,
+        className: getFullClassName()
       };
 
       try {
@@ -940,10 +1155,11 @@
       const monthWord = monthsRu[selectedDateInfo.dateObj.getMonth()];
       const textDateVariant = `${dayNum} ${monthWord}`.toLowerCase();
 
-      // Обновляем плашку дежурства на выбранный день
+      // Дежурные выбранного дня и выбранного класса
       const dutyBanner = document.getElementById('duty-banner');
       const dutyNamesEl = document.getElementById('duty-names');
       const currentDuty = allDuty.find(d => {
+        if (!matchesCurrentClass(d, false)) return false;
         const rawDate = String(d['Дата'] || d['дата'] || '').trim().toLowerCase();
         return rawDate === textDateVariant || rawDate.startsWith(selectedDateInfo.padded) || rawDate.startsWith(selectedDateInfo.unpadded);
       });
@@ -955,8 +1171,10 @@
         dutyBanner.style.display = 'none';
       }
 
-      // Фильтруем уроки
+      // Фильтруем уроки по выбранному классу И дате
       const dayLessons = allItems.filter(item => {
+        if (!matchesCurrentClass(item, false)) return false;
+
         const rawDate = String(
           item['Дата'] || item['дата'] || item['Date'] || item['date'] || ''
         ).trim().toLowerCase();
@@ -969,7 +1187,7 @@
       });
 
       if (dayLessons.length === 0) {
-        container.innerHTML = '<div class="empty-state">На этот день уроков нет ☕🍂</div>';
+        container.innerHTML = `<div class="empty-state">Для ${getFullClassName()} на этот день уроков нет ☕🍂</div>`;
         return;
       }
 
@@ -981,7 +1199,7 @@
         const room = item['Кабинет'] || item['кабинет'] || item['Каб'] || item['Room'] || '';
         const lessonDate = item['Дата'] || item['дата'] || textDateVariant;
 
-        const lessonKey = `hw_${lessonDate}_${subject}_${idx}`;
+        const lessonKey = `hw_${getFullClassName()}_${lessonDate}_${subject}_${idx}`;
         const isDone = localStorage.getItem(lessonKey) === 'true';
 
         card.className = `card ${isDone ? 'completed' : ''}`;
