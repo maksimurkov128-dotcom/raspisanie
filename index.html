@@ -311,7 +311,6 @@
       color: var(--gold);
     }
 
-    /* ПРОГРЕСС-БАР ДОМАШНЕГО ЗАДАНИЯ */
     .progress-box {
       background: #1c1719;
       border: 1px solid var(--card-border);
@@ -454,7 +453,6 @@
       color: var(--gold);
     }
 
-    /* БЕЙДЖИ КОНТРОЛЬНЫХ И САМОСТОЯТЕЛЬНЫХ */
     .exam-badge {
       font-size: 10px;
       padding: 2px 7px;
@@ -828,7 +826,6 @@
     <span id="duty-names" class="names">—</span>
   </div>
 
-  <!-- БЛОК ПРОГРЕСС-БАРА ДЗ -->
   <div id="progress-wrapper" class="progress-box" style="display: none;">
     <div class="progress-header">
       <span id="progress-label">Выполнено ДЗ:</span>
@@ -1125,7 +1122,6 @@
       return s.replace(/\.$/, '');
     }
 
-    /* ИСПРАВЛЕННЫЙ ТАЙМЕР ЗВОНКОВ */
     function updateBellTimer() {
       const timerEl = document.getElementById('timer-status');
       const now = new Date();
@@ -1543,26 +1539,40 @@
         cardEl.classList.add('completed');
       }
 
-      // Пересчитываем прогресс-бар ДЗ
       const container = document.getElementById('cards-container');
       const totalCards = container.querySelectorAll('.card').length;
       const completedCards = container.querySelectorAll('.card.completed').length;
       updateHomeworkProgressBar(totalCards, completedCards);
     }
 
-    // Определение контрольных и самостоятельных работ
+    /* ИСПРАВЛЕННЫЙ ПОИСК КОНТРОЛЬНЫХ И САМОСТОЯТЕЛЬНЫХ */
     function getExamBadgeInfo(item) {
-      const combined = `${item['Тип'] || ''} ${item['Тема'] || item['тема'] || ''} ${item['Задание'] || item['задание'] || ''}`.toLowerCase();
-      
-      if (combined.includes('к/р') || combined.includes('кр') || combined.includes('контрольная')) {
+      const combined = ` ${item['Тип'] || ''} ${item['Тема'] || item['тема'] || ''} ${item['Задание'] || item['задание'] || ''} `
+        .toLowerCase()
+        .replace(/[\(\)\[\],.]/g, ' ');
+
+      if (
+        combined.includes('к/р') || 
+        combined.includes('контрольн') || 
+        /\bкр\b/i.test(combined) || 
+        /\sкр\s/i.test(combined)
+      ) {
         return { type: 'kr', label: '⚠️ Контрольная' };
       }
-      if (combined.includes('с/р') || combined.includes('ср') || combined.includes('самостоятельная')) {
+
+      if (
+        combined.includes('с/р') || 
+        combined.includes('самостоятельн') || 
+        /\bср\b/i.test(combined) || 
+        /\sср\s/i.test(combined)
+      ) {
         return { type: 'sr', label: '📝 Самостоятельная' };
       }
+
       if (combined.includes('тест') || combined.includes('зачет')) {
         return { type: 'sr', label: '📝 Тест' };
       }
+
       return null;
     }
 
@@ -1695,11 +1705,10 @@
         container.appendChild(card);
       });
 
-      // Обновляем шкалу прогресса выполнения
       updateHomeworkProgressBar(dayLessons.length, completedTasksCount);
     }
 
     loadData();
   </script>
 </body>
-</html>
+  </html>
