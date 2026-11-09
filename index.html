@@ -28,6 +28,7 @@
       --danger: #e63946;
       --green: #2a9d8f;
       --green-glow: rgba(42, 157, 143, 0.4);
+      --blue: #457b9d;
     }
 
     * {
@@ -122,6 +123,11 @@
 
     .profile-btn:active {
       transform: scale(0.92);
+    }
+
+    .profile-btn.teacher-badge-btn {
+      border-color: #58a6ff;
+      color: #79c0ff;
     }
 
     .header-top h2 {
@@ -495,6 +501,18 @@
       font-weight: 600;
     }
 
+    /* КНОПКА РЕДАКТИРОВАНИЯ ДЛЯ УЧИТЕЛЯ */
+    .edit-lesson-btn {
+      background: rgba(88, 166, 255, 0.15);
+      border: 1px solid rgba(88, 166, 255, 0.4);
+      color: #79c0ff;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
     .homework-row {
       display: flex;
       align-items: flex-start;
@@ -606,7 +624,7 @@
       border: 1px solid #3c3033;
       border-radius: 20px;
       width: 100%;
-      max-width: 420px;
+      max-width: 440px;
       max-height: 85vh;
       padding: 20px 18px;
       display: flex;
@@ -734,6 +752,17 @@
 
     .submit-btn:active { transform: scale(0.97); }
 
+    .secondary-btn {
+      background: #221c1f;
+      border: 1px solid var(--card-border);
+      color: #fff;
+      font-weight: 600;
+      padding: 10px;
+      border-radius: 10px;
+      cursor: pointer;
+      margin-top: 6px;
+    }
+
     .logout-btn {
       background: #2b2123;
       border: 1px solid var(--danger);
@@ -767,6 +796,29 @@
       color: #f7ede2;
       white-space: pre-wrap;
     }
+
+    /* СПИСОК УЧЕНИКОВ ДЛЯ ВЫСТАВЛЕНИЯ ОЦЕНОК */
+    .grades-table-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .grades-table-row span {
+      font-size: 14px;
+    }
+
+    .grade-select {
+      background: #141113;
+      border: 1px solid var(--card-border);
+      color: var(--gold);
+      padding: 6px 10px;
+      border-radius: 8px;
+      font-weight: 700;
+      outline: none;
+    }
   </style>
 </head>
 <body>
@@ -781,7 +833,7 @@
 
   <div class="header-top">
     <div class="header-left">
-      <div class="profile-btn" onclick="openProfileModal()">
+      <div id="profile-btn" class="profile-btn" onclick="openProfileModal()">
         <span>👤</span>
         <span id="profile-btn-text">Профиль</span>
       </div>
@@ -840,6 +892,7 @@
 
   <div id="cards-container" class="cards-container"></div>
 
+  <!-- АВТОРИЗАЦИЯ -->
   <div id="login-modal" class="modal-overlay">
     <div class="modal-sheet">
       <div class="modal-header">
@@ -848,7 +901,7 @@
       <form onsubmit="handleLogin(event)">
         <div class="form-group">
           <label>Логин</label>
-          <input type="text" id="login-user" class="form-input" placeholder="Например: ivanov" required autocomplete="username">
+          <input type="text" id="login-user" class="form-input" placeholder="Логин ученика или учителя" required autocomplete="username">
         </div>
         <div class="form-group">
           <label>Пароль</label>
@@ -860,37 +913,34 @@
     </div>
   </div>
 
+  <!-- ПРОФИЛЬ -->
   <div id="profile-modal" class="modal-overlay" onclick="closeProfileModal(event)">
     <div class="modal-sheet" onclick="event.stopPropagation()">
       <div class="modal-header">
-        <h3>👤 Мой профиль</h3>
+        <h3 id="profile-modal-title">👤 Мой профиль</h3>
         <button class="close-btn" onclick="closeProfileModal()">✕</button>
       </div>
 
       <div class="detail-item">
-        <div class="detail-label">Ученик</div>
+        <div class="detail-label" id="prof-type-label">Пользователь</div>
         <div id="prof-name" class="detail-val" style="font-weight: 700; font-size: 16px;">—</div>
       </div>
 
-      <div class="detail-item">
+      <div class="detail-item" id="prof-class-box">
         <div class="detail-label">Класс</div>
         <div id="prof-class" class="detail-val">—</div>
       </div>
 
-      <div class="detail-item">
-        <div class="detail-label">Группа по английскому</div>
-        <div id="prof-group" class="detail-val">—</div>
-      </div>
-
-      <div class="detail-item">
-        <div class="detail-label">Профиль труда (технологии)</div>
-        <div id="prof-gender" class="detail-val">—</div>
+      <div class="detail-item" id="prof-extra-box">
+        <div class="detail-label" id="prof-extra-label">Группа / Предмет</div>
+        <div id="prof-extra-val" class="detail-val">—</div>
       </div>
 
       <button class="logout-btn" onclick="handleLogout()">Выйти из профиля</button>
     </div>
   </div>
 
+  <!-- ДЕТАЛИ УРОКА ДЛЯ УЧЕНИКА -->
   <div id="lesson-modal" class="modal-overlay" onclick="closeLessonModal(event)">
     <div class="modal-sheet" onclick="event.stopPropagation()">
       <div class="modal-header">
@@ -934,6 +984,58 @@
     </div>
   </div>
 
+  <!-- РЕДАКТИРОВАНИЕ УРОКА ДЛЯ УЧИТЕЛЯ -->
+  <div id="teacher-edit-modal" class="modal-overlay" onclick="closeTeacherEditModal(event)">
+    <div class="modal-sheet" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <h3>✏️ Редактирование урока</h3>
+        <button class="close-btn" onclick="closeTeacherEditModal()">✕</button>
+      </div>
+      <form onsubmit="saveTeacherLessonChanges(event)">
+        <div class="detail-item" style="margin-bottom: 12px;">
+          <div id="teacher-edit-info" class="detail-val" style="font-weight: 700; color: var(--gold);">—</div>
+        </div>
+
+        <div class="form-group">
+          <label>Тема урока</label>
+          <input type="text" id="t-edit-topic" class="form-input" placeholder="Например: Квадратные уравнения">
+        </div>
+
+        <div class="form-group">
+          <label>Домашнее задание</label>
+          <textarea id="t-edit-homework" class="note-textarea" style="height: 80px;" placeholder="Параграф, номера задач..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Тип урока (бейдж)</label>
+          <select id="t-edit-type" class="form-input">
+            <option value="">Обычный урок</option>
+            <option value="К/Р">⚠️ Контрольная работа (К/Р)</option>
+            <option value="С/Р">📝 Самостоятельная работа (С/Р)</option>
+            <option value="Тест">📝 Тест / Зачет</option>
+          </select>
+        </div>
+
+        <button type="submit" id="t-edit-save-btn" class="submit-btn">Сохранить в расписание</button>
+        <button type="button" class="secondary-btn" onclick="openGradeBookModal()">📊 Выставить оценки за урок</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ЖУРНАЛ ОЦЕНОК ДЛЯ УЧИТЕЛЯ -->
+  <div id="grades-modal" class="modal-overlay" onclick="closeGradeBookModal(event)">
+    <div class="modal-sheet" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <h3>📊 Журнал оценок</h3>
+        <button class="close-btn" onclick="closeGradeBookModal()">✕</button>
+      </div>
+      <div style="font-size: 13px; color: var(--hint); margin-bottom: 10px;" id="grades-lesson-header">—</div>
+      <div id="grades-students-list" style="overflow-y: auto; max-height: 50vh; margin-bottom: 12px;"></div>
+      <button class="submit-btn" id="save-grades-btn" onclick="submitGrades()">Сохранить оценки</button>
+    </div>
+  </div>
+
+  <!-- ОБЪЯВЛЕНИЯ -->
   <div id="modal-overlay" class="modal-overlay" onclick="closeAnnouncements(event)">
     <div class="modal-sheet" onclick="event.stopPropagation()">
       <div class="modal-header">
@@ -944,6 +1046,7 @@
     </div>
   </div>
 
+  <!-- ОТСУТСТВИЕ -->
   <div id="absence-overlay" class="modal-overlay" onclick="closeAbsenceModal(event)">
     <div class="modal-sheet" onclick="event.stopPropagation()">
       <div class="modal-header">
@@ -993,19 +1096,49 @@
     let currentWeekIndex = 0;
     let selectedDateInfo = null;
     let currentEditingLessonKey = null;
+    let currentTeacherLessonItem = null;
 
     let currentUser = JSON.parse(localStorage.getItem('diary_current_user') || 'null');
 
+    function isTeacher() {
+      return currentUser && currentUser.role === 'teacher';
+    }
+
+    // Проверка, преподает ли учитель данный предмет
+    function teacherTeachesSubject(subjectName) {
+      if (!isTeacher()) return false;
+      if (!currentUser.subjects || currentUser.subjects === 'все') return true;
+      const subs = currentUser.subjects.split(',').map(s => s.trim().toLowerCase());
+      return subs.includes(String(subjectName).trim().toLowerCase());
+    }
+
     function updateProfileUI() {
       const btnText = document.getElementById('profile-btn-text');
+      const profBtn = document.getElementById('profile-btn');
+
       if (currentUser) {
-        btnText.innerText = currentUser.name.split(' ')[0] || 'Профиль';
-        document.getElementById('prof-name').innerText = currentUser.name;
-        document.getElementById('prof-class').innerText = currentUser.className;
-        document.getElementById('prof-group').innerText = `${currentUser.group} группа`;
-        document.getElementById('prof-gender').innerText = currentUser.gender === 'м' ? 'Юноши (Мальчики)' : 'Девушки (Девочки)';
+        if (currentUser.role === 'teacher') {
+          btnText.innerText = currentUser.name.split(' ')[0] || 'Учитель';
+          profBtn.classList.add('teacher-badge-btn');
+          document.getElementById('prof-type-label').innerText = 'Учитель';
+          document.getElementById('prof-name').innerText = currentUser.name;
+          document.getElementById('prof-class-box').style.display = currentUser.className ? 'block' : 'none';
+          document.getElementById('prof-class').innerText = currentUser.className || 'Все классы';
+          document.getElementById('prof-extra-label').innerText = 'Предметы преподавания';
+          document.getElementById('prof-extra-val').innerText = currentUser.subjects || 'Все предметы';
+        } else {
+          btnText.innerText = currentUser.name.split(' ')[0] || 'Профиль';
+          profBtn.classList.remove('teacher-badge-btn');
+          document.getElementById('prof-type-label').innerText = 'Ученик';
+          document.getElementById('prof-name').innerText = currentUser.name;
+          document.getElementById('prof-class-box').style.display = 'block';
+          document.getElementById('prof-class').innerText = currentUser.className;
+          document.getElementById('prof-extra-label').innerText = 'Группа по английскому';
+          document.getElementById('prof-extra-val').innerText = `${currentUser.group} группа (${currentUser.gender === 'м' ? 'Юноши' : 'Девушки'})`;
+        }
       } else {
         btnText.innerText = 'Войти';
+        profBtn.classList.remove('teacher-badge-btn');
       }
     }
 
@@ -1025,7 +1158,7 @@
       const errEl = document.getElementById('login-error');
 
       if (!allStudents || allStudents.length === 0) {
-        alert('Данные учеников еще подгружаются из таблицы, подожди пару секунд...');
+        alert('Данные еще загружаются из таблицы, подожди 2 секунды...');
         return;
       }
 
@@ -1037,9 +1170,12 @@
 
       if (found) {
         errEl.style.display = 'none';
+        const role = String(found['Роль'] || found['роль'] || 'student').trim().toLowerCase();
         currentUser = {
           name: String(found['Имя'] || found['имя'] || found['ФИО'] || login).trim(),
-          className: String(found['Класс'] || found['класс'] || '8А').trim().toUpperCase(),
+          className: String(found['Класс'] || found['класс'] || '').trim().toUpperCase(),
+          role: role,
+          subjects: String(found['Предмет'] || found['предмет'] || '').trim().toLowerCase(),
           gender: String(found['Пол'] || found['пол'] || 'м').trim().toLowerCase(),
           group: String(found['Группа'] || found['группа'] || '1').trim()
         };
@@ -1080,6 +1216,15 @@
     function matchesUserProfile(item) {
       if (!currentUser) return true;
 
+      // Учитель видит уроки своего класса или уроки по своим предметам
+      if (isTeacher()) {
+        const itemClass = String(item['Класс'] || item['класс'] || '').trim().toUpperCase();
+        if (currentUser.className && itemClass && itemClass !== currentUser.className) {
+          return false;
+        }
+        return true;
+      }
+
       const itemClass = String(item['Класс'] || item['класс'] || '').trim().toUpperCase();
       if (itemClass && itemClass !== 'ВСЕ' && itemClass !== currentUser.className) {
         return false;
@@ -1102,7 +1247,7 @@
       const rawClass = String(item['Класс'] || item['класс'] || '').trim().toUpperCase();
       if (!rawClass) return true; 
       if (allowAll && (rawClass === 'ВСЕ' || rawClass === 'ОБЩЕЕ')) return true;
-      const targetClass = currentUser ? currentUser.className : '8А';
+      const targetClass = (currentUser && currentUser.className) ? currentUser.className : '8А';
       return rawClass === targetClass;
     }
 
@@ -1228,7 +1373,7 @@
       });
 
       banner.style.display = 'flex';
-      const className = currentUser ? currentUser.className : '8А';
+      const className = (currentUser && currentUser.className) ? currentUser.className : '8А';
       if (todayBday) {
         banner.className = 'banner-pill bday-banner today-bday';
         const name = todayBday['Имя'] || todayBday['ФИО'] || 'Одноклассника';
@@ -1342,7 +1487,7 @@
       list.innerHTML = '';
 
       const filteredNews = getFilteredNews();
-      const className = currentUser ? currentUser.className : '8А';
+      const className = (currentUser && currentUser.className) ? currentUser.className : '8А';
 
       if (filteredNews.length === 0) {
         list.innerHTML = `<div class="empty-state">Для ${className} пока нет объявлений ✨</div>`;
@@ -1389,7 +1534,7 @@
       btn.disabled = true;
 
       const payload = {
-        className: currentUser ? currentUser.className : '8А',
+        className: (currentUser && currentUser.className) ? currentUser.className : '8А',
         name: document.getElementById('abs-name').value.trim(),
         date: document.getElementById('abs-date').value.trim(),
         reason: document.getElementById('abs-reason').value.trim()
@@ -1411,12 +1556,13 @@
           document.getElementById('absence-form').reset();
         }, 1200);
       } catch (err) {
-        alert('Ошибка при отправке. Попробуй позже.');
+        alert('Ошибка при отправке.');
         btn.innerText = 'Отправить старосте';
         btn.disabled = false;
       }
     }
 
+    /* РАБОТА С МОДАЛКАМИ УРОКОВ */
     function openLessonDetails(item, lessonKey, timeString) {
       currentEditingLessonKey = lessonKey;
 
@@ -1467,6 +1613,185 @@
       renderLessons();
     }
 
+    /* РЕДАКТИРОВАНИЕ ДЛЯ УЧИТЕЛЯ */
+    function openTeacherEditModal(item, e) {
+      if (e) e.stopPropagation();
+      currentTeacherLessonItem = item;
+
+      const subject = item['Предмет'] || item['предмет'] || 'Урок';
+      const targetClass = item['Класс'] || item['класс'] || (currentUser ? currentUser.className : '8А');
+      const topic = item['Тема'] || item['тема'] || '';
+      const homework = item['Задание'] || item['задание'] || '';
+      const type = item['Тип'] || '';
+
+      document.getElementById('teacher-edit-info').innerText = `${subject} • ${targetClass} класс`;
+      document.getElementById('t-edit-topic').value = topic;
+      document.getElementById('t-edit-homework').value = homework;
+      document.getElementById('t-edit-type').value = type;
+
+      document.getElementById('teacher-edit-modal').classList.add('open');
+    }
+
+    function closeTeacherEditModal(e) {
+      if (e && e.target !== e.currentTarget && !e.target.classList.contains('close-btn')) return;
+      document.getElementById('teacher-edit-modal').classList.remove('open');
+    }
+
+    async function saveTeacherLessonChanges(e) {
+      e.preventDefault();
+      if (!currentTeacherLessonItem) return;
+
+      const btn = document.getElementById('t-edit-save-btn');
+      btn.innerText = 'Сохранение...';
+      btn.disabled = true;
+
+      const targetClass = currentTeacherLessonItem['Класс'] || currentTeacherLessonItem['класс'] || (currentUser ? currentUser.className : '8А');
+      const subject = currentTeacherLessonItem['Предмет'] || currentTeacherLessonItem['предмет'] || '';
+      const date = cleanDateStr(currentTeacherLessonItem['Дата'] || currentTeacherLessonItem['дата'] || selectedDateInfo.padded);
+      const group = currentTeacherLessonItem['Группа'] || currentTeacherLessonItem['группа'] || '';
+
+      const payload = {
+        action: 'updateLesson',
+        className: targetClass,
+        subject: subject,
+        date: date,
+        group: group,
+        topic: document.getElementById('t-edit-topic').value.trim(),
+        homework: document.getElementById('t-edit-homework').value.trim(),
+        type: document.getElementById('t-edit-type').value
+      };
+
+      try {
+        await fetch(API_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        // Обновляем локально данные в массиве
+        currentTeacherLessonItem['Тема'] = payload.topic;
+        currentTeacherLessonItem['Задание'] = payload.homework;
+        currentTeacherLessonItem['Тип'] = payload.type;
+
+        btn.innerText = 'Сохранено! ✓';
+        setTimeout(() => {
+          closeTeacherEditModal();
+          btn.innerText = 'Сохранить в расписание';
+          btn.disabled = false;
+          renderLessons();
+        }, 1000);
+      } catch (err) {
+        alert('Ошибка при сохранении в таблицу');
+        btn.innerText = 'Сохранить в расписание';
+        btn.disabled = false;
+      }
+    }
+
+    /* ЖУРНАЛ ОЦЕНОК */
+    function openGradeBookModal() {
+      if (!currentTeacherLessonItem) return;
+      const targetClass = currentTeacherLessonItem['Класс'] || currentTeacherLessonItem['класс'] || (currentUser ? currentUser.className : '8А');
+      const subject = currentTeacherLessonItem['Предмет'] || currentTeacherLessonItem['предмет'] || '';
+      const date = cleanDateStr(currentTeacherLessonItem['Дата'] || currentTeacherLessonItem['дата'] || selectedDateInfo.padded);
+
+      document.getElementById('grades-lesson-header').innerText = `${subject} (${targetClass} класс) • Дата: ${date}`;
+
+      // Фильтруем учеников только этого класса
+      const classStudents = allStudents.filter(s => {
+        const c = String(s['Класс'] || s['класс'] || '').trim().toUpperCase();
+        const role = String(s['Роль'] || s['роль'] || 'student').toLowerCase();
+        return c === targetClass.toUpperCase() && role !== 'teacher';
+      });
+
+      const container = document.getElementById('grades-students-list');
+      container.innerHTML = '';
+
+      if (classStudents.length === 0) {
+        container.innerHTML = '<div style="color:var(--hint); font-size:13px; text-align:center;">Ученики этого класса не найдены на листе "Ученики"</div>';
+      } else {
+        classStudents.forEach(st => {
+          const name = st['Имя'] || st['ФИО'] || st['Логин'];
+          const row = document.createElement('div');
+          row.className = 'grades-table-row';
+          row.innerHTML = `
+            <span>${name}</span>
+            <select class="grade-select" data-student="${name}">
+              <option value="">—</option>
+              <option value="5">5</option>
+              <option value="4">4</option>
+              <option value="3">3</option>
+              <option value="2">2</option>
+              <option value="Н">Н</option>
+            </select>
+          `;
+          container.appendChild(row);
+        });
+      }
+
+      document.getElementById('grades-modal').classList.add('open');
+    }
+
+    function closeGradeBookModal(e) {
+      if (e && e.target !== e.currentTarget && !e.target.classList.contains('close-btn')) return;
+      document.getElementById('grades-modal').classList.remove('open');
+    }
+
+    async function submitGrades() {
+      const selects = document.querySelectorAll('.grade-select');
+      const gradesData = [];
+
+      selects.forEach(sel => {
+        if (sel.value) {
+          gradesData.push({
+            studentName: sel.getAttribute('data-student'),
+            grade: sel.value
+          });
+        }
+      });
+
+      if (gradesData.length === 0) {
+        alert('Выберите хотя бы одну оценку');
+        return;
+      }
+
+      const btn = document.getElementById('save-grades-btn');
+      btn.innerText = 'Сохранение...';
+      btn.disabled = true;
+
+      const targetClass = currentTeacherLessonItem['Класс'] || currentTeacherLessonItem['класс'] || (currentUser ? currentUser.className : '8А');
+      const subject = currentTeacherLessonItem['Предмет'] || currentTeacherLessonItem['предмет'] || '';
+      const date = cleanDateStr(currentTeacherLessonItem['Дата'] || currentTeacherLessonItem['дата'] || selectedDateInfo.padded);
+
+      const payload = {
+        action: 'saveGrades',
+        className: targetClass,
+        subject: subject,
+        date: date,
+        grades: gradesData
+      };
+
+      try {
+        await fetch(API_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        btn.innerText = 'Оценки выставлены! ✓';
+        setTimeout(() => {
+          closeGradeBookModal();
+          btn.innerText = 'Сохранить оценки';
+          btn.disabled = false;
+        }, 1200);
+      } catch (err) {
+        alert('Ошибка при сохранении оценок');
+        btn.innerText = 'Сохранить оценки';
+        btn.disabled = false;
+      }
+    }
+
     function switchWeek(weekIndex) {
       currentWeekIndex = weekIndex;
       updateWeekButtons();
@@ -1509,7 +1834,7 @@
 
     function updateHomeworkProgressBar(totalCount, completedCount) {
       const wrapper = document.getElementById('progress-wrapper');
-      if (totalCount === 0) {
+      if (totalCount === 0 || isTeacher()) {
         wrapper.style.display = 'none';
         return;
       }
@@ -1545,7 +1870,6 @@
       updateHomeworkProgressBar(totalCards, completedCards);
     }
 
-    /* ИСПРАВЛЕННЫЙ ПОИСК КОНТРОЛЬНЫХ И САМОСТОЯТЕЛЬНЫХ */
     function getExamBadgeInfo(item) {
       const combined = ` ${item['Тип'] || ''} ${item['Тема'] || item['тема'] || ''} ${item['Задание'] || item['задание'] || ''} `
         .toLowerCase()
@@ -1619,7 +1943,7 @@
         return datePattern.test(rawDate) || paddedPattern.test(rawDate);
       });
 
-      const currentClassName = currentUser ? currentUser.className : '8А';
+      const currentClassName = (currentUser && currentUser.className) ? currentUser.className : '8А';
 
       if (dayLessons.length === 0) {
         updateHomeworkProgressBar(0, 0);
@@ -1627,7 +1951,7 @@
         if (dayOfWeek === 6 || dayOfWeek === 0) {
           container.innerHTML = `<div class="weekend-state">Выходной! Отдыхаем 🎉🍂</div>`;
         } else {
-          container.innerHTML = `<div class="empty-state">Для ${currentClassName} на этот день уроков нет ☕🍂</div>`;
+          container.innerHTML = `<div class="empty-state">На этот день уроков нет ☕🍂</div>`;
         }
         return;
       }
@@ -1672,6 +1996,9 @@
         card.className = `card ${isDone ? 'completed' : ''} ${hasNote ? 'has-note' : ''} ${isNowActive ? 'now-active' : ''} ${examClass}`;
         card.onclick = () => openLessonDetails(item, lessonKey, timeString);
 
+        // Проверяем, может ли текущий учитель редактировать данный урок
+        const canTeacherEdit = isTeacher() && teacherTeachesSubject(subject);
+
         card.innerHTML = `
           <div class="card-header">
             <div class="subject-box">
@@ -1687,10 +2014,11 @@
             </div>
             <div class="badge-group">
               ${room ? `<span class="room-badge">🚪 ${room}</span>` : ''}
+              ${canTeacherEdit ? `<button class="edit-lesson-btn" onclick="openTeacherEditModal(allItems[${allItems.indexOf(item)}], event)">✏️ Изменить</button>` : ''}
             </div>
           </div>
           <div class="homework-row">
-            <div class="custom-check" onclick="toggleHomework(event, '${lessonKey}', this.closest('.card'))" title="Отметить как сделанное"></div>
+            ${!isTeacher() ? `<div class="custom-check" onclick="toggleHomework(event, '${lessonKey}', this.closest('.card'))" title="Отметить как сделанное"></div>` : ''}
             <div class="homework-content">
               <div class="homework-title">Домашнее задание:</div>
               <div class="homework-text">${homework}</div>
@@ -1711,4 +2039,4 @@
     loadData();
   </script>
 </body>
-  </html>
+</html>
