@@ -1105,11 +1105,18 @@
     }
 
     // Проверка, преподает ли учитель данный предмет
+    // Проверка, преподает ли учитель данный предмет
     function teacherTeachesSubject(subjectName) {
       if (!isTeacher()) return false;
-      if (!currentUser.subjects || currentUser.subjects === 'все') return true;
-      const subs = currentUser.subjects.split(',').map(s => s.trim().toLowerCase());
-      return subs.includes(String(subjectName).trim().toLowerCase());
+      const mySubs = String(currentUser.subjects || '').trim().toLowerCase();
+      
+      // Если написано "все", пустая ячейка или стоит прочерк — разрешаем менять абсолютно всё
+      if (!mySubs || mySubs === 'все' || mySubs === 'all' || mySubs === '-') return true;
+
+      // Иначе проверяем совпадение по списку через запятую
+      const list = mySubs.split(',').map(s => s.trim().toLowerCase());
+      const currentSub = String(subjectName || '').trim().toLowerCase();
+      return list.includes(currentSub);
     }
 
     function updateProfileUI() {
