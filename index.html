@@ -1177,7 +1177,8 @@
 
       if (found) {
         errEl.style.display = 'none';
-        const role = String(found['Роль'] || found['роль'] || 'student').trim().toLowerCase();
+        const rawRole = String(found['Роль'] || found['роль'] || found['Role'] || '').trim().toLowerCase();
+const role = (rawRole === 'teacher' || rawRole === 'учитель' || rawRole === 'преподаватель') ? 'teacher' : 'student';
         currentUser = {
           name: String(found['Имя'] || found['имя'] || found['ФИО'] || login).trim(),
           className: String(found['Класс'] || found['класс'] || '').trim().toUpperCase(),
