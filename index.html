@@ -102,7 +102,6 @@
       gap: 10px;
     }
 
-    /* КНОПКА ПРОФИЛЯ В ЛЕВОМ УГЛУ */
     .profile-btn {
       background: linear-gradient(145deg, #2b2123, #1e181a);
       border: 1px solid rgba(244, 162, 97, 0.4);
@@ -173,7 +172,6 @@
       display: none;
     }
 
-    /* БАННЕРЫ */
     .info-banners {
       display: flex;
       flex-direction: column;
@@ -222,7 +220,6 @@
       text-shadow: 0 0 10px var(--gold-glow);
     }
 
-    /* НЕДЕЛЯ */
     .week-segmented {
       display: flex;
       background: #1a1517;
@@ -253,7 +250,6 @@
       box-shadow: 0 0 14px var(--gold-glow);
     }
 
-    /* СЕТКА ДНЕЙ */
     .days-grid {
       display: grid;
       grid-template-columns: repeat(7, 1fr);
@@ -321,7 +317,6 @@
       font-size: 14px;
     }
 
-    /* КАРТОЧКИ УРОКОВ */
     .cards-container {
       display: flex;
       flex-direction: column;
@@ -512,7 +507,6 @@
       border-radius: 14px;
     }
 
-    /* МОДАЛЬНЫЕ ОКНА */
     .modal-overlay {
       position: fixed;
       top: 0;
@@ -716,7 +710,6 @@
 
   <div class="header-top">
     <div class="header-left">
-      <!-- КНОПКА ПРОФИЛЯ В ЛЕВОМ УГЛУ -->
       <div class="profile-btn" onclick="openProfileModal()">
         <span>👤</span>
         <span id="profile-btn-text">Профиль</span>
@@ -735,7 +728,6 @@
     </div>
   </div>
 
-  <!-- Верхние баннеры -->
   <div class="info-banners">
     <div class="banner-pill lesson-timer-banner">
       <span id="timer-status">🔔 Звонки: загрузка...</span>
@@ -751,7 +743,6 @@
     </div>
   </div>
 
-  <!-- Выбор недели -->
   <div class="week-segmented">
     <div id="btn-week-1" class="week-btn active" onclick="switchWeek(0)">Текущая неделя</div>
     <div id="btn-week-2" class="week-btn" onclick="switchWeek(1)">Следующая неделя</div>
@@ -759,7 +750,6 @@
 
   <div id="days-grid" class="days-grid"></div>
 
-  <!-- Дежурные дня -->
   <div id="duty-banner" class="duty-card" style="display: none;">
     <span>🧹 Дежурные:</span>
     <span id="duty-names" class="names">—</span>
@@ -769,7 +759,6 @@
 
   <div id="cards-container" class="cards-container"></div>
 
-  <!-- 1. ОКНО АВТОРИЗАЦИИ (ЕСЛИ ЕЩЕ НЕ ВОШЕЛ) -->
   <div id="login-modal" class="modal-overlay">
     <div class="modal-sheet">
       <div class="modal-header">
@@ -790,7 +779,6 @@
     </div>
   </div>
 
-  <!-- 2. МОДАЛКА ПРОФИЛЯ УЧЕНИКА -->
   <div id="profile-modal" class="modal-overlay" onclick="closeProfileModal(event)">
     <div class="modal-sheet" onclick="event.stopPropagation()">
       <div class="modal-header">
@@ -822,7 +810,6 @@
     </div>
   </div>
 
-  <!-- 3. МОДАЛКА ПОДРОБНОСТЕЙ УРОКА -->
   <div id="lesson-modal" class="modal-overlay" onclick="closeLessonModal(event)">
     <div class="modal-sheet" onclick="event.stopPropagation()">
       <div class="modal-header">
@@ -866,7 +853,6 @@
     </div>
   </div>
 
-  <!-- 4. МОДАЛКА ОБЪЯВЛЕНИЙ -->
   <div id="modal-overlay" class="modal-overlay" onclick="closeAnnouncements(event)">
     <div class="modal-sheet" onclick="event.stopPropagation()">
       <div class="modal-header">
@@ -877,7 +863,6 @@
     </div>
   </div>
 
-  <!-- 5. МОДАЛКА ОТСУТСТВИЯ -->
   <div id="absence-overlay" class="modal-overlay" onclick="closeAbsenceModal(event)">
     <div class="modal-sheet" onclick="event.stopPropagation()">
       <div class="modal-header">
@@ -903,9 +888,6 @@
   </div>
 
   <script>
-    // =========================================================================
-    // НАСТРОЙКА URL ТВОЕГО APPS SCRIPT:
-    // =========================================================================
     const API_URL = 'https://script.google.com/macros/s/AKfycbzoRZ_Fd9Yv2FJq79lpF4HPg-NETJm4gSCqLVxU7_6pp2CHNON2A09U1X0eYRE4cyQ5/exec';
 
     const BELL_SCHEDULE = [
@@ -931,7 +913,6 @@
     let selectedDateInfo = null;
     let currentEditingLessonKey = null;
 
-    // ТЕКУЩИЙ АВТОРИЗОВАННЫЙ ПРОФИЛЬ
     let currentUser = JSON.parse(localStorage.getItem('diary_current_user') || 'null');
 
     function updateProfileUI() {
@@ -1014,23 +995,19 @@
       document.getElementById('profile-modal').classList.remove('open');
     }
 
-    // ФИЛЬТРАЦИЯ УРОКА ПО ПРОФИЛЮ УЧЕНИКА
     function matchesUserProfile(item) {
       if (!currentUser) return true;
 
-      // 1. Проверка Класса
       const itemClass = String(item['Класс'] || item['класс'] || '').trim().toUpperCase();
       if (itemClass && itemClass !== 'ВСЕ' && itemClass !== currentUser.className) {
         return false;
       }
 
-      // 2. Проверка Группы (для иностранного языка)
       const itemGroup = String(item['Группа'] || item['группа'] || '').trim();
       if (itemGroup && itemGroup !== '0' && itemGroup !== currentUser.group) {
         return false;
       }
 
-      // 3. Проверка Пола (для технологии / трудов)
       const itemGender = String(item['Пол'] || item['пол'] || '').trim().toLowerCase();
       if (itemGender && itemGender !== currentUser.gender) {
         return false;
@@ -1109,6 +1086,18 @@
       }
     }
 
+    function cleanDateStr(dStr) {
+      if (!dStr) return '';
+      let s = String(dStr).trim();
+      if (s.includes('T') || s.includes('t')) {
+        const d = new Date(s);
+        if (!isNaN(d.getTime())) {
+          return `${String(d.getDate()).padStart(2, '0')}.${String(d.getMonth() + 1).padStart(2, '0')}`;
+        }
+      }
+      return s.replace(/\.$/, '');
+    }
+
     function checkBirthdays() {
       const banner = document.getElementById('bday-banner');
       const textEl = document.getElementById('bday-text');
@@ -1122,10 +1111,10 @@
       const now = new Date();
       const currentDay = now.getDate();
       const currentMonth = now.getMonth() + 1;
-      const todayStr = `${String(currentDay).padStart(2,'0')}.${String(currentMonth).padStart(2,'0')}`;
+      const todayStr = `${String(currentDay).padStart(2, '0')}.${String(currentMonth).padStart(2, '0')}`;
 
       const todayBday = classBirthdays.find(b => {
-        const rawDate = String(b['Дата'] || b['дата'] || '').trim();
+        const rawDate = cleanDateStr(b['Дата'] || b['дата'] || '');
         return rawDate.startsWith(todayStr) || rawDate.startsWith(`${currentDay}.${currentMonth}`);
       });
 
@@ -1138,7 +1127,7 @@
       } else {
         banner.className = 'banner-pill bday-banner';
         const first = classBirthdays[0];
-        const date = first['Дата'] || first['дата'] || '';
+        const date = cleanDateStr(first['Дата'] || first['дата'] || '');
         const name = first['Имя'] || first['ФИО'] || '';
         textEl.innerHTML = `🎂 Ближайший ДР (${className}): <b>${name}</b> (${date})`;
       }
@@ -1250,7 +1239,7 @@
         list.innerHTML = `<div class="empty-state">Для ${className} пока нет объявлений ✨</div>`;
       } else {
         filteredNews.forEach(item => {
-          const date = item['Дата'] || item['дата'] || item['Date'] || '';
+          const date = cleanDateStr(item['Дата'] || item['дата'] || item['Date'] || '');
           const text = item['Текст'] || item['текст'] || item['Объявление'] || item['Заголовок'] || '';
 
           const card = document.createElement('div');
@@ -1434,12 +1423,11 @@
       const monthWord = monthsRu[selectedDateInfo.dateObj.getMonth()];
       const textDateVariant = `${dayNum} ${monthWord}`.toLowerCase();
 
-      // Дежурные дня (с проверкой точной даты)
       const dutyBanner = document.getElementById('duty-banner');
       const dutyNamesEl = document.getElementById('duty-names');
       const currentDuty = allDuty.find(d => {
         if (!matchesCurrentClass(d, false)) return false;
-        const rawDate = String(d['Дата'] || d['дата'] || '').trim().toLowerCase().replace(/\.$/, '');
+        const rawDate = cleanDateStr(d['Дата'] || d['дата'] || '').toLowerCase();
         if (rawDate === textDateVariant) return true;
         const datePattern = new RegExp(`(^|[^0-9])${selectedDateInfo.unpadded.replace('.', '\\.')}([^0-9]|$)`);
         const paddedPattern = new RegExp(`(^|[^0-9])${selectedDateInfo.padded.replace('.', '\\.')}([^0-9]|$)`);
@@ -1453,13 +1441,10 @@
         dutyBanner.style.display = 'none';
       }
 
-      // Фильтрация уроков: ПО ПРОФИЛЮ УЧЕНИКА + ТОЧНАЯ ДАТА
       const dayLessons = allItems.filter(item => {
         if (!matchesUserProfile(item)) return false;
 
-        const rawDate = String(
-          item['Дата'] || item['дата'] || item['Date'] || item['date'] || ''
-        ).trim().toLowerCase().replace(/\.$/, '');
+        const rawDate = cleanDateStr(item['Дата'] || item['дата'] || item['Date'] || item['date'] || '').toLowerCase();
 
         if (rawDate === textDateVariant) return true;
 
@@ -1491,7 +1476,7 @@
         const homework = item['Задание'] || item['задание'] || item['Homework'] || 'Нет задания';
         const deadline = item['Дедлайн'] || item['дедлайн'] || item['Срок сдачи'] || item['Deadline'] || '';
         const room = item['Кабинет'] || item['кабинет'] || item['Каб'] || item['Room'] || '';
-        const lessonDate = item['Дата'] || item['дата'] || textDateVariant;
+        const lessonDate = cleanDateStr(item['Дата'] || item['дата'] || textDateVariant);
 
         const bellInfo = BELL_SCHEDULE[idx] || null;
         let timeString = '';
