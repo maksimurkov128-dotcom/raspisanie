@@ -27,6 +27,7 @@
       --gold-glow: rgba(244, 162, 97, 0.4);
       --danger: #e63946;
       --green: #2a9d8f;
+      --green-glow: rgba(42, 157, 143, 0.4);
     }
 
     * {
@@ -83,7 +84,7 @@
     .leaf:nth-child(4) { left: 65%; font-size: 22px; animation-duration: 16s, 4.5s; animation-delay: 1s; opacity: 0.3; }
     .leaf:nth-child(5) { left: 85%; font-size: 19px; animation-duration: 15s, 4s; animation-delay: 4s; }
 
-    .header-top, .info-banners, .week-segmented, .days-grid, #cards-container, #loader, #duty-banner {
+    .header-top, .info-banners, .week-segmented, .days-grid, #cards-container, #loader, #duty-banner, #progress-wrapper {
       position: relative;
       z-index: 1;
     }
@@ -298,7 +299,7 @@
       border-radius: 12px;
       padding: 8px 12px;
       font-size: 13px;
-      margin-bottom: 14px;
+      margin-bottom: 12px;
       display: flex;
       align-items: center;
       gap: 8px;
@@ -308,6 +309,45 @@
     .duty-card span.names {
       font-weight: 700;
       color: var(--gold);
+    }
+
+    /* ПРОГРЕСС-БАР ДОМАШНЕГО ЗАДАНИЯ */
+    .progress-box {
+      background: #1c1719;
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 10px 14px;
+      margin-bottom: 14px;
+    }
+
+    .progress-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: #ddd;
+    }
+
+    .progress-track {
+      width: 100%;
+      height: 8px;
+      background: #2a2225;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #f4a261, #e76f51);
+      border-radius: 10px;
+      transition: width 0.35s ease, background 0.35s ease;
+    }
+
+    .progress-bar-fill.all-done {
+      background: linear-gradient(90deg, #2a9d8f, #52b788);
+      box-shadow: 0 0 10px var(--green-glow);
     }
 
     .loader {
@@ -344,6 +384,11 @@
     .card.has-note {
       border: 1px solid var(--gold);
       box-shadow: 0 0 14px rgba(244, 162, 97, 0.25);
+    }
+
+    .card.is-exam-card {
+      border: 1px solid rgba(230, 57, 70, 0.7);
+      box-shadow: 0 0 14px rgba(230, 57, 70, 0.25);
     }
 
     .card.completed {
@@ -401,11 +446,39 @@
       display: flex;
       align-items: center;
       gap: 6px;
+      flex-wrap: wrap;
     }
 
     .note-indicator {
       font-size: 12px;
       color: var(--gold);
+    }
+
+    /* БЕЙДЖИ КОНТРОЛЬНЫХ И САМОСТОЯТЕЛЬНЫХ */
+    .exam-badge {
+      font-size: 10px;
+      padding: 2px 7px;
+      border-radius: 8px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .exam-badge.kr {
+      background: rgba(230, 57, 70, 0.2);
+      border: 1px solid rgba(230, 57, 70, 0.7);
+      color: #ff6b6b;
+      box-shadow: 0 0 10px rgba(230, 57, 70, 0.3);
+    }
+
+    .exam-badge.sr {
+      background: rgba(244, 162, 97, 0.2);
+      border: 1px solid rgba(244, 162, 97, 0.7);
+      color: #f4a261;
+      box-shadow: 0 0 10px rgba(244, 162, 97, 0.3);
     }
 
     .badge-group {
@@ -755,6 +828,17 @@
     <span id="duty-names" class="names">—</span>
   </div>
 
+  <!-- БЛОК ПРОГРЕСС-БАРА ДЗ -->
+  <div id="progress-wrapper" class="progress-box" style="display: none;">
+    <div class="progress-header">
+      <span id="progress-label">Выполнено ДЗ:</span>
+      <span id="progress-percent" class="gold-text">0%</span>
+    </div>
+    <div class="progress-track">
+      <div id="progress-bar-fill" class="progress-bar-fill"></div>
+    </div>
+  </div>
+
   <div id="loader" class="loader">Синхронизация с таблицей...</div>
 
   <div id="cards-container" class="cards-container"></div>
@@ -967,6 +1051,7 @@
         updateProfileUI();
         updateNewsBadge();
         checkBirthdays();
+        updateBellTimer();
         renderLessons();
       } else {
         errEl.style.display = 'block';
@@ -1028,6 +1113,19 @@
       return allNews.filter(item => matchesCurrentClass(item, true));
     }
 
+    function cleanDateStr(dStr) {
+      if (!dStr) return '';
+      let s = String(dStr).trim();
+      if (s.includes('T') || s.includes('t')) {
+        const d = new Date(s);
+        if (!isNaN(d.getTime())) {
+          return `${String(d.getDate()).padStart(2, '0')}.${String(d.getMonth() + 1).padStart(2, '0')}`;
+        }
+      }
+      return s.replace(/\.$/, '');
+    }
+
+    /* ИСПРАВЛЕННЫЙ ТАЙМЕР ЗВОНКОВ */
     function updateBellTimer() {
       const timerEl = document.getElementById('timer-status');
       const now = new Date();
@@ -1038,30 +1136,57 @@
         return;
       }
 
-      const currentMinutes = now.getHours() * 60 + now.getMinutes();
+      const monthsRu = [
+        'января', 'февраля', 'марта', 'апреля', 'мая', 'июня',
+        'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'
+      ];
+      const dayNum = now.getDate();
+      const monthNum = now.getMonth() + 1;
+      const textDateVariant = `${dayNum} ${monthsRu[now.getMonth()]}`.toLowerCase();
+      const paddedStr = `${String(dayNum).padStart(2, '0')}.${String(monthNum).padStart(2, '0')}`;
+      const unpaddedStr = `${dayNum}.${monthNum}`;
 
-      if (currentMinutes < BELL_SCHEDULE[0].startM) {
-        const wait = BELL_SCHEDULE[0].startM - currentMinutes;
+      const todayLessons = allItems.filter(item => {
+        if (!matchesUserProfile(item)) return false;
+        const rawDate = cleanDateStr(item['Дата'] || item['дата'] || item['Date'] || item['date'] || '').toLowerCase();
+        if (rawDate === textDateVariant) return true;
+        const datePattern = new RegExp(`(^|[^0-9])${unpaddedStr.replace('.', '\\.')}([^0-9]|$)`);
+        const paddedPattern = new RegExp(`(^|[^0-9])${paddedStr.replace('.', '\\.')}([^0-9]|$)`);
+        return datePattern.test(rawDate) || paddedPattern.test(rawDate);
+      });
+
+      const totalLessonsToday = todayLessons.length;
+
+      if (totalLessonsToday === 0) {
+        timerEl.innerHTML = `✨ На сегодня уроков нет!`;
+        return;
+      }
+
+      const currentMinutes = now.getHours() * 60 + now.getMinutes();
+      const activeBells = BELL_SCHEDULE.slice(0, totalLessonsToday);
+      const lastBell = activeBells[activeBells.length - 1];
+
+      if (currentMinutes < activeBells[0].startM) {
+        const wait = activeBells[0].startM - currentMinutes;
         timerEl.innerHTML = `☕ Уроки еще не начались (до 1-го урока: <b>${wait} мин</b>)`;
         return;
       }
 
-      const lastBell = BELL_SCHEDULE[BELL_SCHEDULE.length - 1];
       if (currentMinutes >= lastBell.endM) {
-        timerEl.innerHTML = `✨ Учебный день завершен! Отличного вечера`;
+        timerEl.innerHTML = `✨ Все уроки на сегодня закончились! (${totalLessonsToday} уроков)`;
         return;
       }
 
-      for (let i = 0; i < BELL_SCHEDULE.length; i++) {
-        const bell = BELL_SCHEDULE[i];
+      for (let i = 0; i < activeBells.length; i++) {
+        const bell = activeBells[i];
         if (currentMinutes >= bell.startM && currentMinutes < bell.endM) {
           const left = bell.endM - currentMinutes;
           timerEl.innerHTML = `🔔 <b>${bell.num}-й урок</b> • До звонка с урока: <b>${left} мин</b>`;
           return;
         }
 
-        if (i < BELL_SCHEDULE.length - 1) {
-          const nextBell = BELL_SCHEDULE[i + 1];
+        if (i < activeBells.length - 1) {
+          const nextBell = activeBells[i + 1];
           if (currentMinutes >= bell.endM && currentMinutes < nextBell.startM) {
             const left = nextBell.startM - currentMinutes;
             timerEl.innerHTML = `☕ <b>Перемена</b> • До начала ${nextBell.num}-го урока: <b>${left} мин</b>`;
@@ -1084,18 +1209,6 @@
       } else {
         counterEl.innerText = `Каникулы идут! ⛷️`;
       }
-    }
-
-    function cleanDateStr(dStr) {
-      if (!dStr) return '';
-      let s = String(dStr).trim();
-      if (s.includes('T') || s.includes('t')) {
-        const d = new Date(s);
-        if (!isNaN(d.getTime())) {
-          return `${String(d.getDate()).padStart(2, '0')}.${String(d.getMonth() + 1).padStart(2, '0')}`;
-        }
-      }
-      return s.replace(/\.$/, '');
     }
 
     function checkBirthdays() {
@@ -1193,9 +1306,6 @@
         updateNewsBadge();
         updateVacationCountdown();
         checkBirthdays();
-        updateBellTimer();
-
-        setInterval(updateBellTimer, 30000);
 
         twoWeeks = generate14Days();
 
@@ -1207,6 +1317,9 @@
           selectedDateInfo = twoWeeks[0];
           currentWeekIndex = 0;
         }
+
+        updateBellTimer();
+        setInterval(updateBellTimer, 30000);
 
         updateWeekButtons();
         renderDaysGrid();
@@ -1398,6 +1511,27 @@
       });
     }
 
+    function updateHomeworkProgressBar(totalCount, completedCount) {
+      const wrapper = document.getElementById('progress-wrapper');
+      if (totalCount === 0) {
+        wrapper.style.display = 'none';
+        return;
+      }
+
+      wrapper.style.display = 'block';
+      const percent = Math.round((completedCount / totalCount) * 100);
+      document.getElementById('progress-label').innerText = `Выполнено ДЗ: ${completedCount} из ${totalCount}`;
+      document.getElementById('progress-percent').innerText = `${percent}%`;
+
+      const fill = document.getElementById('progress-bar-fill');
+      fill.style.width = `${percent}%`;
+      if (percent === 100) {
+        fill.classList.add('all-done');
+      } else {
+        fill.classList.remove('all-done');
+      }
+    }
+
     function toggleHomework(e, lessonKey, cardEl) {
       e.stopPropagation();
       const isDone = localStorage.getItem(lessonKey) === 'true';
@@ -1408,6 +1542,28 @@
         localStorage.setItem(lessonKey, 'true');
         cardEl.classList.add('completed');
       }
+
+      // Пересчитываем прогресс-бар ДЗ
+      const container = document.getElementById('cards-container');
+      const totalCards = container.querySelectorAll('.card').length;
+      const completedCards = container.querySelectorAll('.card.completed').length;
+      updateHomeworkProgressBar(totalCards, completedCards);
+    }
+
+    // Определение контрольных и самостоятельных работ
+    function getExamBadgeInfo(item) {
+      const combined = `${item['Тип'] || ''} ${item['Тема'] || item['тема'] || ''} ${item['Задание'] || item['задание'] || ''}`.toLowerCase();
+      
+      if (combined.includes('к/р') || combined.includes('кр') || combined.includes('контрольная')) {
+        return { type: 'kr', label: '⚠️ Контрольная' };
+      }
+      if (combined.includes('с/р') || combined.includes('ср') || combined.includes('самостоятельная')) {
+        return { type: 'sr', label: '📝 Самостоятельная' };
+      }
+      if (combined.includes('тест') || combined.includes('зачет')) {
+        return { type: 'sr', label: '📝 Тест' };
+      }
+      return null;
     }
 
     function renderLessons() {
@@ -1445,7 +1601,6 @@
         if (!matchesUserProfile(item)) return false;
 
         const rawDate = cleanDateStr(item['Дата'] || item['дата'] || item['Date'] || item['date'] || '').toLowerCase();
-
         if (rawDate === textDateVariant) return true;
 
         const datePattern = new RegExp(`(^|[^0-9])${selectedDateInfo.unpadded.replace('.', '\\.')}([^0-9]|$)`);
@@ -1457,6 +1612,7 @@
       const currentClassName = currentUser ? currentUser.className : '8А';
 
       if (dayLessons.length === 0) {
+        updateHomeworkProgressBar(0, 0);
         const dayOfWeek = selectedDateInfo.dateObj.getDay();
         if (dayOfWeek === 6 || dayOfWeek === 0) {
           container.innerHTML = `<div class="weekend-state">Выходной! Отдыхаем 🎉🍂</div>`;
@@ -1469,6 +1625,8 @@
       const now = new Date();
       const isTodaySelected = selectedDateInfo.isToday;
       const currentMinutes = now.getHours() * 60 + now.getMinutes();
+
+      let completedTasksCount = 0;
 
       dayLessons.forEach((item, idx) => {
         const card = document.createElement('div');
@@ -1496,7 +1654,12 @@
         const isDone = localStorage.getItem(lessonKey) === 'true';
         const hasNote = Boolean(localStorage.getItem(`note_${lessonKey}`));
 
-        card.className = `card ${isDone ? 'completed' : ''} ${hasNote ? 'has-note' : ''} ${isNowActive ? 'now-active' : ''}`;
+        if (isDone) completedTasksCount++;
+
+        const examBadge = getExamBadgeInfo(item);
+        const examClass = examBadge ? (examBadge.type === 'kr' ? 'is-exam-card' : '') : '';
+
+        card.className = `card ${isDone ? 'completed' : ''} ${hasNote ? 'has-note' : ''} ${isNowActive ? 'now-active' : ''} ${examClass}`;
         card.onclick = () => openLessonDetails(item, lessonKey, timeString);
 
         card.innerHTML = `
@@ -1504,6 +1667,7 @@
             <div class="subject-box">
               <span class="subject">
                 ${subject}
+                ${examBadge ? `<span class="exam-badge ${examBadge.type}">${examBadge.label}</span>` : ''}
                 ${hasNote ? `<span class="note-indicator" title="Есть личная заметка">📌</span>` : ''}
               </span>
               <div class="lesson-time-sub">
@@ -1530,6 +1694,9 @@
         `;
         container.appendChild(card);
       });
+
+      // Обновляем шкалу прогресса выполнения
+      updateHomeworkProgressBar(dayLessons.length, completedTasksCount);
     }
 
     loadData();
