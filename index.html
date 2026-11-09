@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <title>Школьное расписание</title>
   
-  <!-- Иконка и PWA режим для главного экрана -->
   <link rel="icon" type="image/png" href="./icon.png">
   <link rel="apple-touch-icon" href="./icon.png">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -47,7 +46,6 @@
       position: relative;
     }
 
-    /* АНИМАЦИЯ ПАДАЮЩИХ ЛИСТЬЕВ */
     .leaves-container {
       position: fixed;
       top: 0;
@@ -98,38 +96,39 @@
       padding: 0 4px;
     }
 
-    .header-title-box {
+    .header-left {
       display: flex;
       align-items: center;
       gap: 10px;
     }
 
-    .header-top h2 {
-      margin: 0;
-      font-size: 20px;
-      font-weight: 700;
-      color: #fff;
-    }
-
-    .class-badge-btn {
+    /* КНОПКА ПРОФИЛЯ В ЛЕВОМ УГЛУ */
+    .profile-btn {
       background: linear-gradient(145deg, #2b2123, #1e181a);
       border: 1px solid rgba(244, 162, 97, 0.4);
       color: var(--gold);
       font-weight: 700;
-      font-size: 14px;
-      padding: 5px 11px;
-      border-radius: 10px;
+      font-size: 13px;
+      padding: 6px 12px;
+      border-radius: 12px;
       cursor: pointer;
       display: flex;
       align-items: center;
-      gap: 5px;
-      box-shadow: 0 0 12px rgba(244, 162, 97, 0.2);
+      gap: 6px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.4);
       transition: transform 0.15s;
       user-select: none;
     }
 
-    .class-badge-btn:active {
+    .profile-btn:active {
       transform: scale(0.92);
+    }
+
+    .header-top h2 {
+      margin: 0;
+      font-size: 19px;
+      font-weight: 700;
+      color: #fff;
     }
 
     .top-actions {
@@ -174,7 +173,7 @@
       display: none;
     }
 
-    /* БАННЕРЫ ВЕРХА */
+    /* БАННЕРЫ */
     .info-banners {
       display: flex;
       flex-direction: column;
@@ -223,7 +222,7 @@
       text-shadow: 0 0 10px var(--gold-glow);
     }
 
-    /* ПЕРЕКЛЮЧАТЕЛЬ НЕДЕЛИ */
+    /* НЕДЕЛЯ */
     .week-segmented {
       display: flex;
       background: #1a1517;
@@ -297,7 +296,6 @@
 
     .day-cell.active .day-name, .day-cell.active .day-num { color: #fff; }
 
-    /* БАННЕР ДЕЖУРСТВА */
     .duty-card {
       background: #1c181a;
       border: 1px dashed rgba(244, 162, 97, 0.3);
@@ -341,9 +339,7 @@
       position: relative;
     }
 
-    .card:active {
-      transform: scale(0.985);
-    }
+    .card:active { transform: scale(0.985); }
 
     .card.now-active {
       border: 1px solid var(--green);
@@ -580,7 +576,6 @@
       cursor: pointer;
     }
 
-    /* ДЕТАЛИ УРОКА */
     .detail-item {
       background: #221c1f;
       border: 1px solid var(--card-border);
@@ -635,44 +630,6 @@
 
     .note-textarea:focus { border-color: var(--gold); }
 
-    /* ВЫБОР КЛАССА */
-    .picker-label {
-      font-size: 12px;
-      color: var(--hint);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-bottom: 8px;
-      font-weight: 600;
-    }
-
-    .grades-grid, .letters-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 8px;
-      margin-bottom: 18px;
-    }
-
-    .pick-btn {
-      background: #221c1f;
-      border: 1px solid var(--card-border);
-      color: var(--text);
-      padding: 11px 0;
-      text-align: center;
-      border-radius: 11px;
-      font-size: 15px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: all 0.15s;
-      user-select: none;
-    }
-
-    .pick-btn.active {
-      background: linear-gradient(145deg, #e76f51, #d45d3e);
-      border-color: var(--gold);
-      color: #fff;
-      box-shadow: 0 0 12px var(--accent-glow);
-    }
-
     .form-group {
       margin-bottom: 12px;
       display: flex;
@@ -712,6 +669,18 @@
 
     .submit-btn:active { transform: scale(0.97); }
 
+    .logout-btn {
+      background: #2b2123;
+      border: 1px solid var(--danger);
+      color: var(--danger);
+      font-weight: 700;
+      padding: 10px;
+      border-radius: 12px;
+      cursor: pointer;
+      margin-top: 14px;
+      width: 100%;
+    }
+
     .news-card {
       background: #221c1f;
       border: 1px solid var(--card-border);
@@ -746,11 +715,13 @@
   </div>
 
   <div class="header-top">
-    <div class="header-title-box">
-      <h2>Расписание</h2>
-      <div id="current-class-btn" class="class-badge-btn" onclick="openClassModal()">
-        <span id="current-class-text">8А</span> ▾
+    <div class="header-left">
+      <!-- КНОПКА ПРОФИЛЯ В ЛЕВОМ УГЛУ -->
+      <div class="profile-btn" onclick="openProfileModal()">
+        <span>👤</span>
+        <span id="profile-btn-text">Профиль</span>
       </div>
+      <h2>Расписание</h2>
     </div>
     
     <div class="top-actions">
@@ -766,7 +737,6 @@
 
   <!-- Верхние баннеры -->
   <div class="info-banners">
-    <!-- ЖИВОЙ ТАЙМЕР ЗВОНКОВ -->
     <div class="banner-pill lesson-timer-banner">
       <span id="timer-status">🔔 Звонки: загрузка...</span>
     </div>
@@ -799,7 +769,60 @@
 
   <div id="cards-container" class="cards-container"></div>
 
-  <!-- МОДАЛКА ДЕТАЛЕЙ УРОКА -->
+  <!-- 1. ОКНО АВТОРИЗАЦИИ (ЕСЛИ ЕЩЕ НЕ ВОШЕЛ) -->
+  <div id="login-modal" class="modal-overlay">
+    <div class="modal-sheet">
+      <div class="modal-header">
+        <h3>🔐 Вход в дневник</h3>
+      </div>
+      <form onsubmit="handleLogin(event)">
+        <div class="form-group">
+          <label>Логин</label>
+          <input type="text" id="login-user" class="form-input" placeholder="Например: ivanov" required autocomplete="username">
+        </div>
+        <div class="form-group">
+          <label>Пароль</label>
+          <input type="password" id="login-pass" class="form-input" placeholder="••••" required autocomplete="current-password">
+        </div>
+        <div id="login-error" style="color: var(--danger); font-size: 13px; margin-bottom: 8px; display: none;">Неверный логин или пароль</div>
+        <button type="submit" id="login-submit-btn" class="submit-btn">Войти</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- 2. МОДАЛКА ПРОФИЛЯ УЧЕНИКА -->
+  <div id="profile-modal" class="modal-overlay" onclick="closeProfileModal(event)">
+    <div class="modal-sheet" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <h3>👤 Мой профиль</h3>
+        <button class="close-btn" onclick="closeProfileModal()">✕</button>
+      </div>
+
+      <div class="detail-item">
+        <div class="detail-label">Ученик</div>
+        <div id="prof-name" class="detail-val" style="font-weight: 700; font-size: 16px;">—</div>
+      </div>
+
+      <div class="detail-item">
+        <div class="detail-label">Класс</div>
+        <div id="prof-class" class="detail-val">—</div>
+      </div>
+
+      <div class="detail-item">
+        <div class="detail-label">Группа по английскому</div>
+        <div id="prof-group" class="detail-val">—</div>
+      </div>
+
+      <div class="detail-item">
+        <div class="detail-label">Профиль труда (технологии)</div>
+        <div id="prof-gender" class="detail-val">—</div>
+      </div>
+
+      <button class="logout-btn" onclick="handleLogout()">Выйти из профиля</button>
+    </div>
+  </div>
+
+  <!-- 3. МОДАЛКА ПОДРОБНОСТЕЙ УРОКА -->
   <div id="lesson-modal" class="modal-overlay" onclick="closeLessonModal(event)">
     <div class="modal-sheet" onclick="event.stopPropagation()">
       <div class="modal-header">
@@ -843,24 +866,7 @@
     </div>
   </div>
 
-  <!-- МОДАЛКА ВЫБОРА КЛАССА -->
-  <div id="class-overlay" class="modal-overlay" onclick="closeClassModal(event)">
-    <div class="modal-sheet" onclick="event.stopPropagation()">
-      <div class="modal-header">
-        <h3>🏫 Выбери свой класс</h3>
-        <button class="close-btn" onclick="closeClassModal()">✕</button>
-      </div>
-      <div class="picker-label">Параллель (1–11):</div>
-      <div id="grades-grid" class="grades-grid"></div>
-
-      <div class="picker-label">Буква класса:</div>
-      <div id="letters-grid" class="letters-grid"></div>
-
-      <button class="submit-btn" onclick="saveSelectedClass()">Сохранить класс</button>
-    </div>
-  </div>
-
-  <!-- МОДАЛКА ОБЪЯВЛЕНИЙ -->
+  <!-- 4. МОДАЛКА ОБЪЯВЛЕНИЙ -->
   <div id="modal-overlay" class="modal-overlay" onclick="closeAnnouncements(event)">
     <div class="modal-sheet" onclick="event.stopPropagation()">
       <div class="modal-header">
@@ -871,7 +877,7 @@
     </div>
   </div>
 
-  <!-- МОДАЛКА ОТСУТСТВИЯ -->
+  <!-- 5. МОДАЛКА ОТСУТСТВИЯ -->
   <div id="absence-overlay" class="modal-overlay" onclick="closeAbsenceModal(event)">
     <div class="modal-sheet" onclick="event.stopPropagation()">
       <div class="modal-header">
@@ -897,16 +903,11 @@
   </div>
 
   <script>
-    let tgUser = null;
-    if (window.Telegram && window.Telegram.WebApp) {
-      window.Telegram.WebApp.ready();
-      window.Telegram.WebApp.expand();
-      tgUser = window.Telegram.WebApp.initDataUnsafe?.user;
-    }
-
+    // =========================================================================
+    // НАСТРОЙКА URL ТВОЕГО APPS SCRIPT:
+    // =========================================================================
     const API_URL = 'https://script.google.com/macros/s/AKfycbzoRZ_Fd9Yv2FJq79lpF4HPg-NETJm4gSCqLVxU7_6pp2CHNON2A09U1X0eYRE4cyQ5/exec';
 
-    // РАСПИСАНИЕ ЗВОНКОВ ШКОЛЫ
     const BELL_SCHEDULE = [
       { num: 1, start: '08:30', end: '09:10', startM: 8 * 60 + 30, endM: 9 * 60 + 10 },
       { num: 2, start: '09:20', end: '10:00', startM: 9 * 60 + 20, endM: 10 * 60 + 0 },
@@ -918,116 +919,138 @@
       { num: 8, start: '14:40', end: '15:20', startM: 14 * 60 + 40, endM: 15 * 60 + 20 }
     ];
 
-    const SCHOOL_CLASSES = {
-      '1':  ['А', 'Б', 'В', 'Г'],
-      '2':  ['А', 'Б', 'В', 'Г'],
-      '3':  ['А', 'Б', 'В', 'Г'],
-      '4':  ['А', 'Б', 'В', 'Г'],
-      '5':  ['А', 'Б', 'В', 'Г'],
-      '6':  ['А', 'Б', 'В', 'Г'],
-      '7':  ['А', 'Б', 'В', 'Г'],
-      '8':  ['А', 'Б', 'В', 'Г'],
-      '9':  ['А', 'Б', 'В', 'Г'],
-      '10': ['А', 'Б', 'В', 'Г'],
-      '11': ['А', 'Б', 'В', 'Г']
-    };
-
     const VACATION_DATE = new Date(2026, 11, 28); 
 
     let allItems = [];
     let allNews = [];
     let allDuty = [];
     let allBirthdays = [];
+    let allStudents = [];
     let twoWeeks = [];
     let currentWeekIndex = 0;
     let selectedDateInfo = null;
-
-    let savedGrade = localStorage.getItem('user_grade') || '8';
-    let savedLetter = localStorage.getItem('user_letter') || 'А';
-    let tempGrade = savedGrade;
-    let tempLetter = savedLetter;
     let currentEditingLessonKey = null;
 
-    function getFullClassName() {
-      return `${savedGrade}${savedLetter}`;
+    // ТЕКУЩИЙ АВТОРИЗОВАННЫЙ ПРОФИЛЬ
+    let currentUser = JSON.parse(localStorage.getItem('diary_current_user') || 'null');
+
+    function updateProfileUI() {
+      const btnText = document.getElementById('profile-btn-text');
+      if (currentUser) {
+        btnText.innerText = currentUser.name.split(' ')[0] || 'Профиль';
+        document.getElementById('prof-name').innerText = currentUser.name;
+        document.getElementById('prof-class').innerText = currentUser.className;
+        document.getElementById('prof-group').innerText = `${currentUser.group} группа`;
+        document.getElementById('prof-gender').innerText = currentUser.gender === 'м' ? 'Юноши (Мальчики)' : 'Девушки (Девочки)';
+      } else {
+        btnText.innerText = 'Войти';
+      }
     }
 
-    function updateClassHeader() {
-      document.getElementById('current-class-text').innerText = getFullClassName();
+    function checkAuth() {
+      if (!currentUser) {
+        document.getElementById('login-modal').classList.add('open');
+      } else {
+        document.getElementById('login-modal').classList.remove('open');
+        updateProfileUI();
+      }
     }
 
-    function openClassModal() {
-      tempGrade = savedGrade;
-      tempLetter = savedLetter;
-      renderClassPicker();
-      document.getElementById('class-overlay').classList.add('open');
+    function handleLogin(e) {
+      e.preventDefault();
+      const login = document.getElementById('login-user').value.trim().toLowerCase();
+      const pass = document.getElementById('login-pass').value.trim();
+      const errEl = document.getElementById('login-error');
+
+      if (!allStudents || allStudents.length === 0) {
+        alert('Данные учеников еще подгружаются из таблицы, подожди пару секунд...');
+        return;
+      }
+
+      const found = allStudents.find(s => {
+        const u = String(s['Логин'] || s['логин'] || '').trim().toLowerCase();
+        const p = String(s['Пароль'] || s['пароль'] || '').trim();
+        return u === login && p === pass;
+      });
+
+      if (found) {
+        errEl.style.display = 'none';
+        currentUser = {
+          name: String(found['Имя'] || found['имя'] || found['ФИО'] || login).trim(),
+          className: String(found['Класс'] || found['класс'] || '8А').trim().toUpperCase(),
+          gender: String(found['Пол'] || found['пол'] || 'м').trim().toLowerCase(),
+          group: String(found['Группа'] || found['группа'] || '1').trim()
+        };
+        localStorage.setItem('diary_current_user', JSON.stringify(currentUser));
+        document.getElementById('login-modal').classList.remove('open');
+        updateProfileUI();
+        updateNewsBadge();
+        checkBirthdays();
+        renderLessons();
+      } else {
+        errEl.style.display = 'block';
+      }
     }
 
-    function closeClassModal(e) {
+    function handleLogout() {
+      if (!confirm('Выйти из профиля?')) return;
+      localStorage.removeItem('diary_current_user');
+      currentUser = null;
+      closeProfileModal();
+      checkAuth();
+    }
+
+    function openProfileModal() {
+      if (!currentUser) {
+        checkAuth();
+        return;
+      }
+      updateProfileUI();
+      document.getElementById('profile-modal').classList.add('open');
+    }
+
+    function closeProfileModal(e) {
       if (e && e.target !== e.currentTarget && !e.target.classList.contains('close-btn')) return;
-      document.getElementById('class-overlay').classList.remove('open');
+      document.getElementById('profile-modal').classList.remove('open');
     }
 
-    function renderClassPicker() {
-      const gradesGrid = document.getElementById('grades-grid');
-      const lettersGrid = document.getElementById('letters-grid');
-      gradesGrid.innerHTML = '';
-      lettersGrid.innerHTML = '';
+    // ФИЛЬТРАЦИЯ УРОКА ПО ПРОФИЛЮ УЧЕНИКА
+    function matchesUserProfile(item) {
+      if (!currentUser) return true;
 
-      Object.keys(SCHOOL_CLASSES).forEach(grade => {
-        const btn = document.createElement('div');
-        btn.className = `pick-btn ${grade === tempGrade ? 'active' : ''}`;
-        btn.innerText = grade;
-        btn.onclick = () => {
-          tempGrade = grade;
-          const availableLetters = SCHOOL_CLASSES[tempGrade];
-          if (!availableLetters.includes(tempLetter)) {
-            tempLetter = availableLetters[0];
-          }
-          renderClassPicker();
-        };
-        gradesGrid.appendChild(btn);
-      });
+      // 1. Проверка Класса
+      const itemClass = String(item['Класс'] || item['класс'] || '').trim().toUpperCase();
+      if (itemClass && itemClass !== 'ВСЕ' && itemClass !== currentUser.className) {
+        return false;
+      }
 
-      const letters = SCHOOL_CLASSES[tempGrade] || ['А'];
-      letters.forEach(letter => {
-        const btn = document.createElement('div');
-        btn.className = `pick-btn ${letter === tempLetter ? 'active' : ''}`;
-        btn.innerText = letter;
-        btn.onclick = () => {
-          tempLetter = letter;
-          renderClassPicker();
-        };
-        lettersGrid.appendChild(btn);
-      });
-    }
+      // 2. Проверка Группы (для иностранного языка)
+      const itemGroup = String(item['Группа'] || item['группа'] || '').trim();
+      if (itemGroup && itemGroup !== '0' && itemGroup !== currentUser.group) {
+        return false;
+      }
 
-    function saveSelectedClass() {
-      savedGrade = tempGrade;
-      savedLetter = tempLetter;
-      localStorage.setItem('user_grade', savedGrade);
-      localStorage.setItem('user_letter', savedLetter);
-      localStorage.setItem('has_selected_class', 'true');
-      updateClassHeader();
-      document.getElementById('class-overlay').classList.remove('open');
-      updateNewsBadge();
-      checkBirthdays();
-      updateBellTimer();
-      renderLessons();
+      // 3. Проверка Пола (для технологии / трудов)
+      const itemGender = String(item['Пол'] || item['пол'] || '').trim().toLowerCase();
+      if (itemGender && itemGender !== currentUser.gender) {
+        return false;
+      }
+
+      return true;
     }
 
     function matchesCurrentClass(item, allowAll = false) {
-      const rawClass = String(item['Класс'] || item['класс'] || item['Class'] || '').trim().toUpperCase();
+      const rawClass = String(item['Класс'] || item['класс'] || '').trim().toUpperCase();
       if (!rawClass) return true; 
       if (allowAll && (rawClass === 'ВСЕ' || rawClass === 'ОБЩЕЕ')) return true;
-      return rawClass === getFullClassName().toUpperCase();
+      const targetClass = currentUser ? currentUser.className : '8А';
+      return rawClass === targetClass;
     }
 
     function getFilteredNews() {
       return allNews.filter(item => matchesCurrentClass(item, true));
     }
 
-    /* ЖИВОЙ СТАТУС ЗВОНКОВ */
     function updateBellTimer() {
       const timerEl = document.getElementById('timer-status');
       const now = new Date();
@@ -1040,32 +1063,26 @@
 
       const currentMinutes = now.getHours() * 60 + now.getMinutes();
 
-      // До первого урока
       if (currentMinutes < BELL_SCHEDULE[0].startM) {
         const wait = BELL_SCHEDULE[0].startM - currentMinutes;
         timerEl.innerHTML = `☕ Уроки еще не начались (до 1-го урока: <b>${wait} мин</b>)`;
         return;
       }
 
-      // После всех уроков
       const lastBell = BELL_SCHEDULE[BELL_SCHEDULE.length - 1];
       if (currentMinutes >= lastBell.endM) {
         timerEl.innerHTML = `✨ Учебный день завершен! Отличного вечера`;
         return;
       }
 
-      // Проверяем: идет урок или перемена
       for (let i = 0; i < BELL_SCHEDULE.length; i++) {
         const bell = BELL_SCHEDULE[i];
-
-        // Идет урок
         if (currentMinutes >= bell.startM && currentMinutes < bell.endM) {
           const left = bell.endM - currentMinutes;
           timerEl.innerHTML = `🔔 <b>${bell.num}-й урок</b> • До звонка с урока: <b>${left} мин</b>`;
           return;
         }
 
-        // Перемена между текущим и следующим уроком (показывается только после первого)
         if (i < BELL_SCHEDULE.length - 1) {
           const nextBell = BELL_SCHEDULE[i + 1];
           if (currentMinutes >= bell.endM && currentMinutes < nextBell.startM) {
@@ -1113,6 +1130,7 @@
       });
 
       banner.style.display = 'flex';
+      const className = currentUser ? currentUser.className : '8А';
       if (todayBday) {
         banner.className = 'banner-pill bday-banner today-bday';
         const name = todayBday['Имя'] || todayBday['ФИО'] || 'Одноклассника';
@@ -1122,7 +1140,7 @@
         const first = classBirthdays[0];
         const date = first['Дата'] || first['дата'] || '';
         const name = first['Имя'] || first['ФИО'] || '';
-        textEl.innerHTML = `🎂 Ближайший ДР (${getFullClassName()}): <b>${name}</b> (${date})`;
+        textEl.innerHTML = `🎂 Ближайший ДР (${className}): <b>${name}</b> (${date})`;
       }
     }
 
@@ -1161,11 +1179,7 @@
     }
 
     async function loadData() {
-      updateClassHeader();
-      if (!localStorage.getItem('has_selected_class')) {
-        openClassModal();
-      }
-
+      updateProfileUI();
       const loader = document.getElementById('loader');
       try {
         const res = await fetch(API_URL);
@@ -1177,19 +1191,21 @@
           allNews = [];
           allDuty = [];
           allBirthdays = [];
+          allStudents = [];
         } else {
           allItems = data.schedule || [];
           allNews = data.announcements || [];
           allDuty = data.duty || [];
           allBirthdays = data.birthdays || [];
+          allStudents = data.students || [];
         }
 
+        checkAuth();
         updateNewsBadge();
         updateVacationCountdown();
         checkBirthdays();
         updateBellTimer();
 
-        // Запуск живого таймера звонков раз в 30 секунд
         setInterval(updateBellTimer, 30000);
 
         twoWeeks = generate14Days();
@@ -1228,9 +1244,10 @@
       list.innerHTML = '';
 
       const filteredNews = getFilteredNews();
+      const className = currentUser ? currentUser.className : '8А';
 
       if (filteredNews.length === 0) {
-        list.innerHTML = `<div class="empty-state">Для ${getFullClassName()} пока нет объявлений ✨</div>`;
+        list.innerHTML = `<div class="empty-state">Для ${className} пока нет объявлений ✨</div>`;
       } else {
         filteredNews.forEach(item => {
           const date = item['Дата'] || item['дата'] || item['Date'] || '';
@@ -1256,9 +1273,8 @@
 
     function openAbsenceModal() {
       const modal = document.getElementById('absence-overlay');
-      if (tgUser && !document.getElementById('abs-name').value) {
-        const fullName = [tgUser.first_name, tgUser.last_name].filter(Boolean).join(' ');
-        document.getElementById('abs-name').value = fullName || tgUser.username || '';
+      if (currentUser && !document.getElementById('abs-name').value) {
+        document.getElementById('abs-name').value = currentUser.name;
       }
       modal.classList.add('open');
     }
@@ -1275,7 +1291,7 @@
       btn.disabled = true;
 
       const payload = {
-        className: getFullClassName(),
+        className: currentUser ? currentUser.className : '8А',
         name: document.getElementById('abs-name').value.trim(),
         date: document.getElementById('abs-date').value.trim(),
         reason: document.getElementById('abs-reason').value.trim()
@@ -1303,7 +1319,6 @@
       }
     }
 
-    /* МОДАЛКА ДЕТАЛЕЙ УРОКА И ЗАМЕТОК */
     function openLessonDetails(item, lessonKey, timeString) {
       currentEditingLessonKey = lessonKey;
 
@@ -1419,12 +1434,16 @@
       const monthWord = monthsRu[selectedDateInfo.dateObj.getMonth()];
       const textDateVariant = `${dayNum} ${monthWord}`.toLowerCase();
 
+      // Дежурные дня (с проверкой точной даты)
       const dutyBanner = document.getElementById('duty-banner');
       const dutyNamesEl = document.getElementById('duty-names');
       const currentDuty = allDuty.find(d => {
         if (!matchesCurrentClass(d, false)) return false;
-        const rawDate = String(d['Дата'] || d['дата'] || '').trim().toLowerCase();
-        return rawDate === textDateVariant || rawDate.startsWith(selectedDateInfo.padded) || rawDate.startsWith(selectedDateInfo.unpadded);
+        const rawDate = String(d['Дата'] || d['дата'] || '').trim().toLowerCase().replace(/\.$/, '');
+        if (rawDate === textDateVariant) return true;
+        const datePattern = new RegExp(`(^|[^0-9])${selectedDateInfo.unpadded.replace('.', '\\.')}([^0-9]|$)`);
+        const paddedPattern = new RegExp(`(^|[^0-9])${selectedDateInfo.padded.replace('.', '\\.')}([^0-9]|$)`);
+        return datePattern.test(rawDate) || paddedPattern.test(rawDate);
       });
 
       if (currentDuty) {
@@ -1434,26 +1453,30 @@
         dutyBanner.style.display = 'none';
       }
 
+      // Фильтрация уроков: ПО ПРОФИЛЮ УЧЕНИКА + ТОЧНАЯ ДАТА
       const dayLessons = allItems.filter(item => {
-        if (!matchesCurrentClass(item, false)) return false;
+        if (!matchesUserProfile(item)) return false;
 
         const rawDate = String(
           item['Дата'] || item['дата'] || item['Date'] || item['date'] || ''
-        ).trim().toLowerCase();
+        ).trim().toLowerCase().replace(/\.$/, '');
 
-        return rawDate === textDateVariant ||
-               rawDate.startsWith(selectedDateInfo.padded) ||
-               rawDate.startsWith(selectedDateInfo.unpadded) ||
-               rawDate.includes(selectedDateInfo.padded) ||
-               rawDate.includes(textDateVariant);
+        if (rawDate === textDateVariant) return true;
+
+        const datePattern = new RegExp(`(^|[^0-9])${selectedDateInfo.unpadded.replace('.', '\\.')}([^0-9]|$)`);
+        const paddedPattern = new RegExp(`(^|[^0-9])${selectedDateInfo.padded.replace('.', '\\.')}([^0-9]|$)`);
+
+        return datePattern.test(rawDate) || paddedPattern.test(rawDate);
       });
+
+      const currentClassName = currentUser ? currentUser.className : '8А';
 
       if (dayLessons.length === 0) {
         const dayOfWeek = selectedDateInfo.dateObj.getDay();
         if (dayOfWeek === 6 || dayOfWeek === 0) {
           container.innerHTML = `<div class="weekend-state">Выходной! Отдыхаем 🎉🍂</div>`;
         } else {
-          container.innerHTML = `<div class="empty-state">Для ${getFullClassName()} на этот день уроков нет ☕🍂</div>`;
+          container.innerHTML = `<div class="empty-state">Для ${currentClassName} на этот день уроков нет ☕🍂</div>`;
         }
         return;
       }
@@ -1470,7 +1493,6 @@
         const room = item['Кабинет'] || item['кабинет'] || item['Каб'] || item['Room'] || '';
         const lessonDate = item['Дата'] || item['дата'] || textDateVariant;
 
-        // ВРЕМЯ УРОКА ПО ЗВОНКАМ
         const bellInfo = BELL_SCHEDULE[idx] || null;
         let timeString = '';
         let isNowActive = false;
@@ -1484,12 +1506,12 @@
           timeString = `${idx + 1} урок`;
         }
 
-        const lessonKey = `hw_${getFullClassName()}_${lessonDate}_${subject}_${idx}`;
+        const userKey = currentUser ? currentUser.name : currentClassName;
+        const lessonKey = `hw_${userKey}_${lessonDate}_${subject}_${idx}`;
         const isDone = localStorage.getItem(lessonKey) === 'true';
         const hasNote = Boolean(localStorage.getItem(`note_${lessonKey}`));
 
         card.className = `card ${isDone ? 'completed' : ''} ${hasNote ? 'has-note' : ''} ${isNowActive ? 'now-active' : ''}`;
-
         card.onclick = () => openLessonDetails(item, lessonKey, timeString);
 
         card.innerHTML = `
@@ -1528,4 +1550,4 @@
     loadData();
   </script>
 </body>
-    </html>
+</html>
