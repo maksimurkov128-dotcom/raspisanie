@@ -1,13 +1,22 @@
 {
-  "name": "Расписание 8А",
+  "name": "Школьное расписание",
   "short_name": "Расписание",
+  "description": "Электронный дневник и интерактивное расписание уроков",
   "start_url": "./index.html",
+  "scope": "./",
   "display": "standalone",
   "background_color": "#141113",
   "theme_color": "#141113",
+  "orientation": "portrait",
   "icons": [
     {
-      "src": "icon.png",
+      "src": "./icon.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./icon.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
