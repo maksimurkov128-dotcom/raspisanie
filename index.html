@@ -95,7 +95,6 @@
       z-index: 1;
     }
 
-    /* АДАПТИВНАЯ ШАПКА БЕЗ СЛОВА "РАСПИСАНИЕ" */
     .header-top {
       display: flex;
       justify-content: space-between;
@@ -132,9 +131,7 @@
       white-space: nowrap;
     }
 
-    .profile-btn:active {
-      transform: scale(0.92);
-    }
+    .profile-btn:active { transform: scale(0.92); }
 
     .profile-btn.teacher-badge-btn {
       border-color: #58a6ff;
@@ -145,7 +142,7 @@
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
-      max-width: 135px;
+      max-width: 125px;
     }
 
     .top-actions {
@@ -176,6 +173,14 @@
     .icon-btn:active {
       transform: scale(0.9);
       box-shadow: 0 0 12px var(--gold-glow);
+    }
+
+    .spin-anim {
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      100% { transform: rotate(360deg); }
     }
 
     .news-badge {
@@ -841,6 +846,36 @@
       outline: none;
     }
 
+    /* ФИЛЬТРЫ РЕЙТИНГА */
+    .leaderboard-filter-tabs {
+      display: flex;
+      background: #151012;
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 3px;
+      margin-bottom: 12px;
+      gap: 4px;
+    }
+
+    .leaderboard-filter-tab {
+      flex: 1;
+      text-align: center;
+      padding: 6px 0;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--hint);
+      border-radius: 8px;
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.2s;
+    }
+
+    .leaderboard-filter-tab.active {
+      background: #2b2123;
+      color: var(--gold);
+      border: 1px solid rgba(244, 162, 97, 0.25);
+    }
+
     .leaderboard-row {
       display: flex;
       justify-content: space-between;
@@ -913,6 +948,10 @@
     </div>
     
     <div class="top-actions">
+      <!-- КНОПКА РУЧНОГО ОБНОВЛЕНИЯ ДАННЫХ -->
+      <div class="icon-btn" id="refresh-btn" onclick="forceReloadData()" title="Обновить расписание">
+        🔄
+      </div>
       <div class="icon-btn" onclick="openLeaderboardModal()" title="Рейтинг по баллам">
         🏆
       </div>
@@ -1030,15 +1069,21 @@
     </div>
   </div>
 
-  <!-- ЛИДЕРБОРД / РЕЙТИНГ ПАРАЛЛЕЛИ -->
+  <!-- ЛИДЕРБОРД С ПЕРЕКЛЮЧАТЕЛЕМ КЛАССОВ -->
   <div id="leaderboard-modal" class="modal-overlay" onclick="closeLeaderboardModal(event)">
     <div class="modal-sheet" onclick="event.stopPropagation()">
       <div class="modal-header">
         <h3>🏆 Рейтинг учеников</h3>
         <button class="close-btn" onclick="closeLeaderboardModal()">✕</button>
       </div>
-      <div style="font-size: 12px; color: var(--hint); margin-bottom: 12px;">Баллы = Оценка × Вес. Суммируются все оценки за учебный период!</div>
-      <div id="leaderboard-list" style="overflow-y: auto; max-height: 55vh;"></div>
+      <div style="font-size: 12px; color: var(--hint); margin-bottom: 10px;">Баллы = Оценка × Вес. Суммируются все оценки за учебный период!</div>
+
+      <div class="leaderboard-filter-tabs">
+        <div id="lb-tab-all" class="leaderboard-filter-tab active" onclick="setLeaderboardFilter('all')">Все классы</div>
+        <div id="lb-tab-my" class="leaderboard-filter-tab" onclick="setLeaderboardFilter('my')">Мой класс</div>
+      </div>
+
+      <div id="leaderboard-list" style="overflow-y: auto; max-height: 50vh;"></div>
     </div>
   </div>
 
@@ -1124,7 +1169,7 @@
     </div>
   </div>
 
-  <!-- ЖУРНАЛ ОЦЕНОК ДЛЯ УЧИТЕЛЯ С ВЫБОРОМ ВЕСА -->
+  <!-- ЖУРНАЛ ОЦЕНОК ДЛЯ УЧИТЕЛЯ -->
   <div id="grades-modal" class="modal-overlay" onclick="closeGradeBookModal(event)">
     <div class="modal-sheet" onclick="event.stopPropagation()">
       <div class="modal-header">
@@ -1190,6 +1235,9 @@
 
   <script>
     const API_URL = 'https://script.google.com/macros/s/AKfycbzoRZ_Fd9Yv2FJq79lpF4HPg-NETJm4gSCqLVxU7_6pp2CHNON2A09U1X0eYRE4cyQ5/exec';
+    const CACHE_KEY = 'diary_cached_data_v2';
+    const CACHE_TIME_KEY = 'diary_cache_timestamp_v2';
+    const CACHE_TTL = 3 * 60 * 1000; // 3 минуты кэширования для защиты квот Google
 
     const BELL_SCHEDULE = [
       { num: 1, start: '08:30', end: '09:10', startM: 8 * 60 + 30, endM: 9 * 60 + 10 },
@@ -1215,6 +1263,7 @@
     let selectedDateInfo = null;
     let currentEditingLessonKey = null;
     let currentTeacherLessonItem = null;
+    let currentLeaderboardMode = 'all';
 
     let currentUser = JSON.parse(localStorage.getItem('diary_current_user') || 'null');
 
@@ -1318,20 +1367,41 @@
       document.getElementById('prof-total-xp').innerText = `${totalXP} XP (баллов)`;
     }
 
+    /* РЕЙТИНГ С ПЕРЕКЛЮЧАТЕЛЕМ КЛАССОВ */
+    function setLeaderboardFilter(mode) {
+      currentLeaderboardMode = mode;
+      document.getElementById('lb-tab-all').className = `leaderboard-filter-tab ${mode === 'all' ? 'active' : ''}`;
+      document.getElementById('lb-tab-my').className = `leaderboard-filter-tab ${mode === 'my' ? 'active' : ''}`;
+      renderLeaderboard();
+    }
+
     function openLeaderboardModal() {
-      const modal = document.getElementById('leaderboard-modal');
+      const myClass = currentUser && currentUser.className ? currentUser.className : 'Мой класс';
+      document.getElementById('lb-tab-my').innerText = myClass;
+      setLeaderboardFilter(currentLeaderboardMode);
+      document.getElementById('leaderboard-modal').classList.add('open');
+    }
+
+    function renderLeaderboard() {
       const listEl = document.getElementById('leaderboard-list');
       listEl.innerHTML = '';
 
+      const myClass = currentUser && currentUser.className ? currentUser.className.toUpperCase() : '';
       const scores = {};
 
       allStudents.forEach(st => {
         const role = String(st['Роль'] || st['роль'] || 'student').toLowerCase();
+        const stClass = String(st['Класс'] || st['класс'] || '').trim().toUpperCase();
+
         if (role !== 'teacher') {
+          if (currentLeaderboardMode === 'my' && myClass && stClass !== myClass) {
+            return;
+          }
+
           const name = st['Имя'] || st['ФИО'] || st['Логин'];
           scores[name] = {
             name: name,
-            className: st['Класс'] || '8А',
+            className: stClass || '8А',
             score: 0
           };
         }
@@ -1356,7 +1426,7 @@
       const sortedLeaders = Object.values(scores).sort((a, b) => b.score - a.score);
 
       if (sortedLeaders.length === 0) {
-        listEl.innerHTML = '<div class="empty-state">Ученики пока не добавлены</div>';
+        listEl.innerHTML = '<div class="empty-state">Ученики в этой категории не найдены</div>';
       } else {
         sortedLeaders.forEach((leader, idx) => {
           const isMe = currentUser && leader.name.toLowerCase().includes(currentUser.name.toLowerCase());
@@ -1379,8 +1449,6 @@
           listEl.appendChild(row);
         });
       }
-
-      modal.classList.add('open');
     }
 
     function closeLeaderboardModal(e) {
@@ -1404,7 +1472,7 @@
       const errEl = document.getElementById('login-error');
 
       if (!allStudents || allStudents.length === 0) {
-        alert('Данные еще загружаются из таблицы, подожди 2 секунды...');
+        alert('Данные еще загружаются из таблицы, подожди пару секунд...');
         return;
       }
 
@@ -1656,37 +1724,31 @@
       return days;
     }
 
-    async function loadData() {
-      updateProfileUI();
-      const loader = document.getElementById('loader');
-      try {
-        const res = await fetch(API_URL);
-        const data = await res.json();
-        loader.style.display = 'none';
+    function applyDataToApp(data) {
+      if (Array.isArray(data)) {
+        allItems = data;
+        allNews = [];
+        allDuty = [];
+        allBirthdays = [];
+        allStudents = [];
+        allGrades = [];
+      } else {
+        allItems = data.schedule || [];
+        allNews = data.announcements || [];
+        allDuty = data.duty || [];
+        allBirthdays = data.birthdays || [];
+        allStudents = data.students || [];
+        allGrades = data.grades || [];
+      }
 
-        if (Array.isArray(data)) {
-          allItems = data;
-          allNews = [];
-          allDuty = [];
-          allBirthdays = [];
-          allStudents = [];
-          allGrades = [];
-        } else {
-          allItems = data.schedule || [];
-          allNews = data.announcements || [];
-          allDuty = data.duty || [];
-          allBirthdays = data.birthdays || [];
-          allStudents = data.students || [];
-          allGrades = data.grades || [];
-        }
+      checkAuth();
+      updateNewsBadge();
+      updateVacationCountdown();
+      checkBirthdays();
 
-        checkAuth();
-        updateNewsBadge();
-        updateVacationCountdown();
-        checkBirthdays();
+      twoWeeks = generate14Days();
 
-        twoWeeks = generate14Days();
-
+      if (!selectedDateInfo) {
         const todayItem = twoWeeks.find(d => d.isToday);
         if (todayItem) {
           selectedDateInfo = todayItem;
@@ -1695,16 +1757,60 @@
           selectedDateInfo = twoWeeks[0];
           currentWeekIndex = 0;
         }
-
-        updateBellTimer();
-        setInterval(updateBellTimer, 30000);
-
-        updateWeekButtons();
-        renderDaysGrid();
-        renderLessons();
-      } catch (err) {
-        loader.innerText = 'Не удалось загрузить данные из таблицы.';
       }
+
+      updateBellTimer();
+      updateWeekButtons();
+      renderDaysGrid();
+      renderLessons();
+    }
+
+    /* ЗАГРУЗКА ДАННЫХ С КЭШИРОВАНИЕМ */
+    async function loadData(force = false) {
+      updateProfileUI();
+      const loader = document.getElementById('loader');
+      const cached = localStorage.getItem(CACHE_KEY);
+      const cacheTime = localStorage.getItem(CACHE_TIME_KEY);
+      const now = Date.now();
+
+      // Если есть свежий кэш и не было принудительного обновления — отображаем сразу
+      if (!force && cached && cacheTime && (now - Number(cacheTime) < CACHE_TTL)) {
+        try {
+          const parsed = JSON.parse(cached);
+          loader.style.display = 'none';
+          applyDataToApp(parsed);
+          return;
+        } catch (e) {}
+      }
+
+      try {
+        const res = await fetch(API_URL);
+        const data = await res.json();
+        loader.style.display = 'none';
+
+        // Сохраняем в кэш
+        localStorage.setItem(CACHE_KEY, JSON.stringify(data));
+        localStorage.setItem(CACHE_TIME_KEY, String(Date.now()));
+
+        applyDataToApp(data);
+      } catch (err) {
+        if (cached) {
+          applyDataToApp(JSON.parse(cached));
+          loader.style.display = 'none';
+        } else {
+          loader.innerText = 'Не удалось загрузить данные из таблицы.';
+        }
+      }
+    }
+
+    /* РУЧНОЕ ОБНОВЛЕНИЕ ДАННЫХ (КНОПКА 🔄) */
+    async function forceReloadData() {
+      const btn = document.getElementById('refresh-btn');
+      btn.classList.add('spin-anim');
+      await loadData(true);
+      setTimeout(() => {
+        btn.classList.remove('spin-anim');
+      }, 700);
     }
 
     function updateNewsBadge() {
@@ -1908,6 +2014,9 @@
         currentTeacherLessonItem['Задание'] = payload.homework;
         currentTeacherLessonItem['Тип'] = payload.type;
 
+        // Очищаем кэш, чтобы при следующем открытии подтянулись обновленные данные
+        localStorage.removeItem(CACHE_TIME_KEY);
+
         btn.innerText = 'Сохранено! ✓';
         setTimeout(() => {
           closeTeacherEditModal();
@@ -2023,6 +2132,8 @@
             'Вес': weight
           });
         });
+
+        localStorage.removeItem(CACHE_TIME_KEY);
 
         btn.innerText = 'Оценки выставлены! ✓';
         setTimeout(() => {
@@ -2302,6 +2413,7 @@
     }
 
     loadData();
+    setInterval(updateBellTimer, 30000);
   </script>
 </body>
 </html>
