@@ -175,13 +175,8 @@
       box-shadow: 0 0 12px var(--gold-glow);
     }
 
-    .spin-anim {
-      animation: spin 0.8s linear infinite;
-    }
-
-    @keyframes spin {
-      100% { transform: rotate(360deg); }
-    }
+    .spin-anim { animation: spin 0.8s linear infinite; }
+    @keyframes spin { 100% { transform: rotate(360deg); } }
 
     .news-badge {
       position: absolute;
@@ -191,6 +186,20 @@
       color: #fff;
       font-size: 10px;
       font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 10px;
+      border: 2px solid var(--bg);
+      display: none;
+    }
+
+    .absence-badge {
+      position: absolute;
+      top: -4px;
+      right: -4px;
+      background: #58a6ff;
+      color: #141113;
+      font-size: 10px;
+      font-weight: 800;
       padding: 2px 6px;
       border-radius: 10px;
       border: 2px solid var(--bg);
@@ -533,6 +542,16 @@
       font-weight: 600;
     }
 
+    .class-tag-badge {
+      font-size: 11px;
+      color: #f4a261;
+      background: rgba(244, 162, 97, 0.15);
+      border: 1px solid rgba(244, 162, 97, 0.35);
+      padding: 2px 7px;
+      border-radius: 8px;
+      font-weight: 700;
+    }
+
     .edit-lesson-btn {
       background: rgba(88, 166, 255, 0.15);
       border: 1px solid rgba(88, 166, 255, 0.4);
@@ -792,6 +811,19 @@
       border-radius: 10px;
       cursor: pointer;
       margin-top: 6px;
+      width: 100%;
+    }
+
+    .teacher-action-btn {
+      background: rgba(88, 166, 255, 0.14);
+      border: 1px solid rgba(88, 166, 255, 0.4);
+      color: #79c0ff;
+      font-weight: 700;
+      padding: 11px;
+      border-radius: 12px;
+      cursor: pointer;
+      margin-top: 8px;
+      width: 100%;
     }
 
     .logout-btn {
@@ -846,7 +878,6 @@
       outline: none;
     }
 
-    /* ФИЛЬТРЫ РЕЙТИНГА */
     .leaderboard-filter-tabs {
       display: flex;
       background: #151012;
@@ -855,12 +886,13 @@
       padding: 3px;
       margin-bottom: 12px;
       gap: 4px;
+      flex-wrap: wrap;
     }
 
     .leaderboard-filter-tab {
       flex: 1;
       text-align: center;
-      padding: 6px 0;
+      padding: 6px 4px;
       font-size: 12px;
       font-weight: 700;
       color: var(--hint);
@@ -927,6 +959,42 @@
       font-weight: 800;
       color: var(--gold);
     }
+
+    /* КАРТОЧКА ОТСУТСТВУЮЩЕГО ДЛЯ УЧИТЕЛЯ */
+    .absence-item-card {
+      background: #221c1f;
+      border: 1px solid var(--card-border);
+      border-left: 3px solid #58a6ff;
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 8px;
+    }
+
+    .absence-item-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 5px;
+    }
+
+    .absence-student-name {
+      font-weight: 700;
+      font-size: 14px;
+      color: #fff;
+    }
+
+    .absence-date-pill {
+      font-size: 11px;
+      color: var(--gold);
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .absence-reason-text {
+      font-size: 13px;
+      color: #d6ccc8;
+      line-height: 1.4;
+    }
   </style>
 </head>
 <body>
@@ -948,15 +1016,16 @@
     </div>
     
     <div class="top-actions">
-      <!-- КНОПКА РУЧНОГО ОБНОВЛЕНИЯ ДАННЫХ -->
       <div class="icon-btn" id="refresh-btn" onclick="forceReloadData()" title="Обновить расписание">
         🔄
       </div>
       <div class="icon-btn" onclick="openLeaderboardModal()" title="Рейтинг по баллам">
         🏆
       </div>
-      <div class="icon-btn" onclick="openAbsenceModal()" title="Отметиться об отсутствии">
+      <!-- КНОПКА ОТСУТСТВИЙ: УЧЕНИК ОТМЕЧАЕТСЯ, УЧИТЕЛЬ СМОТРИТ СПИСОК -->
+      <div class="icon-btn" id="absence-header-btn" onclick="handleAbsenceButtonClick()" title="Отсутствия">
         📝
+        <div id="absence-badge" class="absence-badge">0</div>
       </div>
       <div class="icon-btn" onclick="openAnnouncements()" title="Объявления">
         📢
@@ -1051,6 +1120,13 @@
           <div id="prof-extra-val" class="detail-val">—</div>
         </div>
 
+        <!-- БЛОК ДЛЯ УЧИТЕЛЯ В ПРОФИЛЕ -->
+        <div id="teacher-actions-section" style="display: none;">
+          <button class="teacher-action-btn" onclick="closeProfileModal(); openTeacherAbsencesModal();">
+            📋 Журнал отсутствующих (<span id="prof-abs-count">0</span>)
+          </button>
+        </div>
+
         <!-- ОЦЕНКИ И ОЧКИ УЧЕНИКА -->
         <div id="student-grades-section" style="display: none;">
           <div class="detail-item" style="background: linear-gradient(135deg, rgba(244,162,97,0.12), rgba(231,111,81,0.08)); border-color: rgba(244,162,97,0.3);">
@@ -1066,6 +1142,20 @@
 
         <button class="logout-btn" onclick="handleLogout()">Выйти из профиля</button>
       </div>
+    </div>
+  </div>
+
+  <!-- ЖУРНАЛ ОТСУТСТВУЮЩИХ ДЛЯ УЧИТЕЛЯ -->
+  <div id="teacher-absences-modal" class="modal-overlay" onclick="closeTeacherAbsencesModal(event)">
+    <div class="modal-sheet" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <h3>📋 Журнал отсутствующих</h3>
+        <button class="close-btn" onclick="closeTeacherAbsencesModal()">✕</button>
+      </div>
+
+      <div id="absence-class-tabs" class="leaderboard-filter-tabs"></div>
+
+      <div id="teacher-absences-list" style="overflow-y: auto; max-height: 55vh;"></div>
     </div>
   </div>
 
@@ -1208,7 +1298,7 @@
     </div>
   </div>
 
-  <!-- ОТСУТСТВИЕ -->
+  <!-- ОТСУТСТВИЕ (ФОРМА ДЛЯ УЧЕНИКА) -->
   <div id="absence-overlay" class="modal-overlay" onclick="closeAbsenceModal(event)">
     <div class="modal-sheet" onclick="event.stopPropagation()">
       <div class="modal-header">
@@ -1222,7 +1312,7 @@
         </div>
         <div class="form-group">
           <label>Когда не будет в школе?</label>
-          <input type="text" id="abs-date" class="form-input" placeholder="Сегодня / 10 ноября" required>
+          <input type="text" id="abs-date" class="form-input" placeholder="Сегодня / 12 ноября" required>
         </div>
         <div class="form-group">
           <label>Причина</label>
@@ -1235,9 +1325,9 @@
 
   <script>
     const API_URL = 'https://script.google.com/macros/s/AKfycbzoRZ_Fd9Yv2FJq79lpF4HPg-NETJm4gSCqLVxU7_6pp2CHNON2A09U1X0eYRE4cyQ5/exec';
-    const CACHE_KEY = 'diary_cached_data_v2';
-    const CACHE_TIME_KEY = 'diary_cache_timestamp_v2';
-    const CACHE_TTL = 3 * 60 * 1000; // 3 минуты кэширования для защиты квот Google
+    const CACHE_KEY = 'diary_cached_data_v3';
+    const CACHE_TIME_KEY = 'diary_cache_timestamp_v3';
+    const CACHE_TTL = 3 * 60 * 1000;
 
     const BELL_SCHEDULE = [
       { num: 1, start: '08:30', end: '09:10', startM: 8 * 60 + 30, endM: 9 * 60 + 10 },
@@ -1258,12 +1348,14 @@
     let allBirthdays = [];
     let allStudents = [];
     let allGrades = [];
+    let allAbsences = [];
     let twoWeeks = [];
     let currentWeekIndex = 0;
     let selectedDateInfo = null;
     let currentEditingLessonKey = null;
     let currentTeacherLessonItem = null;
     let currentLeaderboardMode = 'all';
+    let currentAbsenceFilterClass = 'ALL';
 
     let currentUser = JSON.parse(localStorage.getItem('diary_current_user') || 'null');
 
@@ -1277,6 +1369,15 @@
       if (!mySubs || mySubs === 'все' || mySubs === 'all' || mySubs === '-') return true;
       const list = mySubs.split(',').map(s => s.trim().toLowerCase());
       return list.includes(String(subjectName || '').trim().toLowerCase());
+    }
+
+    function normalizeClassStr(val) {
+      return String(val || '')
+        .trim()
+        .toUpperCase()
+        .replace(/A/g, 'А')
+        .replace(/B/g, 'В')
+        .replace(/\s+/g, '');
     }
 
     function cleanDateStr(dStr) {
@@ -1295,6 +1396,9 @@
       const btnText = document.getElementById('profile-btn-text');
       const profBtn = document.getElementById('profile-btn');
       const studentGradesSec = document.getElementById('student-grades-section');
+      const teacherActionsSec = document.getElementById('teacher-actions-section');
+      const absHeaderBtn = document.getElementById('absence-header-btn');
+      const absBadge = document.getElementById('absence-badge');
 
       if (currentUser) {
         if (currentUser.role === 'teacher') {
@@ -1306,7 +1410,19 @@
           document.getElementById('prof-class').innerText = currentUser.className || 'Все классы';
           document.getElementById('prof-extra-label').innerText = 'Предметы преподавания';
           document.getElementById('prof-extra-val').innerText = currentUser.subjects || 'Все предметы';
+
           studentGradesSec.style.display = 'none';
+          teacherActionsSec.style.display = 'block';
+          absHeaderBtn.title = 'Журнал отсутствующих';
+
+          const relevantAbs = getTeacherRelevantAbsences();
+          document.getElementById('prof-abs-count').innerText = relevantAbs.length;
+          if (relevantAbs.length > 0) {
+            absBadge.innerText = relevantAbs.length;
+            absBadge.style.display = 'block';
+          } else {
+            absBadge.style.display = 'none';
+          }
         } else {
           btnText.innerText = currentUser.name.split(' ')[0] || 'Профиль';
           profBtn.classList.remove('teacher-badge-btn');
@@ -1317,13 +1433,120 @@
           document.getElementById('prof-extra-label').innerText = 'Группа по английскому';
           document.getElementById('prof-extra-val').innerText = `${currentUser.group} группа (${currentUser.gender === 'м' ? 'Юноши' : 'Девушки'})`;
 
+          teacherActionsSec.style.display = 'none';
           studentGradesSec.style.display = 'block';
+          absHeaderBtn.title = 'Отметиться об отсутствии';
+          absBadge.style.display = 'none';
           renderStudentProfileGrades();
         }
       } else {
         btnText.innerText = 'Войти';
         profBtn.classList.remove('teacher-badge-btn');
+        absBadge.style.display = 'none';
       }
+    }
+
+    function getTeacherRelevantAbsences() {
+      if (!allAbsences || allAbsences.length === 0) return [];
+      const userClass = normalizeClassStr(currentUser ? currentUser.className : '');
+      return allAbsences.filter(a => {
+        const c = normalizeClassStr(a['Класс'] || a['класс'] || '');
+        if (userClass && c && c !== userClass) return false;
+        return Boolean(a['Имя'] || a['имя'] || a['ФИО']);
+      });
+    }
+
+    function handleAbsenceButtonClick() {
+      if (isTeacher()) {
+        openTeacherAbsencesModal();
+      } else {
+        openAbsenceModal();
+      }
+    }
+
+    /* ОКНО ПРОСМОТРА ОТСУТСТВУЮЩИХ ДЛЯ УЧИТЕЛЯ */
+    function openTeacherAbsencesModal() {
+      const modal = document.getElementById('teacher-absences-modal');
+      const tabsEl = document.getElementById('absence-class-tabs');
+      const relevant = getTeacherRelevantAbsences();
+
+      // Собираем уникальные классы из списка отсутствующих
+      const classesSet = new Set();
+      relevant.forEach(a => {
+        const c = normalizeClassStr(a['Класс'] || a['класс'] || '');
+        if (c) classesSet.add(c);
+      });
+
+      const classList = Array.from(classesSet).sort();
+      tabsEl.innerHTML = '';
+
+      if (classList.length > 1) {
+        tabsEl.style.display = 'flex';
+        const allTab = document.createElement('div');
+        allTab.className = `leaderboard-filter-tab ${currentAbsenceFilterClass === 'ALL' ? 'active' : ''}`;
+        allTab.innerText = 'Все классы';
+        allTab.onclick = () => {
+          currentAbsenceFilterClass = 'ALL';
+          openTeacherAbsencesModal();
+        };
+        tabsEl.appendChild(allTab);
+
+        classList.forEach(c => {
+          const tab = document.createElement('div');
+          tab.className = `leaderboard-filter-tab ${currentAbsenceFilterClass === c ? 'active' : ''}`;
+          tab.innerText = c;
+          tab.onclick = () => {
+            currentAbsenceFilterClass = c;
+            openTeacherAbsencesModal();
+          };
+          tabsEl.appendChild(tab);
+        });
+      } else {
+        tabsEl.style.display = 'none';
+        currentAbsenceFilterClass = 'ALL';
+      }
+
+      renderTeacherAbsencesList(relevant);
+      modal.classList.add('open');
+    }
+
+    function renderTeacherAbsencesList(relevant) {
+      const listEl = document.getElementById('teacher-absences-list');
+      listEl.innerHTML = '';
+
+      let filtered = relevant.slice().reverse(); // Свежие отметки сверху
+      if (currentAbsenceFilterClass !== 'ALL') {
+        filtered = filtered.filter(a => normalizeClassStr(a['Класс'] || a['класс'] || '') === currentAbsenceFilterClass);
+      }
+
+      if (filtered.length === 0) {
+        listEl.innerHTML = '<div class="empty-state">Заявок об отсутствии пока нет ✨</div>';
+        return;
+      }
+
+      filtered.forEach(item => {
+        const name = item['Имя'] || item['имя'] || item['ФИО'] || 'Ученик';
+        const className = normalizeClassStr(item['Класс'] || item['класс'] || '');
+        const date = cleanDateStr(item['Дата'] || item['дата'] || 'Не указана');
+        const reason = item['Причина'] || item['причина'] || 'Не указана';
+
+        const card = document.createElement('div');
+        card.className = 'absence-item-card';
+        card.innerHTML = `
+          <div class="absence-item-header">
+            <span class="absence-student-name">${name}</span>
+            ${className ? `<span class="class-tag-badge">${className}</span>` : ''}
+          </div>
+          <div class="absence-date-pill">📅 Дата: ${date}</div>
+          <div class="absence-reason-text">💬 Причина: ${reason}</div>
+        `;
+        listEl.appendChild(card);
+      });
+    }
+
+    function closeTeacherAbsencesModal(e) {
+      if (e && e.target !== e.currentTarget && !e.target.classList.contains('close-btn')) return;
+      document.getElementById('teacher-absences-modal').classList.remove('open');
     }
 
     function renderStudentProfileGrades() {
@@ -1367,7 +1590,6 @@
       document.getElementById('prof-total-xp').innerText = `${totalXP} XP (баллов)`;
     }
 
-    /* РЕЙТИНГ С ПЕРЕКЛЮЧАТЕЛЕМ КЛАССОВ */
     function setLeaderboardFilter(mode) {
       currentLeaderboardMode = mode;
       document.getElementById('lb-tab-all').className = `leaderboard-filter-tab ${mode === 'all' ? 'active' : ''}`;
@@ -1386,12 +1608,12 @@
       const listEl = document.getElementById('leaderboard-list');
       listEl.innerHTML = '';
 
-      const myClass = currentUser && currentUser.className ? currentUser.className.toUpperCase() : '';
+      const myClass = normalizeClassStr(currentUser ? currentUser.className : '');
       const scores = {};
 
       allStudents.forEach(st => {
         const role = String(st['Роль'] || st['роль'] || 'student').toLowerCase();
-        const stClass = String(st['Класс'] || st['класс'] || '').trim().toUpperCase();
+        const stClass = normalizeClassStr(st['Класс'] || st['класс'] || '');
 
         if (role !== 'teacher') {
           if (currentLeaderboardMode === 'my' && myClass && stClass !== myClass) {
@@ -1489,7 +1711,7 @@
 
         currentUser = {
           name: String(found['Имя'] || found['имя'] || found['ФИО'] || login).trim(),
-          className: String(found['Класс'] || found['класс'] || '').trim().toUpperCase(),
+          className: normalizeClassStr(found['Класс'] || found['класс'] || ''),
           role: role,
           subjects: String(found['Предмет'] || found['предмет'] || '').trim().toLowerCase(),
           gender: String(found['Пол'] || found['пол'] || 'м').trim().toLowerCase(),
@@ -1530,28 +1752,32 @@
     }
 
     function matchesUserProfile(item) {
-      if (!currentUser) return true;
+      if (!currentUser) return false;
+
+      const itemClass = normalizeClassStr(item['Класс'] || item['класс'] || item['Class'] || '');
+      const userClass = normalizeClassStr(currentUser.className || '');
 
       if (isTeacher()) {
-        const itemClass = String(item['Класс'] || item['класс'] || '').trim().toUpperCase();
-        if (currentUser.className && itemClass && itemClass !== currentUser.className) {
+        if (userClass && itemClass && itemClass !== userClass && itemClass !== 'ВСЕ') {
           return false;
         }
         return true;
       }
 
-      const itemClass = String(item['Класс'] || item['класс'] || '').trim().toUpperCase();
-      if (itemClass && itemClass !== 'ВСЕ' && itemClass !== currentUser.className) {
+      if (!itemClass) return false;
+      if (itemClass !== 'ВСЕ' && itemClass !== 'ОБЩЕЕ' && itemClass !== userClass) {
         return false;
       }
 
       const itemGroup = String(item['Группа'] || item['группа'] || '').trim();
-      if (itemGroup && itemGroup !== '0' && itemGroup !== currentUser.group) {
+      const userGroup = String(currentUser.group || '1').trim();
+      if (itemGroup && itemGroup !== '0' && itemGroup !== userGroup) {
         return false;
       }
 
       const itemGender = String(item['Пол'] || item['пол'] || '').trim().toLowerCase();
-      if (itemGender && itemGender !== currentUser.gender) {
+      const userGender = String(currentUser.gender || '').trim().toLowerCase();
+      if (itemGender && userGender && itemGender !== userGender) {
         return false;
       }
 
@@ -1559,10 +1785,10 @@
     }
 
     function matchesCurrentClass(item, allowAll = false) {
-      const rawClass = String(item['Класс'] || item['класс'] || '').trim().toUpperCase();
+      const rawClass = normalizeClassStr(item['Класс'] || item['класс'] || '');
       if (!rawClass) return true; 
       if (allowAll && (rawClass === 'ВСЕ' || rawClass === 'ОБЩЕЕ')) return true;
-      const targetClass = (currentUser && currentUser.className) ? currentUser.className : '8А';
+      const targetClass = normalizeClassStr((currentUser && currentUser.className) ? currentUser.className : '8А');
       return rawClass === targetClass;
     }
 
@@ -1732,6 +1958,7 @@
         allBirthdays = [];
         allStudents = [];
         allGrades = [];
+        allAbsences = [];
       } else {
         allItems = data.schedule || [];
         allNews = data.announcements || [];
@@ -1739,6 +1966,7 @@
         allBirthdays = data.birthdays || [];
         allStudents = data.students || [];
         allGrades = data.grades || [];
+        allAbsences = data.absences || [];
       }
 
       checkAuth();
@@ -1765,7 +1993,6 @@
       renderLessons();
     }
 
-    /* ЗАГРУЗКА ДАННЫХ С КЭШИРОВАНИЕМ */
     async function loadData(force = false) {
       updateProfileUI();
       const loader = document.getElementById('loader');
@@ -1773,7 +2000,6 @@
       const cacheTime = localStorage.getItem(CACHE_TIME_KEY);
       const now = Date.now();
 
-      // Если есть свежий кэш и не было принудительного обновления — отображаем сразу
       if (!force && cached && cacheTime && (now - Number(cacheTime) < CACHE_TTL)) {
         try {
           const parsed = JSON.parse(cached);
@@ -1788,7 +2014,6 @@
         const data = await res.json();
         loader.style.display = 'none';
 
-        // Сохраняем в кэш
         localStorage.setItem(CACHE_KEY, JSON.stringify(data));
         localStorage.setItem(CACHE_TIME_KEY, String(Date.now()));
 
@@ -1803,7 +2028,6 @@
       }
     }
 
-    /* РУЧНОЕ ОБНОВЛЕНИЕ ДАННЫХ (КНОПКА 🔄) */
     async function forceReloadData() {
       const btn = document.getElementById('refresh-btn');
       btn.classList.add('spin-anim');
@@ -1891,6 +2115,15 @@
           body: JSON.stringify(payload)
         });
 
+        allAbsences.push({
+          'Дата': payload.date,
+          'Класс': payload.className,
+          'Имя': payload.name,
+          'Причина': payload.reason
+        });
+
+        localStorage.removeItem(CACHE_TIME_KEY);
+
         btn.innerText = 'Успешно отправлено! ✓';
         setTimeout(() => {
           closeAbsenceModal();
@@ -1960,7 +2193,7 @@
       currentTeacherLessonItem = item;
 
       const subject = item['Предмет'] || item['предмет'] || 'Урок';
-      const targetClass = item['Класс'] || item['класс'] || (currentUser ? currentUser.className : '8А');
+      const targetClass = normalizeClassStr(item['Класс'] || item['класс'] || (currentUser ? currentUser.className : '8А'));
       const topic = item['Тема'] || item['тема'] || '';
       const homework = item['Задание'] || item['задание'] || '';
       const type = item['Тип'] || '';
@@ -1986,7 +2219,7 @@
       btn.innerText = 'Сохранение...';
       btn.disabled = true;
 
-      const targetClass = currentTeacherLessonItem['Класс'] || currentTeacherLessonItem['класс'] || (currentUser ? currentUser.className : '8А');
+      const targetClass = normalizeClassStr(currentTeacherLessonItem['Класс'] || currentTeacherLessonItem['класс'] || (currentUser ? currentUser.className : '8А'));
       const subject = currentTeacherLessonItem['Предмет'] || currentTeacherLessonItem['предмет'] || '';
       const date = cleanDateStr(currentTeacherLessonItem['Дата'] || currentTeacherLessonItem['дата'] || selectedDateInfo.padded);
       const group = currentTeacherLessonItem['Группа'] || currentTeacherLessonItem['группа'] || '';
@@ -2014,7 +2247,6 @@
         currentTeacherLessonItem['Задание'] = payload.homework;
         currentTeacherLessonItem['Тип'] = payload.type;
 
-        // Очищаем кэш, чтобы при следующем открытии подтянулись обновленные данные
         localStorage.removeItem(CACHE_TIME_KEY);
 
         btn.innerText = 'Сохранено! ✓';
@@ -2033,16 +2265,16 @@
 
     function openGradeBookModal() {
       if (!currentTeacherLessonItem) return;
-      const targetClass = currentTeacherLessonItem['Класс'] || currentTeacherLessonItem['класс'] || (currentUser ? currentUser.className : '8А');
+      const targetClass = normalizeClassStr(currentTeacherLessonItem['Класс'] || currentTeacherLessonItem['класс'] || (currentUser ? currentUser.className : '8А'));
       const subject = currentTeacherLessonItem['Предмет'] || currentTeacherLessonItem['предмет'] || '';
       const date = cleanDateStr(currentTeacherLessonItem['Дата'] || currentTeacherLessonItem['дата'] || selectedDateInfo.padded);
 
       document.getElementById('grades-lesson-header').innerText = `${subject} (${targetClass} класс) • Дата: ${date}`;
 
       const classStudents = allStudents.filter(s => {
-        const c = String(s['Класс'] || s['класс'] || '').trim().toUpperCase();
+        const c = normalizeClassStr(s['Класс'] || s['класс'] || '');
         const role = String(s['Роль'] || s['роль'] || 'student').toLowerCase();
-        return c === targetClass.toUpperCase() && role !== 'teacher';
+        return c === targetClass && role !== 'teacher';
       });
 
       const container = document.getElementById('grades-students-list');
@@ -2100,7 +2332,7 @@
       btn.innerText = 'Сохранение...';
       btn.disabled = true;
 
-      const targetClass = currentTeacherLessonItem['Класс'] || currentTeacherLessonItem['класс'] || (currentUser ? currentUser.className : '8А');
+      const targetClass = normalizeClassStr(currentTeacherLessonItem['Класс'] || currentTeacherLessonItem['класс'] || (currentUser ? currentUser.className : '8А'));
       const subject = currentTeacherLessonItem['Предмет'] || currentTeacherLessonItem['предмет'] || '';
       const date = cleanDateStr(currentTeacherLessonItem['Дата'] || currentTeacherLessonItem['дата'] || selectedDateInfo.padded);
       const weight = document.getElementById('grade-weight-select').value;
@@ -2325,6 +2557,7 @@
         const homework = item['Задание'] || item['задание'] || item['Homework'] || 'Нет задания';
         const deadline = item['Дедлайн'] || item['дедлайн'] || item['Срок сдачи'] || item['Deadline'] || '';
         const room = item['Кабинет'] || item['кабинет'] || item['Каб'] || item['Room'] || '';
+        const itemClassLabel = normalizeClassStr(item['Класс'] || item['класс'] || '');
         const lessonDate = cleanDateStr(item['Дата'] || item['дата'] || textDateVariant);
 
         const bellInfo = BELL_SCHEDULE[idx] || null;
@@ -2379,6 +2612,7 @@
             <div class="subject-box">
               <span class="subject">
                 ${subject}
+                ${isTeacher() && itemClassLabel ? `<span class="class-tag-badge">${itemClassLabel}</span>` : ''}
                 ${examBadge ? `<span class="exam-badge ${examBadge.type}">${examBadge.label}</span>` : ''}
                 ${gradeBadgeHtml}
                 ${hasNote ? `<span class="note-indicator" title="Есть личная заметка">📌</span>` : ''}
