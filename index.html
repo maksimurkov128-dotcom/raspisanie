@@ -960,7 +960,6 @@
       color: var(--gold);
     }
 
-    /* КАРТОЧКА ОТСУТСТВУЮЩЕГО ДЛЯ УЧИТЕЛЯ */
     .absence-item-card {
       background: #221c1f;
       border: 1px solid var(--card-border);
@@ -1022,7 +1021,6 @@
       <div class="icon-btn" onclick="openLeaderboardModal()" title="Рейтинг по баллам">
         🏆
       </div>
-      <!-- КНОПКА ОТСУТСТВИЙ: УЧЕНИК ОТМЕЧАЕТСЯ, УЧИТЕЛЬ СМОТРИТ СПИСОК -->
       <div class="icon-btn" id="absence-header-btn" onclick="handleAbsenceButtonClick()" title="Отсутствия">
         📝
         <div id="absence-badge" class="absence-badge">0</div>
@@ -1120,14 +1118,12 @@
           <div id="prof-extra-val" class="detail-val">—</div>
         </div>
 
-        <!-- БЛОК ДЛЯ УЧИТЕЛЯ В ПРОФИЛЕ -->
         <div id="teacher-actions-section" style="display: none;">
           <button class="teacher-action-btn" onclick="closeProfileModal(); openTeacherAbsencesModal();">
             📋 Журнал отсутствующих (<span id="prof-abs-count">0</span>)
           </button>
         </div>
 
-        <!-- ОЦЕНКИ И ОЧКИ УЧЕНИКА -->
         <div id="student-grades-section" style="display: none;">
           <div class="detail-item" style="background: linear-gradient(135deg, rgba(244,162,97,0.12), rgba(231,111,81,0.08)); border-color: rgba(244,162,97,0.3);">
             <div class="detail-label">🏆 Мои баллы в рейтинге:</div>
@@ -1298,7 +1294,7 @@
     </div>
   </div>
 
-  <!-- ОТСУТСТВИЕ (ФОРМА ДЛЯ УЧЕНИКА) -->
+  <!-- ОТСУТСТВИЕ -->
   <div id="absence-overlay" class="modal-overlay" onclick="closeAbsenceModal(event)">
     <div class="modal-sheet" onclick="event.stopPropagation()">
       <div class="modal-header">
@@ -1325,8 +1321,8 @@
 
   <script>
     const API_URL = 'https://script.google.com/macros/s/AKfycbzoRZ_Fd9Yv2FJq79lpF4HPg-NETJm4gSCqLVxU7_6pp2CHNON2A09U1X0eYRE4cyQ5/exec';
-    const CACHE_KEY = 'diary_cached_data_v3';
-    const CACHE_TIME_KEY = 'diary_cache_timestamp_v3';
+    const CACHE_KEY = 'diary_cached_data_v4';
+    const CACHE_TIME_KEY = 'diary_cache_timestamp_v4';
     const CACHE_TTL = 3 * 60 * 1000;
 
     const BELL_SCHEDULE = [
@@ -1378,6 +1374,17 @@
         .replace(/A/g, 'А')
         .replace(/B/g, 'В')
         .replace(/\s+/g, '');
+    }
+
+    function normalizePersonName(nameStr) {
+      return String(nameStr || '')
+        .toLowerCase()
+        .replace(/ё/g, 'е')
+        .replace(/[^а-яa-z0-9\s]/g, '')
+        .trim()
+        .split(/\s+/)
+        .sort()
+        .join(' ');
     }
 
     function cleanDateStr(dStr) {
@@ -1464,13 +1471,11 @@
       }
     }
 
-    /* ОКНО ПРОСМОТРА ОТСУТСТВУЮЩИХ ДЛЯ УЧИТЕЛЯ */
     function openTeacherAbsencesModal() {
       const modal = document.getElementById('teacher-absences-modal');
       const tabsEl = document.getElementById('absence-class-tabs');
       const relevant = getTeacherRelevantAbsences();
 
-      // Собираем уникальные классы из списка отсутствующих
       const classesSet = new Set();
       relevant.forEach(a => {
         const c = normalizeClassStr(a['Класс'] || a['класс'] || '');
@@ -1514,7 +1519,7 @@
       const listEl = document.getElementById('teacher-absences-list');
       listEl.innerHTML = '';
 
-      let filtered = relevant.slice().reverse(); // Свежие отметки сверху
+      let filtered = relevant.slice().reverse();
       if (currentAbsenceFilterClass !== 'ALL') {
         filtered = filtered.filter(a => normalizeClassStr(a['Класс'] || a['класс'] || '') === currentAbsenceFilterClass);
       }
@@ -1551,11 +1556,11 @@
 
     function renderStudentProfileGrades() {
       if (!currentUser || isTeacher()) return;
-      const myName = currentUser.name.toLowerCase();
+      const myNormName = normalizePersonName(currentUser.name);
 
       const myGrades = allGrades.filter(g => {
-        const student = String(g['Ученик'] || g['ученик'] || '').toLowerCase();
-        return student.includes(myName) || myName.includes(student);
+        const stNorm = normalizePersonName(g['Ученик'] || g['ученик'] || '');
+        return stNorm && (stNorm === myNormName || stNorm.includes(myNormName) || myNormName.includes(stNorm));
       });
 
       let totalXP = 0;
@@ -1612,33 +1617,43 @@
       const scores = {};
 
       allStudents.forEach(st => {
-        const role = String(st['Роль'] || st['роль'] || 'student').toLowerCase();
+        const rawRole = String(st['Роль'] || st['роль'] || '').trim().toLowerCase();
+        if (rawRole === 'teacher' || rawRole === 'учитель') return;
+
+        const rawName = String(st['Имя'] || st['имя'] || st['ФИО'] || '').trim();
+        if (!rawName || rawName.length < 2) return;
+
         const stClass = normalizeClassStr(st['Класс'] || st['класс'] || '');
-
-        if (role !== 'teacher') {
-          if (currentLeaderboardMode === 'my' && myClass && stClass !== myClass) {
-            return;
-          }
-
-          const name = st['Имя'] || st['ФИО'] || st['Логин'];
-          scores[name] = {
-            name: name,
-            className: stClass || '8А',
-            score: 0
-          };
+        if (currentLeaderboardMode === 'my' && myClass && stClass !== myClass) {
+          return;
         }
+
+        const normKey = normalizePersonName(rawName) + '_' + stClass;
+        scores[normKey] = {
+          name: rawName,
+          normName: normalizePersonName(rawName),
+          className: stClass || '—',
+          score: 0
+        };
       });
 
       allGrades.forEach(g => {
-        const student = String(g['Ученик'] || g['ученик'] || '').trim();
+        const rawStudent = String(g['Ученик'] || g['ученик'] || '').trim();
+        if (!rawStudent || rawStudent.length < 2) return;
+
         const gradeVal = Number(g['Оценка'] || g['оценка']);
         const weight = Number(g['Вес'] || g['вес'] || 5);
+        const gClass = normalizeClassStr(g['Класс'] || g['класс'] || '');
 
         if (!isNaN(gradeVal)) {
           const add = gradeVal * weight;
+          const normStudent = normalizePersonName(rawStudent);
+
           for (const key in scores) {
-            if (key.toLowerCase().includes(student.toLowerCase()) || student.toLowerCase().includes(key.toLowerCase())) {
-              scores[key].score += add;
+            const item = scores[key];
+            const classMatches = !gClass || item.className === '—' || item.className === gClass;
+            if (classMatches && (item.normName === normStudent || item.normName.includes(normStudent) || normStudent.includes(item.normName))) {
+              item.score += add;
               break;
             }
           }
@@ -1651,14 +1666,14 @@
         listEl.innerHTML = '<div class="empty-state">Ученики в этой категории не найдены</div>';
       } else {
         sortedLeaders.forEach((leader, idx) => {
-          const isMe = currentUser && leader.name.toLowerCase().includes(currentUser.name.toLowerCase());
+          const isMe = currentUser && normalizePersonName(leader.name) === normalizePersonName(currentUser.name);
           const row = document.createElement('div');
-          row.className = `leaderboard-row ${idx === 0 ? 'top-1' : ''} ${isMe ? 'my-row' : ''}`;
+          row.className = `leaderboard-row ${idx === 0 && leader.score > 0 ? 'top-1' : ''} ${isMe ? 'my-row' : ''}`;
 
           let medal = `${idx + 1}`;
-          if (idx === 0) medal = '🥇';
-          if (idx === 1) medal = '🥈';
-          if (idx === 2) medal = '🥉';
+          if (idx === 0 && leader.score > 0) medal = '🥇';
+          if (idx === 1 && leader.score > 0) medal = '🥈';
+          if (idx === 2 && leader.score > 0) medal = '🥉';
 
           row.innerHTML = `
             <div class="leader-rank">${medal}</div>
@@ -2274,7 +2289,8 @@
       const classStudents = allStudents.filter(s => {
         const c = normalizeClassStr(s['Класс'] || s['класс'] || '');
         const role = String(s['Роль'] || s['роль'] || 'student').toLowerCase();
-        return c === targetClass && role !== 'teacher';
+        const name = String(s['Имя'] || s['имя'] || s['ФИО'] || '').trim();
+        return c === targetClass && role !== 'teacher' && name.length >= 2;
       });
 
       const container = document.getElementById('grades-students-list');
@@ -2585,12 +2601,12 @@
 
         let gradeBadgeHtml = '';
         if (currentUser && !isTeacher()) {
-          const myName = currentUser.name.toLowerCase();
+          const myNormName = normalizePersonName(currentUser.name);
           const matchGrade = allGrades.find(g => {
-            const stName = String(g['Ученик'] || g['ученик'] || '').toLowerCase();
+            const stNorm = normalizePersonName(g['Ученик'] || g['ученик'] || '');
             const gSub = String(g['Предмет'] || g['предмет'] || '').toLowerCase();
             const gDate = cleanDateStr(g['Дата'] || g['дата'] || '');
-            return (stName.includes(myName) || myName.includes(stName)) &&
+            return stNorm && (stNorm === myNormName || stNorm.includes(myNormName) || myNormName.includes(stNorm)) &&
                    gSub === subject.toLowerCase() &&
                    (gDate === lessonDate || gDate === selectedDateInfo.padded);
           });
