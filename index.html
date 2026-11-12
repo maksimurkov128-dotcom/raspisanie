@@ -763,6 +763,30 @@
 
     .note-textarea:focus { border-color: var(--gold); }
 
+    .hw-chips-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin-top: 6px;
+    }
+
+    .hw-chip {
+      background: #2b2225;
+      border: 1px solid var(--card-border);
+      color: var(--gold);
+      font-size: 11px;
+      font-weight: 600;
+      padding: 4px 8px;
+      border-radius: 8px;
+      cursor: pointer;
+      user-select: none;
+      transition: background 0.15s;
+    }
+
+    .hw-chip:active {
+      background: rgba(244, 162, 97, 0.2);
+    }
+
     .form-group {
       margin-bottom: 12px;
       display: flex;
@@ -798,6 +822,7 @@
       cursor: pointer;
       margin-top: 8px;
       box-shadow: 0 0 14px var(--accent-glow);
+      width: 100%;
     }
 
     .submit-btn:active { transform: scale(0.97); }
@@ -824,6 +849,10 @@
       cursor: pointer;
       margin-top: 8px;
       width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
     }
 
     .logout-btn {
@@ -960,6 +989,84 @@
       color: var(--gold);
     }
 
+    .subject-avg-card {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #181315;
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 10px 12px;
+      cursor: pointer;
+      transition: border-color 0.2s, transform 0.15s;
+    }
+
+    .subject-avg-card:active {
+      transform: scale(0.98);
+      border-color: var(--gold);
+    }
+
+    .avg-pill {
+      font-size: 13px;
+      font-weight: 800;
+      padding: 3px 9px;
+      border-radius: 8px;
+    }
+
+    .avg-5 { background: rgba(42, 157, 143, 0.2); color: #52b788; border: 1px solid #52b788; }
+    .avg-4 { background: rgba(88, 166, 255, 0.2); color: #79c0ff; border: 1px solid #79c0ff; }
+    .avg-3 { background: rgba(244, 162, 97, 0.2); color: #f4a261; border: 1px solid #f4a261; }
+    .avg-2 { background: rgba(230, 57, 70, 0.2); color: #ff6b6b; border: 1px solid #ff6b6b; }
+
+    .sim-controls {
+      display: flex;
+      gap: 8px;
+      margin: 8px 0;
+    }
+
+    .sim-grade-btns {
+      display: flex;
+      gap: 6px;
+      flex: 1;
+    }
+
+    .sim-g-btn {
+      flex: 1;
+      padding: 8px 0;
+      background: #141113;
+      border: 1px solid var(--card-border);
+      color: #fff;
+      font-weight: 700;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .sim-g-btn.selected {
+      background: var(--accent);
+      border-color: var(--gold);
+    }
+
+    .sim-tags-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .sim-tag {
+      background: rgba(244, 162, 97, 0.15);
+      border: 1px solid rgba(244, 162, 97, 0.35);
+      color: var(--gold);
+      font-size: 12px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 8px;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      cursor: pointer;
+    }
+
     .absence-item-card {
       background: #221c1f;
       border: 1px solid var(--card-border);
@@ -1018,7 +1125,7 @@
       <div class="icon-btn" id="refresh-btn" onclick="forceReloadData()" title="Обновить расписание">
         🔄
       </div>
-      <div class="icon-btn" onclick="openLeaderboardModal()" title="Рейтинг по баллам">
+      <div class="icon-btn" onclick="openLeaderboardModal()" title="Рейтинг и Битва классов">
         🏆
       </div>
       <div class="icon-btn" id="absence-header-btn" onclick="handleAbsenceButtonClick()" title="Отсутствия">
@@ -1102,7 +1209,7 @@
         <button class="close-btn" onclick="closeProfileModal()">✕</button>
       </div>
 
-      <div style="overflow-y: auto; max-height: 65vh; padding-right: 2px;">
+      <div style="overflow-y: auto; max-height: 68vh; padding-right: 2px;">
         <div class="detail-item">
           <div class="detail-label" id="prof-type-label">Пользователь</div>
           <div id="prof-name" class="detail-val" style="font-weight: 700; font-size: 16px;">—</div>
@@ -1118,12 +1225,20 @@
           <div id="prof-extra-val" class="detail-val">—</div>
         </div>
 
+        <!-- ДЕЙСТВИЯ УЧИТЕЛЯ -->
         <div id="teacher-actions-section" style="display: none;">
+          <button class="teacher-action-btn" onclick="closeProfileModal(); openTeacherAnnouncementModal();">
+            📢 Создать объявление
+          </button>
+          <button class="teacher-action-btn" onclick="closeProfileModal(); openTeacherDutyModal();">
+            🧹 Назначить дежурных
+          </button>
           <button class="teacher-action-btn" onclick="closeProfileModal(); openTeacherAbsencesModal();">
             📋 Журнал отсутствующих (<span id="prof-abs-count">0</span>)
           </button>
         </div>
 
+        <!-- УСПЕВАЕМОСТЬ И КАЛЬКУЛЯТОР УЧЕНИКА -->
         <div id="student-grades-section" style="display: none;">
           <div class="detail-item" style="background: linear-gradient(135deg, rgba(244,162,97,0.12), rgba(231,111,81,0.08)); border-color: rgba(244,162,97,0.3);">
             <div class="detail-label">🏆 Мои баллы в рейтинге:</div>
@@ -1131,13 +1246,155 @@
           </div>
 
           <div class="detail-item">
-            <div class="detail-label">📖 История оценок:</div>
-            <div id="prof-grades-list" style="margin-top: 6px; display: flex; flex-direction: column; gap: 6px;"></div>
+            <div class="detail-label">📊 Средневзвешенный балл (нажми для прогноза):</div>
+            <div id="prof-subjects-list" style="margin-top: 8px; display: flex; flex-direction: column; gap: 6px;"></div>
+          </div>
+        </div>
+
+        <!-- БЛОК ТЕСТОВОГО РЕЖИМА (ОТЗЫВ И РАЗРАБОТЧИК) -->
+        <div style="margin-top: 14px; padding-top: 12px; border-top: 1px dashed var(--card-border);">
+          <div style="font-size: 11px; color: var(--hint); text-align: center; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;">
+            🧪 Тестовый режим дневника
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <button type="button" class="secondary-btn" style="margin-top: 0; font-size: 12px; flex: 1;" onclick="closeProfileModal(); openFeedbackModal();">
+              ⭐ Оставить отзыв
+            </button>
+            <a href="https://t.me/ТВОЙ_ЮЗЕРНЕЙМ_В_ТГ" target="_blank" class="secondary-btn" style="margin-top: 0; font-size: 12px; flex: 1; text-align: center; text-decoration: none; display: flex; align-items: center; justify-content: center;">
+              💬 Разработчик
+            </a>
           </div>
         </div>
 
         <button class="logout-btn" onclick="handleLogout()">Выйти из профиля</button>
       </div>
+    </div>
+  </div>
+
+  <!-- НАЗНАЧЕНИЕ ДЕЖУРНЫХ ДЛЯ УЧИТЕЛЯ -->
+  <div id="teacher-duty-modal" class="modal-overlay" onclick="closeTeacherDutyModal(event)">
+    <div class="modal-sheet" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <h3>🧹 Назначить дежурных</h3>
+        <button class="close-btn" onclick="closeTeacherDutyModal()">✕</button>
+      </div>
+      <form onsubmit="submitTeacherDuty(event)">
+        <div class="form-group">
+          <label>Класс</label>
+          <select id="t-duty-class" class="form-input"></select>
+        </div>
+        <div class="form-group">
+          <label>Дата дежурства</label>
+          <input type="text" id="t-duty-date" class="form-input" placeholder="Например: 13 ноября" required>
+        </div>
+        <div class="form-group">
+          <label>Фамилии дежурных</label>
+          <input type="text" id="t-duty-names" class="form-input" placeholder="Иванов, Петрова" required>
+        </div>
+        <button type="submit" id="t-duty-submit-btn" class="submit-btn">Сохранить дежурных</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ОСТАВИТЬ ОТЗЫВ (БЕТА-ТЕСТ) -->
+  <div id="feedback-modal" class="modal-overlay" onclick="closeFeedbackModal(event)">
+    <div class="modal-sheet" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <h3>⭐ Оценить дневник</h3>
+        <button class="close-btn" onclick="closeFeedbackModal()">✕</button>
+      </div>
+      <form onsubmit="submitFeedbackForm(event)">
+        <div class="form-group">
+          <label>Общая оценка (от 1 до 5 звёзд)</label>
+          <div id="fb-stars-row" style="display: flex; justify-content: space-between; gap: 6px;">
+            <button type="button" class="sim-g-btn" onclick="setFeedbackStars(1)">1 ⭐</button>
+            <button type="button" class="sim-g-btn" onclick="setFeedbackStars(2)">2 ⭐</button>
+            <button type="button" class="sim-g-btn" onclick="setFeedbackStars(3)">3 ⭐</button>
+            <button type="button" class="sim-g-btn" onclick="setFeedbackStars(4)">4 ⭐</button>
+            <button type="button" class="sim-g-btn selected" onclick="setFeedbackStars(5)">5 ⭐</button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Плюсы, минусы и чего не хватает (обязательно)</label>
+          <textarea id="fb-comment" class="note-textarea" style="height: 100px;" placeholder="Напиши, что понравилось, какие нашёл баги или какие функции стоит добавить..." required></textarea>
+        </div>
+        <button type="submit" id="fb-submit-btn" class="submit-btn">Отправить отзыв</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ОТДЕЛЬНОЕ ОКНО: ПРЕДМЕТ И КАЛЬКУЛЯТОР ПРОГНОЗА ОЦЕНОК -->
+  <div id="subject-calc-modal" class="modal-overlay" onclick="closeSubjectCalcModal(event)">
+    <div class="modal-sheet" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <h3 id="calc-subject-title">Предмет</h3>
+        <button class="close-btn" onclick="closeSubjectCalcModal()">✕</button>
+      </div>
+
+      <div style="overflow-y: auto; max-height: 68vh; padding-right: 2px;">
+        <div class="detail-item" style="display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <div class="detail-label">Текущий средний балл</div>
+            <div style="font-size: 12px; color: var(--hint);" id="calc-formula-info">—</div>
+          </div>
+          <div id="calc-current-avg" class="avg-pill avg-5" style="font-size: 18px; padding: 6px 12px;">0.00</div>
+        </div>
+
+        <div class="detail-item">
+          <div class="detail-label">🧮 Симулятор (прогноз оценки):</div>
+          <div style="font-size: 12px; color: var(--hint); margin-bottom: 6px;">Добавь гипотетические оценки, чтобы увидеть новый средний балл:</div>
+
+          <div class="sim-controls">
+            <div class="sim-grade-btns">
+              <button type="button" class="sim-g-btn selected" onclick="selectSimGrade(5, this)">5</button>
+              <button type="button" class="sim-g-btn" onclick="selectSimGrade(4, this)">4</button>
+              <button type="button" class="sim-g-btn" onclick="selectSimGrade(3, this)">3</button>
+              <button type="button" class="sim-g-btn" onclick="selectSimGrade(2, this)">2</button>
+            </div>
+            <select id="sim-weight-select" class="grade-select">
+              <option value="3">Вес 3</option>
+              <option value="5" selected>Вес 5</option>
+              <option value="7">Вес 7</option>
+              <option value="10">Вес 10</option>
+            </select>
+          </div>
+
+          <div style="display: flex; gap: 6px;">
+            <button type="button" class="submit-btn" style="margin-top: 0; padding: 8px; font-size: 13px;" onclick="addSimulatedGrade()">+ Добавить в прогноз</button>
+            <button type="button" class="secondary-btn" style="margin-top: 0; padding: 8px; font-size: 13px; width: auto;" onclick="clearSimulatedGrades()">Сброс</button>
+          </div>
+
+          <div id="sim-tags-box" class="sim-tags-container"></div>
+        </div>
+
+        <div class="detail-item">
+          <div class="detail-label">📖 Все оценки по предмету:</div>
+          <div id="calc-grades-history" style="margin-top: 6px; display: flex; flex-direction: column; gap: 6px;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- СОЗДАНИЕ ОБЪЯВЛЕНИЯ ДЛЯ УЧИТЕЛЯ -->
+  <div id="teacher-announcement-modal" class="modal-overlay" onclick="closeTeacherAnnouncementModal(event)">
+    <div class="modal-sheet" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <h3>📢 Новое объявление</h3>
+        <button class="close-btn" onclick="closeTeacherAnnouncementModal()">✕</button>
+      </div>
+      <form onsubmit="submitTeacherAnnouncement(event)">
+        <div class="form-group">
+          <label>Кому показать объявление?</label>
+          <select id="t-news-class" class="form-input">
+            <option value="ВСЕ">Всем классам (общая новость)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Текст объявления</label>
+          <textarea id="t-news-text" class="note-textarea" style="height: 100px;" placeholder="Например: Завтра принести атласы и контурные карты..." required></textarea>
+        </div>
+        <button type="submit" id="t-news-submit-btn" class="submit-btn">Опубликовать объявление</button>
+      </form>
     </div>
   </div>
 
@@ -1148,25 +1405,24 @@
         <h3>📋 Журнал отсутствующих</h3>
         <button class="close-btn" onclick="closeTeacherAbsencesModal()">✕</button>
       </div>
-
       <div id="absence-class-tabs" class="leaderboard-filter-tabs"></div>
-
       <div id="teacher-absences-list" style="overflow-y: auto; max-height: 55vh;"></div>
     </div>
   </div>
 
-  <!-- ЛИДЕРБОРД С ПЕРЕКЛЮЧАТЕЛЕМ КЛАССОВ -->
+  <!-- ЛИДЕРБОРД + БИТВА КЛАССОВ -->
   <div id="leaderboard-modal" class="modal-overlay" onclick="closeLeaderboardModal(event)">
     <div class="modal-sheet" onclick="event.stopPropagation()">
       <div class="modal-header">
-        <h3>🏆 Рейтинг учеников</h3>
+        <h3>🏆 Рейтинг и Битва классов</h3>
         <button class="close-btn" onclick="closeLeaderboardModal()">✕</button>
       </div>
-      <div style="font-size: 12px; color: var(--hint); margin-bottom: 10px;">Баллы = Оценка × Вес. Суммируются все оценки за учебный период!</div>
+      <div style="font-size: 12px; color: var(--hint); margin-bottom: 10px;" id="lb-subtitle">Баллы = Оценка × Вес. Суммируются все оценки за учебный период!</div>
 
       <div class="leaderboard-filter-tabs">
-        <div id="lb-tab-all" class="leaderboard-filter-tab active" onclick="setLeaderboardFilter('all')">Все классы</div>
+        <div id="lb-tab-all" class="leaderboard-filter-tab active" onclick="setLeaderboardFilter('all')">Все ученики</div>
         <div id="lb-tab-my" class="leaderboard-filter-tab" onclick="setLeaderboardFilter('my')">Мой класс</div>
+        <div id="lb-tab-classes" class="leaderboard-filter-tab" onclick="setLeaderboardFilter('classes')">⚔️ Битва классов</div>
       </div>
 
       <div id="leaderboard-list" style="overflow-y: auto; max-height: 50vh;"></div>
@@ -1217,7 +1473,7 @@
     </div>
   </div>
 
-  <!-- РЕДАКТИРОВАНИЕ УРОКА ДЛЯ УЧИТЕЛЯ -->
+  <!-- РЕДАКТИРОВАНИЕ УРОКА ДЛЯ УЧИТЕЛЯ С БЫСТРЫМИ ШАБЛОНАМИ -->
   <div id="teacher-edit-modal" class="modal-overlay" onclick="closeTeacherEditModal(event)">
     <div class="modal-sheet" onclick="event.stopPropagation()">
       <div class="modal-header">
@@ -1237,6 +1493,14 @@
         <div class="form-group">
           <label>Домашнее задание</label>
           <textarea id="t-edit-homework" class="note-textarea" style="height: 80px;" placeholder="Параграф, номера задач..."></textarea>
+          <div class="hw-chips-row">
+            <span class="hw-chip" onclick="appendHwTemplate('§ ')">+ §</span>
+            <span class="hw-chip" onclick="appendHwTemplate('стр. ')">+ стр.</span>
+            <span class="hw-chip" onclick="appendHwTemplate('№ ')">+ №</span>
+            <span class="hw-chip" onclick="appendHwTemplate('Выучить наизусть ')">+ Наизусть</span>
+            <span class="hw-chip" onclick="appendHwTemplate('Подготовиться к тесту ')">+ Тест</span>
+            <span class="hw-chip" onclick="setHwTemplate('Не задано')">Не задано</span>
+          </div>
         </div>
 
         <div class="form-group">
@@ -1244,13 +1508,14 @@
           <select id="t-edit-type" class="form-input">
             <option value="">Обычный урок</option>
             <option value="К/Р">⚠️ Контрольная работа (К/Р)</option>
+            <option value="П/Р">📋 Проверочная работа (П/Р)</option>
             <option value="С/Р">📝 Самостоятельная работа (С/Р)</option>
             <option value="Тест">📝 Тест / Зачет</option>
           </select>
         </div>
 
         <button type="submit" id="t-edit-save-btn" class="submit-btn">Сохранить в расписание</button>
-        <button type="button" class="secondary-btn" onclick="openGradeBookModal()">📊 Выставить оценки за урок</button>
+        <button type="button" class="secondary-btn" onclick="openGradeBookModal()">📊 Выставить / изменить оценки</button>
       </form>
     </div>
   </div>
@@ -1321,8 +1586,8 @@
 
   <script>
     const API_URL = 'https://script.google.com/macros/s/AKfycbzoRZ_Fd9Yv2FJq79lpF4HPg-NETJm4gSCqLVxU7_6pp2CHNON2A09U1X0eYRE4cyQ5/exec';
-    const CACHE_KEY = 'diary_cached_data_v4';
-    const CACHE_TIME_KEY = 'diary_cache_timestamp_v4';
+    const CACHE_KEY = 'diary_cached_data_v6';
+    const CACHE_TIME_KEY = 'diary_cache_timestamp_v6';
     const CACHE_TTL = 3 * 60 * 1000;
 
     const BELL_SCHEDULE = [
@@ -1352,6 +1617,12 @@
     let currentTeacherLessonItem = null;
     let currentLeaderboardMode = 'all';
     let currentAbsenceFilterClass = 'ALL';
+
+    let activeCalcSubject = '';
+    let activeCalcRealGrades = [];
+    let activeCalcSimGrades = [];
+    let selectedSimGradeVal = 5;
+    let selectedFeedbackRating = 5;
 
     let currentUser = JSON.parse(localStorage.getItem('diary_current_user') || 'null');
 
@@ -1397,6 +1668,20 @@
         }
       }
       return s.replace(/\.$/, '');
+    }
+
+    /* ШАБЛОНЫ ДЗ */
+    function appendHwTemplate(text) {
+      const el = document.getElementById('t-edit-homework');
+      const cur = el.value;
+      el.value = cur && !cur.endsWith(' ') && !cur.endsWith('\n') ? `${cur} ${text}` : `${cur}${text}`;
+      el.focus();
+    }
+
+    function setHwTemplate(text) {
+      const el = document.getElementById('t-edit-homework');
+      el.value = text;
+      el.focus();
     }
 
     function updateProfileUI() {
@@ -1450,6 +1735,392 @@
         btnText.innerText = 'Войти';
         profBtn.classList.remove('teacher-badge-btn');
         absBadge.style.display = 'none';
+      }
+    }
+
+    function renderStudentProfileGrades() {
+      if (!currentUser || isTeacher()) return;
+      const myNormName = normalizePersonName(currentUser.name);
+
+      const myGrades = allGrades.filter(g => {
+        const stNorm = normalizePersonName(g['Ученик'] || g['ученик'] || '');
+        return stNorm && (stNorm === myNormName || stNorm.includes(myNormName) || myNormName.includes(stNorm));
+      });
+
+      let totalXP = 0;
+      const bySubject = {};
+
+      myGrades.forEach(g => {
+        const subj = String(g['Предмет'] || g['предмет'] || 'Предмет').trim();
+        const val = g['Оценка'] || g['оценка'] || '';
+        const weight = Number(g['Вес'] || g['вес'] || 5);
+        const date = g['Дата'] || g['дата'] || '';
+        const numVal = Number(val);
+
+        if (!isNaN(numVal)) {
+          totalXP += numVal * weight;
+        }
+
+        if (!bySubject[subj]) {
+          bySubject[subj] = [];
+        }
+        bySubject[subj].push({ val, numVal, weight, date });
+      });
+
+      document.getElementById('prof-total-xp').innerText = `${totalXP} XP (баллов)`;
+
+      const subjListEl = document.getElementById('prof-subjects-list');
+      subjListEl.innerHTML = '';
+
+      const subjects = Object.keys(bySubject).sort();
+      if (subjects.length === 0) {
+        subjListEl.innerHTML = '<div style="color:var(--hint); font-size:13px;">Оценок пока нет ✨</div>';
+        return;
+      }
+
+      subjects.forEach(subj => {
+        const items = bySubject[subj];
+        let weightedSum = 0;
+        let weightsTotal = 0;
+
+        items.forEach(it => {
+          if (!isNaN(it.numVal)) {
+            weightedSum += it.numVal * it.weight;
+            weightsTotal += it.weight;
+          }
+        });
+
+        const avg = weightsTotal > 0 ? (weightedSum / weightsTotal).toFixed(2) : '—';
+        let badgeClass = 'avg-5';
+        if (avg !== '—') {
+          const numAvg = Number(avg);
+          if (numAvg < 2.5) badgeClass = 'avg-2';
+          else if (numAvg < 3.5) badgeClass = 'avg-3';
+          else if (numAvg < 4.5) badgeClass = 'avg-4';
+        }
+
+        const card = document.createElement('div');
+        card.className = 'subject-avg-card';
+        card.onclick = () => openSubjectCalcModal(subj, items);
+        card.innerHTML = `
+          <div>
+            <div style="font-weight: 700; font-size: 14px; color: #fff;">${subj}</div>
+            <div style="font-size: 11px; color: var(--hint);">Оценок: ${items.length} • Нажми для прогноза</div>
+          </div>
+          <div class="avg-pill ${badgeClass}">${avg}</div>
+        `;
+        subjListEl.appendChild(card);
+      });
+    }
+
+    function openSubjectCalcModal(subjName, gradesItems) {
+      activeCalcSubject = subjName;
+      activeCalcRealGrades = gradesItems.slice();
+      activeCalcSimGrades = [];
+
+      document.getElementById('calc-subject-title').innerText = subjName;
+      recalcSubjectForecast();
+      document.getElementById('subject-calc-modal').classList.add('open');
+    }
+
+    function closeSubjectCalcModal(e) {
+      if (e && e.target !== e.currentTarget && !e.target.classList.contains('close-btn')) return;
+      document.getElementById('subject-calc-modal').classList.remove('open');
+    }
+
+    function selectSimGrade(val, btnEl) {
+      selectedSimGradeVal = val;
+      document.querySelectorAll('#subject-calc-modal .sim-g-btn').forEach(b => b.classList.remove('selected'));
+      btnEl.classList.add('selected');
+    }
+
+    function addSimulatedGrade() {
+      const weight = Number(document.getElementById('sim-weight-select').value) || 5;
+      activeCalcSimGrades.push({ numVal: selectedSimGradeVal, weight });
+      recalcSubjectForecast();
+    }
+
+    function removeSimulatedGrade(index) {
+      activeCalcSimGrades.splice(index, 1);
+      recalcSubjectForecast();
+    }
+
+    function clearSimulatedGrades() {
+      activeCalcSimGrades = [];
+      recalcSubjectForecast();
+    }
+
+    function recalcSubjectForecast() {
+      let weightedSum = 0;
+      let weightsTotal = 0;
+
+      activeCalcRealGrades.forEach(it => {
+        if (!isNaN(it.numVal)) {
+          weightedSum += it.numVal * it.weight;
+          weightsTotal += it.weight;
+        }
+      });
+
+      activeCalcSimGrades.forEach(it => {
+        weightedSum += it.numVal * it.weight;
+        weightsTotal += it.weight;
+      });
+
+      const avg = weightsTotal > 0 ? (weightedSum / weightsTotal).toFixed(2) : '0.00';
+      const avgEl = document.getElementById('calc-current-avg');
+      avgEl.innerText = avg;
+
+      avgEl.className = 'avg-pill avg-5';
+      const numAvg = Number(avg);
+      if (numAvg < 2.5) avgEl.className = 'avg-pill avg-2';
+      else if (numAvg < 3.5) avgEl.className = 'avg-pill avg-3';
+      else if (numAvg < 4.5) avgEl.className = 'avg-pill avg-4';
+
+      document.getElementById('calc-formula-info').innerText = `Сумма баллов: ${weightedSum} / Общий вес: ${weightsTotal}`;
+
+      const tagsBox = document.getElementById('sim-tags-box');
+      tagsBox.innerHTML = '';
+      activeCalcSimGrades.forEach((sg, idx) => {
+        const tag = document.createElement('span');
+        tag.className = 'sim-tag';
+        tag.innerHTML = `+${sg.numVal} (вес ${sg.weight}) ✕`;
+        tag.onclick = () => removeSimulatedGrade(idx);
+        tagsBox.appendChild(tag);
+      });
+
+      const histEl = document.getElementById('calc-grades-history');
+      histEl.innerHTML = '';
+      activeCalcRealGrades.forEach(g => {
+        const row = document.createElement('div');
+        row.style.display = 'flex';
+        row.style.justifyContent = 'space-between';
+        row.style.fontSize = '13px';
+        row.style.padding = '4px 0';
+        row.style.borderBottom = '1px dashed rgba(255,255,255,0.06)';
+        row.innerHTML = `
+          <span>📅 ${g.date}</span>
+          <span>Оценка: <b>${g.val}</b> <span style="color:var(--gold);">(вес ${g.weight})</span></span>
+        `;
+        histEl.appendChild(row);
+      });
+    }
+
+    /* НАЗНАЧЕНИЕ ДЕЖУРНЫХ УЧИТЕЛЕМ */
+    function openTeacherDutyModal() {
+      const selectEl = document.getElementById('t-duty-class');
+      selectEl.innerHTML = '';
+
+      const classesSet = new Set();
+      allStudents.forEach(s => {
+        const c = normalizeClassStr(s['Класс'] || s['класс'] || '');
+        if (c) classesSet.add(c);
+      });
+      if (classesSet.size === 0) classesSet.add('8А');
+
+      Array.from(classesSet).sort().forEach(c => {
+        const opt = document.createElement('option');
+        opt.value = c;
+        opt.innerText = `${c} класс`;
+        if (currentUser && currentUser.className === c) opt.selected = true;
+        selectEl.appendChild(opt);
+      });
+
+      const monthsRu = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
+      if (selectedDateInfo) {
+        document.getElementById('t-duty-date').value = `${selectedDateInfo.dayNumber} ${monthsRu[selectedDateInfo.dateObj.getMonth()]}`;
+      }
+
+      document.getElementById('teacher-duty-modal').classList.add('open');
+    }
+
+    function closeTeacherDutyModal(e) {
+      if (e && e.target !== e.currentTarget && !e.target.classList.contains('close-btn')) return;
+      document.getElementById('teacher-duty-modal').classList.remove('open');
+    }
+
+    async function submitTeacherDuty(e) {
+      e.preventDefault();
+      const btn = document.getElementById('t-duty-submit-btn');
+      btn.innerText = 'Сохранение...';
+      btn.disabled = true;
+
+      const payload = {
+        action: 'setDuty',
+        className: document.getElementById('t-duty-class').value,
+        date: document.getElementById('t-duty-date').value.trim(),
+        dutyNames: document.getElementById('t-duty-names').value.trim()
+      };
+
+      try {
+        await fetch(API_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        const existingIdx = allDuty.findIndex(d =>
+          normalizeClassStr(d['Класс'] || '') === payload.className &&
+          cleanDateStr(d['Дата'] || '').toLowerCase() === payload.date.toLowerCase()
+        );
+        if (existingIdx !== -1) {
+          allDuty[existingIdx]['Дежурные'] = payload.dutyNames;
+        } else {
+          allDuty.push({
+            'Дата': payload.date,
+            'Класс': payload.className,
+            'Дежурные': payload.dutyNames
+          });
+        }
+
+        localStorage.removeItem(CACHE_TIME_KEY);
+        btn.innerText = 'Дежурные назначены! ✓';
+        setTimeout(() => {
+          closeTeacherDutyModal();
+          btn.innerText = 'Сохранить дежурных';
+          btn.disabled = false;
+          document.getElementById('t-duty-names').value = '';
+          renderLessons();
+        }, 1000);
+      } catch (err) {
+        alert('Ошибка при сохранении дежурных');
+        btn.innerText = 'Сохранить дежурных';
+        btn.disabled = false;
+      }
+    }
+
+    /* ОТЗЫВЫ (БЕТА-ТЕСТ) */
+    function openFeedbackModal() {
+      setFeedbackStars(5);
+      document.getElementById('fb-comment').value = '';
+      document.getElementById('feedback-modal').classList.add('open');
+    }
+
+    function closeFeedbackModal(e) {
+      if (e && e.target !== e.currentTarget && !e.target.classList.contains('close-btn')) return;
+      document.getElementById('feedback-modal').classList.remove('open');
+    }
+
+    function setFeedbackStars(rating) {
+      selectedFeedbackRating = rating;
+      const btns = document.querySelectorAll('#fb-stars-row .sim-g-btn');
+      btns.forEach((b, idx) => {
+        if (idx + 1 === rating) {
+          b.classList.add('selected');
+        } else {
+          b.classList.remove('selected');
+        }
+      });
+    }
+
+    async function submitFeedbackForm(e) {
+      e.preventDefault();
+      const commentVal = document.getElementById('fb-comment').value.trim();
+      if (!commentVal) return;
+
+      const btn = document.getElementById('fb-submit-btn');
+      btn.innerText = 'Отправка...';
+      btn.disabled = true;
+
+      const payload = {
+        action: 'sendFeedback',
+        userName: currentUser ? currentUser.name : 'Гость',
+        userClass: currentUser ? (currentUser.role === 'teacher' ? 'Учитель' : currentUser.className) : '—',
+        rating: selectedFeedbackRating,
+        comment: commentVal
+      };
+
+      try {
+        await fetch(API_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        btn.innerText = 'Спасибо за отзыв! ✓';
+        setTimeout(() => {
+          closeFeedbackModal();
+          btn.innerText = 'Отправить отзыв';
+          btn.disabled = false;
+        }, 1100);
+      } catch (err) {
+        alert('Не удалось отправить отзыв');
+        btn.innerText = 'Отправить отзыв';
+        btn.disabled = false;
+      }
+    }
+
+    /* ПУБЛИКАЦИЯ ОБЪЯВЛЕНИЙ УЧИТЕЛЕМ */
+    function openTeacherAnnouncementModal() {
+      const selectEl = document.getElementById('t-news-class');
+      selectEl.innerHTML = '<option value="ВСЕ">Всем классам (общая новость)</option>';
+
+      const classesSet = new Set();
+      allStudents.forEach(s => {
+        const c = normalizeClassStr(s['Класс'] || s['класс'] || '');
+        if (c) classesSet.add(c);
+      });
+      Array.from(classesSet).sort().forEach(c => {
+        const opt = document.createElement('option');
+        opt.value = c;
+        opt.innerText = `Только ${c} классу`;
+        selectEl.appendChild(opt);
+      });
+
+      document.getElementById('teacher-announcement-modal').classList.add('open');
+    }
+
+    function closeTeacherAnnouncementModal(e) {
+      if (e && e.target !== e.currentTarget && !e.target.classList.contains('close-btn')) return;
+      document.getElementById('teacher-announcement-modal').classList.remove('open');
+    }
+
+    async function submitTeacherAnnouncement(e) {
+      e.preventDefault();
+      const btn = document.getElementById('t-news-submit-btn');
+      btn.innerText = 'Публикация...';
+      btn.disabled = true;
+
+      const monthsRu = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
+      const now = new Date();
+      const todayStr = `${now.getDate()} ${monthsRu[now.getMonth()]}`;
+
+      const payload = {
+        action: 'addAnnouncement',
+        date: todayStr,
+        targetClass: document.getElementById('t-news-class').value,
+        text: document.getElementById('t-news-text').value.trim(),
+        author: currentUser ? currentUser.name : ''
+      };
+
+      try {
+        await fetch(API_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        allNews.unshift({
+          'Дата': payload.date,
+          'Класс': payload.targetClass,
+          'Текст': `${payload.text}\n— ${payload.author}`
+        });
+        updateNewsBadge();
+        localStorage.removeItem(CACHE_TIME_KEY);
+
+        btn.innerText = 'Опубликовано! ✓';
+        setTimeout(() => {
+          closeTeacherAnnouncementModal();
+          btn.innerText = 'Опубликовать объявление';
+          btn.disabled = false;
+          document.getElementById('t-news-text').value = '';
+        }, 1000);
+      } catch (err) {
+        alert('Ошибка при отправке объявления');
+        btn.innerText = 'Опубликовать объявление';
+        btn.disabled = false;
       }
     }
 
@@ -1554,51 +2225,19 @@
       document.getElementById('teacher-absences-modal').classList.remove('open');
     }
 
-    function renderStudentProfileGrades() {
-      if (!currentUser || isTeacher()) return;
-      const myNormName = normalizePersonName(currentUser.name);
-
-      const myGrades = allGrades.filter(g => {
-        const stNorm = normalizePersonName(g['Ученик'] || g['ученик'] || '');
-        return stNorm && (stNorm === myNormName || stNorm.includes(myNormName) || myNormName.includes(stNorm));
-      });
-
-      let totalXP = 0;
-      const gradesListEl = document.getElementById('prof-grades-list');
-      gradesListEl.innerHTML = '';
-
-      if (myGrades.length === 0) {
-        gradesListEl.innerHTML = '<div style="color:var(--hint); font-size:13px;">Оценок пока нет ✨</div>';
-      } else {
-        myGrades.forEach(g => {
-          const val = g['Оценка'] || g['оценка'] || '';
-          const weight = Number(g['Вес'] || g['вес'] || 5);
-          const numVal = Number(val);
-          const xp = !isNaN(numVal) ? numVal * weight : 0;
-          totalXP += xp;
-
-          const row = document.createElement('div');
-          row.style.display = 'flex';
-          row.style.justifyContent = 'space-between';
-          row.style.padding = '4px 0';
-          row.style.fontSize = '13px';
-          row.style.borderBottom = '1px dashed rgba(255,255,255,0.06)';
-
-          row.innerHTML = `
-            <span>${g['Предмет']} <span style="color:var(--hint); font-size:11px;">(${g['Дата']})</span></span>
-            <span><b>${val}</b> <span style="color:var(--gold); font-size:11px;">(вес ${weight} • +${xp} XP)</span></span>
-          `;
-          gradesListEl.appendChild(row);
-        });
-      }
-
-      document.getElementById('prof-total-xp').innerText = `${totalXP} XP (баллов)`;
-    }
-
     function setLeaderboardFilter(mode) {
       currentLeaderboardMode = mode;
       document.getElementById('lb-tab-all').className = `leaderboard-filter-tab ${mode === 'all' ? 'active' : ''}`;
       document.getElementById('lb-tab-my').className = `leaderboard-filter-tab ${mode === 'my' ? 'active' : ''}`;
+      document.getElementById('lb-tab-classes').className = `leaderboard-filter-tab ${mode === 'classes' ? 'active' : ''}`;
+
+      const sub = document.getElementById('lb-subtitle');
+      if (mode === 'classes') {
+        sub.innerText = 'Суммарные очки XP всех учеников каждого класса!';
+      } else {
+        sub.innerText = 'Баллы = Оценка × Вес. Суммируются все оценки за учебный период!';
+      }
+
       renderLeaderboard();
     }
 
@@ -1624,10 +2263,6 @@
         if (!rawName || rawName.length < 2) return;
 
         const stClass = normalizeClassStr(st['Класс'] || st['класс'] || '');
-        if (currentLeaderboardMode === 'my' && myClass && stClass !== myClass) {
-          return;
-        }
-
         const normKey = normalizePersonName(rawName) + '_' + stClass;
         scores[normKey] = {
           name: rawName,
@@ -1660,7 +2295,52 @@
         }
       });
 
-      const sortedLeaders = Object.values(scores).sort((a, b) => b.score - a.score);
+      if (currentLeaderboardMode === 'classes') {
+        const classTotals = {};
+        Object.values(scores).forEach(st => {
+          if (!st.className || st.className === '—') return;
+          if (!classTotals[st.className]) {
+            classTotals[st.className] = { className: st.className, totalScore: 0, studentCount: 0 };
+          }
+          classTotals[st.className].totalScore += st.score;
+          classTotals[st.className].studentCount += 1;
+        });
+
+        const sortedClasses = Object.values(classTotals).sort((a, b) => b.totalScore - a.totalScore);
+        if (sortedClasses.length === 0) {
+          listEl.innerHTML = '<div class="empty-state">Классы пока не добавлены</div>';
+          return;
+        }
+
+        sortedClasses.forEach((cls, idx) => {
+          const isMyClass = myClass && cls.className === myClass;
+          const row = document.createElement('div');
+          row.className = `leaderboard-row ${idx === 0 && cls.totalScore > 0 ? 'top-1' : ''} ${isMyClass ? 'my-row' : ''}`;
+
+          let medal = `${idx + 1}`;
+          if (idx === 0 && cls.totalScore > 0) medal = '🥇';
+          if (idx === 1 && cls.totalScore > 0) medal = '🥈';
+          if (idx === 2 && cls.totalScore > 0) medal = '🥉';
+
+          row.innerHTML = `
+            <div class="leader-rank">${medal}</div>
+            <div class="leader-info">
+              <span class="leader-name">${cls.className} класс ${isMyClass ? '⭐' : ''}</span>
+              <span class="leader-class">Учеников в рейтинге: ${cls.studentCount}</span>
+            </div>
+            <div class="leader-score">${cls.totalScore} XP</div>
+          `;
+          listEl.appendChild(row);
+        });
+        return;
+      }
+
+      let leadersArr = Object.values(scores);
+      if (currentLeaderboardMode === 'my' && myClass) {
+        leadersArr = leadersArr.filter(l => l.className === myClass);
+      }
+
+      const sortedLeaders = leadersArr.sort((a, b) => b.score - a.score);
 
       if (sortedLeaders.length === 0) {
         listEl.innerHTML = '<div class="empty-state">Ученики в этой категории не найдены</div>';
@@ -2300,18 +2980,33 @@
         container.innerHTML = '<div style="color:var(--hint); font-size:13px; text-align:center;">Ученики этого класса не найдены на листе "Ученики"</div>';
       } else {
         classStudents.forEach(st => {
-          const name = st['Имя'] || st['ФИО'] || st['Логин'];
+          const name = String(st['Имя'] || st['ФИО'] || st['Логин']).trim();
+          const normName = normalizePersonName(name);
+
+          const existing = allGrades.find(g => {
+            const gClass = normalizeClassStr(g['Класс'] || g['класс'] || '');
+            const gSub = String(g['Предмет'] || g['предмет'] || '').trim().toLowerCase();
+            const gDate = cleanDateStr(g['Дата'] || g['дата'] || '');
+            const gStud = normalizePersonName(g['Ученик'] || g['ученик'] || '');
+            return gClass === targetClass &&
+                   gSub === subject.toLowerCase() &&
+                   (gDate === date || gDate === selectedDateInfo.padded) &&
+                   gStud === normName;
+          });
+
+          const curVal = existing ? String(existing['Оценка'] || existing['оценка'] || '').trim() : '';
+
           const row = document.createElement('div');
           row.className = 'grades-table-row';
           row.innerHTML = `
-            <span>${name}</span>
+            <span>${name} ${curVal ? '<span style="color:var(--green); font-size:11px;">(стоит)</span>' : ''}</span>
             <select class="grade-select" data-student="${name}">
-              <option value="">—</option>
-              <option value="5">5</option>
-              <option value="4">4</option>
-              <option value="3">3</option>
-              <option value="2">2</option>
-              <option value="Н">Н</option>
+              <option value="" ${curVal === '' ? 'selected' : ''}>—</option>
+              <option value="5" ${curVal === '5' ? 'selected' : ''}>5</option>
+              <option value="4" ${curVal === '4' ? 'selected' : ''}>4</option>
+              <option value="3" ${curVal === '3' ? 'selected' : ''}>3</option>
+              <option value="2" ${curVal === '2' ? 'selected' : ''}>2</option>
+              <option value="Н" ${curVal === 'Н' ? 'selected' : ''}>Н</option>
             </select>
           `;
           container.appendChild(row);
@@ -2371,19 +3066,32 @@
         });
 
         gradesData.forEach(item => {
-          allGrades.push({
-            'Дата': date,
-            'Класс': targetClass,
-            'Предмет': subject,
-            'Ученик': item.studentName,
-            'Оценка': item.grade,
-            'Вес': weight
-          });
+          const normStud = normalizePersonName(item.studentName);
+          const idx = allGrades.findIndex(g =>
+            normalizeClassStr(g['Класс'] || '') === targetClass &&
+            String(g['Предмет'] || '').toLowerCase() === subject.toLowerCase() &&
+            cleanDateStr(g['Дата'] || '') === date &&
+            normalizePersonName(g['Ученик'] || '') === normStud
+          );
+
+          if (idx !== -1) {
+            allGrades[idx]['Оценка'] = item.grade;
+            allGrades[idx]['Вес'] = weight;
+          } else {
+            allGrades.push({
+              'Дата': date,
+              'Класс': targetClass,
+              'Предмет': subject,
+              'Ученик': item.studentName,
+              'Оценка': item.grade,
+              'Вес': weight
+            });
+          }
         });
 
         localStorage.removeItem(CACHE_TIME_KEY);
 
-        btn.innerText = 'Оценки выставлены! ✓';
+        btn.innerText = 'Оценки сохранены! ✓';
         setTimeout(() => {
           closeGradeBookModal();
           btn.innerText = 'Сохранить оценки';
@@ -2487,6 +3195,15 @@
         /\sкр\s/i.test(combined)
       ) {
         return { type: 'kr', label: '⚠️ Контрольная' };
+      }
+
+      if (
+        combined.includes('п/р') || 
+        combined.includes('проверочн') || 
+        /\bпр\b/i.test(combined) || 
+        /\sпр\s/i.test(combined)
+      ) {
+        return { type: 'sr', label: '📋 Проверочная' };
       }
 
       if (
