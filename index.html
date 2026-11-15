@@ -51,6 +51,7 @@
       min-height: 100vh;
       position: relative;
       width: 100%;
+      transition: background-color 0.3s ease;
     }
 
     .leaves-container {
@@ -90,7 +91,7 @@
     .leaf:nth-child(4) { left: 65%; font-size: 22px; animation-duration: 16s, 4.5s; animation-delay: 1s; opacity: 0.3; }
     .leaf:nth-child(5) { left: 85%; font-size: 19px; animation-duration: 15s, 4s; animation-delay: 4s; }
 
-    .header-top, .info-banners, .week-segmented, .days-grid, #cards-container, #loader, #duty-banner, #progress-wrapper, #share-hw-wrapper {
+    .header-top, .info-banners, .week-segmented, .days-grid, #cards-container, #loader, #duty-banner, #progress-wrapper, #share-hw-wrapper, #events-banner-container {
       position: relative;
       z-index: 1;
     }
@@ -216,7 +217,7 @@
       display: flex;
       flex-direction: column;
       gap: 8px;
-      margin-bottom: 14px;
+      margin-bottom: 12px;
     }
 
     .banner-pill {
@@ -252,6 +253,80 @@
       color: #fff;
       box-shadow: 0 0 16px var(--accent-glow);
       font-weight: 600;
+    }
+
+    /* КАРТОЧКА ЕЖЕНЕДЕЛЬНОГО СОБЫТИЯ */
+    .event-card-banner {
+      background: linear-gradient(135deg, rgba(255, 209, 102, 0.14), rgba(231, 111, 81, 0.12));
+      border: 1px solid rgba(255, 209, 102, 0.4);
+      border-radius: 14px;
+      padding: 11px 13px;
+      margin-bottom: 12px;
+      box-shadow: 0 3px 12px rgba(0, 0, 0, 0.25);
+    }
+
+    .event-card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+
+    .event-title {
+      font-size: 13px;
+      font-weight: 800;
+      color: #ffd166;
+    }
+
+    .event-reward-pill {
+      font-size: 10px;
+      font-weight: 700;
+      background: rgba(255, 209, 102, 0.18);
+      border: 1px solid rgba(255, 209, 102, 0.45);
+      color: #ffd166;
+      padding: 2px 7px;
+      border-radius: 8px;
+      white-space: nowrap;
+    }
+
+    .event-desc {
+      font-size: 12px;
+      color: #ebd9ce;
+      line-height: 1.35;
+      margin-bottom: 7px;
+    }
+
+    .event-progress-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .event-progress-track {
+      flex: 1;
+      height: 6px;
+      background: rgba(0, 0, 0, 0.35);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    .event-progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #ffd166, #e76f51);
+      border-radius: 6px;
+      transition: width 0.35s ease;
+    }
+
+    .event-progress-fill.done {
+      background: linear-gradient(90deg, #2a9d8f, #52b788);
+    }
+
+    .event-progress-text {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--gold);
+      white-space: nowrap;
     }
 
     .gold-text {
@@ -591,6 +666,16 @@
       font-weight: 700;
     }
 
+    .activ-tag-badge {
+      font-size: 11px;
+      color: #64dfdf;
+      background: rgba(42, 157, 143, 0.2);
+      border: 1px solid rgba(42, 157, 143, 0.45);
+      padding: 2px 7px;
+      border-radius: 8px;
+      font-weight: 700;
+    }
+
     .edit-lesson-btn {
       background: rgba(255, 209, 102, 0.16);
       border: 1px solid rgba(255, 209, 102, 0.45);
@@ -915,11 +1000,17 @@
       margin-bottom: 10px;
     }
 
+    .news-header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+
     .news-date {
       font-size: 11px;
       color: var(--gold);
       font-weight: 700;
-      margin-bottom: 6px;
     }
 
     .news-text {
@@ -1152,11 +1243,35 @@
       cursor: pointer;
       margin-left: 6px;
     }
+
+    .theme-selector-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 6px;
+    }
+
+    .theme-option-btn {
+      background: #141113;
+      border: 1px solid var(--card-border);
+      color: #ddd;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 6px 10px;
+      border-radius: 9px;
+      cursor: pointer;
+    }
+
+    .theme-option-btn.active {
+      border-color: var(--gold);
+      color: var(--gold);
+      background: #2b2123;
+    }
   </style>
 </head>
 <body>
 
-  <div class="leaves-container">
+  <div class="leaves-container" id="leaves-container">
     <div class="leaf">🍁</div>
     <div class="leaf">🍂</div>
     <div class="leaf">🍁</div>
@@ -1205,6 +1320,9 @@
     </div>
   </div>
 
+  <!-- БЛОК АКТИВНЫХ ЕЖЕНЕДЕЛЬНЫХ СОБЫТИЙ -->
+  <div id="events-banner-container"></div>
+
   <div class="week-segmented">
     <div id="btn-week-1" class="week-btn active" onclick="switchWeek(0)">Текущая неделя</div>
     <div id="btn-week-2" class="week-btn" onclick="switchWeek(1)">Следующая неделя</div>
@@ -1250,7 +1368,7 @@
         </div>
         <div class="form-group">
           <label>Пароль</label>
-          <input type="password" id="login-pass" class="form-input" placeholder="••••" required autocomplete="current-password">
+          <input type="password" id="login-pass" class="form-input" placeholder="••••••" required autocomplete="current-password">
         </div>
         <div id="login-error" style="color: var(--danger); font-size: 13px; margin-bottom: 8px; display: none;">Неверный логин или пароль</div>
         <button type="submit" id="login-submit-btn" class="submit-btn">Войти</button>
@@ -1277,18 +1395,33 @@
           <div id="prof-class" class="detail-val">—</div>
         </div>
 
+        <div class="detail-item" id="prof-activ-box" style="display: none;">
+          <div class="detail-label">🏅 Школьный актив</div>
+          <div id="prof-activ" class="detail-val" style="color: #64dfdf; font-weight: 700;">—</div>
+        </div>
+
         <div class="detail-item" id="prof-extra-box">
           <div class="detail-label" id="prof-extra-label">Группа / Предмет</div>
           <div id="prof-extra-val" class="detail-val">—</div>
         </div>
 
-        <!-- ПАНЕЛЬ УПРАВЛЕНИЯ СТАРОСТЫ -->
+        <!-- ПЕРЕКЛЮЧАТЕЛЬ ТЕМ И ЭФФЕКТОВ ФОНА -->
+        <div class="detail-item">
+          <div class="detail-label">🎨 Оформление и эффекты</div>
+          <div id="theme-options-container" class="theme-selector-grid"></div>
+          <div id="particles-options-container" class="theme-selector-grid" style="margin-top: 8px;"></div>
+        </div>
+
+        <!-- ПАНЕЛЬ УПРАВЛЕНИЯ СТАРОСТЫ / УЧИТЕЛЯ -->
         <div id="manager-actions-section" style="display: none;">
           <button class="teacher-action-btn" onclick="closeProfileModal(); openTeacherAnnouncementModal();">
             📢 Создать объявление
           </button>
           <button class="teacher-action-btn" onclick="closeProfileModal(); openTeacherDutyModal();">
             🧹 Назначить дежурных
+          </button>
+          <button class="teacher-action-btn" onclick="closeProfileModal(); openEventsManagerModal();">
+            ⚡ Еженедельные события
           </button>
           <button class="teacher-action-btn" onclick="closeProfileModal(); openTeacherAbsencesModal();">
             📋 Журнал отсутствующих (<span id="prof-abs-count">0</span>)
@@ -1317,13 +1450,79 @@
             <button type="button" class="secondary-btn" style="margin-top: 0; font-size: 12px; flex: 1;" onclick="closeProfileModal(); openFeedbackModal();">
               ⭐ Оставить отзыв
             </button>
-            <a href="https://max.ru/u/f9LHodD0cOKI48hDsSOHvyiussj9Gpb-hJtcdE91LPpdrNOpi6jPEgRZbXs" target="_blank" class="secondary-btn" style="margin-top: 0; font-size: 12px; flex: 1; text-align: center; text-decoration: none; display: flex; align-items: center; justify-content: center;">
+            <a href="https://t.me/ТВОЙ_ЮЗЕРНЕЙМ_В_ТГ" target="_blank" class="secondary-btn" style="margin-top: 0; font-size: 12px; flex: 1; text-align: center; text-decoration: none; display: flex; align-items: center; justify-content: center;">
               💬 Разработчик
             </a>
           </div>
         </div>
 
         <button class="logout-btn" onclick="handleLogout()">Выйти из профиля</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- КОНСТРУКТОР ЕЖЕНЕДЕЛЬНЫХ СОБЫТИЙ -->
+  <div id="events-manager-modal" class="modal-overlay" onclick="closeEventsManagerModal(event)">
+    <div class="modal-sheet" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <h3>⚡ Еженедельные события</h3>
+        <button class="close-btn" onclick="closeEventsManagerModal()">✕</button>
+      </div>
+
+      <div style="overflow-y: auto; max-height: 68vh; padding-right: 2px;">
+        <form onsubmit="submitNewEvent(event)">
+          <div class="form-group">
+            <label>Название события</label>
+            <input type="text" id="ev-title" class="form-input" placeholder="Например: Спринт отличника" required>
+          </div>
+
+          <div class="form-group">
+            <label>Описание для учеников</label>
+            <input type="text" id="ev-desc" class="form-input" placeholder="Получи 3 пятёрки за эту неделю!" required>
+          </div>
+
+          <div class="form-group">
+            <label>Условие выполнения</label>
+            <select id="ev-cond-type" class="form-input" onchange="updateEventParamPlaceholder()">
+              <option value="3_fives">Личный: Получить N пятёрок за неделю</option>
+              <option value="x1.5_subj">Буст: Множитель ×1.5 XP по предметам</option>
+              <option value="no_twos">Класс: Неделя без двоек в классе</option>
+            </select>
+          </div>
+
+          <div class="form-group" id="ev-param-group">
+            <label id="ev-param-label">Количество пятёрок (число)</label>
+            <input type="text" id="ev-param" class="form-input" value="3" placeholder="3">
+          </div>
+
+          <div class="form-group">
+            <label>Награда: бонус XP</label>
+            <input type="number" id="ev-bonus-xp" class="form-input" value="100" min="0" step="10">
+          </div>
+
+          <div class="form-group">
+            <label>Награда: эффект фона (необязательно)</label>
+            <select id="ev-reward-bg" class="form-input">
+              <option value="">Без нового фона</option>
+              <option value="❄️,☃️,🌨️">❄️ Зимний снегопад</option>
+              <option value="🔥,✨,⚡">🔥 Огненные искры</option>
+              <option value="⭐,✨,💫">⭐ Звёздный дождь</option>
+              <option value="1,0,1,0">💻 Матрица (0 и 1)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Награда: код темы (если уже создана в коде)</label>
+            <input type="text" id="ev-reward-theme" class="form-input" placeholder="Оставь пустым, если пока без темы">
+          </div>
+
+          <button type="submit" id="ev-submit-btn" class="submit-btn">Запустить событие</button>
+        </form>
+
+        <div style="margin-top: 16px; padding-top: 12px; border-top: 1px dashed var(--card-border);">
+          <div class="detail-label" style="margin-bottom: 8px;">Текущие и прошлые события:</div>
+          <div id="events-manage-list"></div>
+        </div>
       </div>
     </div>
   </div>
@@ -1432,7 +1631,7 @@
     </div>
   </div>
 
-  <!-- СОЗДАНИЕ ОБЪЯВЛЕНИЯ -->
+  <!-- СОЗДАНИЕ ОБЪЯВЛЕНИЯ (КЛАССЫ И ШКОЛЬНЫЕ АКТИВЫ) -->
   <div id="teacher-announcement-modal" class="modal-overlay" onclick="closeTeacherAnnouncementModal(event)">
     <div class="modal-sheet" onclick="event.stopPropagation()">
       <div class="modal-header">
@@ -1442,13 +1641,11 @@
       <form onsubmit="submitTeacherAnnouncement(event)">
         <div class="form-group">
           <label>Кому показать объявление?</label>
-          <select id="t-news-class" class="form-input">
-            <option value="ВСЕ">Всем классам (общая новость)</option>
-          </select>
+          <select id="t-news-class" class="form-input"></select>
         </div>
         <div class="form-group">
           <label>Текст объявления</label>
-          <textarea id="t-news-text" class="note-textarea" style="height: 100px;" placeholder="Например: Завтра принести атласы и контурные карты..." required></textarea>
+          <textarea id="t-news-text" class="note-textarea" style="height: 100px;" placeholder="Например: Сбор волонтеров завтра на большой перемене..." required></textarea>
         </div>
         <button type="submit" id="t-news-submit-btn" class="submit-btn">Опубликовать объявление</button>
       </form>
@@ -1470,7 +1667,7 @@
     </div>
   </div>
 
-  <!-- ЛИДЕРБОРД + БИТВА КЛАССОВ + ЛЕНТА (СКРЫТА ОТ ОБЫЧНЫХ УЧЕНИКОВ) -->
+  <!-- ЛИДЕРБОРД + БИТВА КЛАССОВ + ЛЕНТА -->
   <div id="leaderboard-modal" class="modal-overlay" onclick="closeLeaderboardModal(event)">
     <div class="modal-sheet" onclick="event.stopPropagation()">
       <div class="modal-header">
@@ -1647,9 +1844,33 @@
 
   <script>
     const API_URL = 'https://script.google.com/macros/s/AKfycbzoRZ_Fd9Yv2FJq79lpF4HPg-NETJm4gSCqLVxU7_6pp2CHNON2A09U1X0eYRE4cyQ5/exec';
-    const CACHE_KEY = 'diary_cached_data_v10';
-    const CACHE_TIME_KEY = 'diary_cache_timestamp_v10';
+    const CACHE_KEY = 'diary_cached_data_v11';
+    const CACHE_TIME_KEY = 'diary_cache_timestamp_v11';
     const CACHE_TTL = 2 * 60 * 1000;
+
+    // РЕЕСТР ТЕМ ОФОРМЛЕНИЯ (сюда можно добавлять новые темы в любой момент)
+    const THEMES_REGISTRY = {
+      default: {
+        name: 'Стандартная (Осень)',
+        vars: {
+          '--bg': '#141113',
+          '--card-bg': '#1e191b',
+          '--card-border': '#322829',
+          '--text': '#f7ede2',
+          '--hint': '#9e8d89',
+          '--accent': '#e76f51',
+          '--accent-glow': 'rgba(231, 111, 81, 0.45)',
+          '--gold': '#f4a261',
+          '--gold-glow': 'rgba(244, 162, 97, 0.4)'
+        }
+      }
+    };
+
+    const SCHOOL_ACTIVS = [
+      { id: 'Биоритм', label: '🏅 Волонтеры «Биоритм»' },
+      { id: 'Движение Первых', label: '🏅 «Движение Первых»' },
+      { id: 'Юнармия', label: '🏅 «Юнармия»' }
+    ];
 
     const BELL_SCHEDULE = [
       { num: 1, start: '08:30', end: '09:10', startM: 8 * 60 + 30, endM: 9 * 60 + 10 },
@@ -1671,6 +1892,7 @@
     let allStudents = [];
     let allGrades = [];
     let allAbsences = [];
+    let allEvents = [];
     let globalTop50 = [];
     let globalClassBattle = [];
     let allSchoolClasses = [];
@@ -1692,6 +1914,8 @@
 
     let currentUser = JSON.parse(localStorage.getItem('diary_current_user') || 'null');
     let savedAuth = JSON.parse(localStorage.getItem('diary_auth_creds') || 'null');
+    let selectedThemeId = localStorage.getItem('diary_selected_theme') || 'default';
+    let selectedParticlesStr = localStorage.getItem('diary_selected_particles') || 'default';
 
     function isTeacher() {
       return currentUser && currentUser.role === 'teacher';
@@ -1703,6 +1927,98 @@
 
     function isManager() {
       return isTeacher() || isStarosta();
+    }
+
+    /* УПРАВЛЕНИЕ ТЕМАМИ И ФОНОМ */
+    function applyThemeAndParticles() {
+      const themeObj = THEMES_REGISTRY[selectedThemeId] || THEMES_REGISTRY.default;
+      const root = document.documentElement;
+      Object.entries(themeObj.vars).forEach(([k, v]) => {
+        root.style.setProperty(k, v);
+      });
+
+      const container = document.getElementById('leaves-container');
+      if (selectedParticlesStr === 'off') {
+        container.style.display = 'none';
+        return;
+      }
+
+      container.style.display = 'block';
+      const defaultIcons = ['🍁', '🍂', '🍁', '🍃', '🍂'];
+      const icons = selectedParticlesStr === 'default'
+        ? defaultIcons
+        : selectedParticlesStr.split(',').map(s => s.trim()).filter(Boolean);
+
+      const leafEls = container.querySelectorAll('.leaf');
+      leafEls.forEach((el, idx) => {
+        el.innerText = icons[idx % icons.length] || '🍁';
+      });
+    }
+
+    function selectUserTheme(themeId) {
+      selectedThemeId = themeId;
+      localStorage.setItem('diary_selected_theme', themeId);
+      applyThemeAndParticles();
+      renderThemeSelector();
+    }
+
+    function selectUserParticles(pStr) {
+      selectedParticlesStr = pStr;
+      localStorage.setItem('diary_selected_particles', pStr);
+      applyThemeAndParticles();
+      renderThemeSelector();
+    }
+
+    function renderThemeSelector() {
+      const themeBox = document.getElementById('theme-options-container');
+      const partBox = document.getElementById('particles-options-container');
+      if (!themeBox || !partBox) return;
+
+      themeBox.innerHTML = '';
+      const unlockedThemes = new Set(['default']);
+
+      // Проверяем разблокированные темы из выполненных или активных событий
+      const completedEvents = getUserCompletedEvents();
+      completedEvents.forEach(ev => {
+        const tId = String(ev['Награда_тема'] || '').trim();
+        if (tId && THEMES_REGISTRY[tId]) unlockedThemes.add(tId);
+      });
+
+      Object.keys(THEMES_REGISTRY).forEach(tKey => {
+        if (!unlockedThemes.has(tKey) && !isManager()) return;
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = `theme-option-btn ${selectedThemeId === tKey ? 'active' : ''}`;
+        btn.innerText = THEMES_REGISTRY[tKey].name;
+        btn.onclick = () => selectUserTheme(tKey);
+        themeBox.appendChild(btn);
+      });
+
+      partBox.innerHTML = '';
+      const bgOptions = [
+        { id: 'default', label: '🍁 Осень' },
+        { id: 'off', label: '🚫 Без анимации' }
+      ];
+
+      // Добавляем фоны, разблокированные за события (или все доступные для старосты при тесте)
+      allEvents.forEach(ev => {
+        const bgVal = String(ev['Награда_фон'] || '').trim();
+        if (!bgVal) return;
+        const isUnlocked = isManager() || completedEvents.some(ce => ce['ID'] === ev['ID']);
+        if (isUnlocked && !bgOptions.some(o => o.id === bgVal)) {
+          const preview = bgVal.split(',')[0] || '✨';
+          bgOptions.push({ id: bgVal, label: `${preview} ${ev['Название'] || 'Эффект'}` });
+        }
+      });
+
+      bgOptions.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = `theme-option-btn ${selectedParticlesStr === opt.id ? 'active' : ''}`;
+        btn.innerText = opt.label;
+        btn.onclick = () => selectUserParticles(opt.id);
+        partBox.appendChild(btn);
+      });
     }
 
     function canEditSpecificLesson(item) {
@@ -1758,6 +2074,279 @@
       return s.replace(/\.$/, '');
     }
 
+    /* РАСЧЁТ ПРОГРЕССА ЕЖЕНЕДЕЛЬНЫХ СОБЫТИЙ */
+    function getCurrentWeekPaddedSet() {
+      const set = new Set();
+      if (twoWeeks && twoWeeks.length >= 7) {
+        twoWeeks.slice(0, 7).forEach(d => set.add(d.padded));
+      }
+      return set;
+    }
+
+    function getUserCompletedEvents() {
+      if (!currentUser || !allEvents) return [];
+      const weekSet = getCurrentWeekPaddedSet();
+      const myNormName = normalizePersonName(currentUser.name);
+
+      let myWeekFives = 0;
+      allGrades.forEach(g => {
+        const gDate = cleanDateStr(g['Дата'] || g['дата'] || '');
+        const gStud = normalizePersonName(g['Ученик'] || g['ученик'] || '');
+        const gVal = Number(g['Оценка'] || g['оценка']);
+        if (weekSet.has(gDate) && gStud === myNormName && gVal === 5) {
+          myWeekFives++;
+        }
+      });
+
+      let classWeekTwos = 0;
+      allGrades.forEach(g => {
+        const gDate = cleanDateStr(g['Дата'] || g['дата'] || '');
+        const gVal = Number(g['Оценка'] || g['оценка']);
+        if (weekSet.has(gDate) && gVal === 2) {
+          classWeekTwos++;
+        }
+      });
+
+      return allEvents.filter(ev => {
+        if (String(ev['Активно'] || '').trim().toUpperCase() !== 'ДА') return false;
+        const cType = String(ev['Тип_условия'] || '').trim();
+        if (cType === '3_fives') {
+          const target = Number(ev['Параметр']) || 3;
+          return myWeekFives >= target;
+        }
+        if (cType === 'no_twos') {
+          return classWeekTwos === 0;
+        }
+        return false;
+      });
+    }
+
+    function renderActiveEventsBanners() {
+      const container = document.getElementById('events-banner-container');
+      container.innerHTML = '';
+
+      const activeList = allEvents.filter(ev => String(ev['Активно'] || '').trim().toUpperCase() === 'ДА');
+      if (activeList.length === 0 || !currentUser) return;
+
+      const weekSet = getCurrentWeekPaddedSet();
+      const myNormName = normalizePersonName(currentUser.name);
+
+      let myWeekFives = 0;
+      allGrades.forEach(g => {
+        const gDate = cleanDateStr(g['Дата'] || g['дата'] || '');
+        const gStud = normalizePersonName(g['Ученик'] || g['ученик'] || '');
+        const gVal = Number(g['Оценка'] || g['оценка']);
+        if (weekSet.has(gDate) && gStud === myNormName && gVal === 5) {
+          myWeekFives++;
+        }
+      });
+
+      let classWeekTwos = 0;
+      allGrades.forEach(g => {
+        const gDate = cleanDateStr(g['Дата'] || g['дата'] || '');
+        const gVal = Number(g['Оценка'] || g['оценка']);
+        if (weekSet.has(gDate) && gVal === 2) {
+          classWeekTwos++;
+        }
+      });
+
+      activeList.forEach(ev => {
+        const title = ev['Название'] || 'Событие недели';
+        const desc = ev['Описание'] || '';
+        const cType = String(ev['Тип_условия'] || '').trim();
+        const param = String(ev['Параметр'] || '').trim();
+        const bonusXp = Number(ev['Бонус_XP'] || 0);
+        const rewardBg = String(ev['Награда_фон'] || '').trim();
+
+        let rewardParts = [];
+        if (bonusXp > 0) rewardParts.push(`+${bonusXp} XP`);
+        if (rewardBg) rewardParts.push(`Фон ${rewardBg.split(',')[0]}`);
+        const rewardText = rewardParts.length > 0 ? rewardParts.join(' • ') : 'Событие';
+
+        let percent = 0;
+        let statusLabel = '';
+        let isDone = false;
+
+        if (cType === '3_fives') {
+          const target = Number(param) || 3;
+          const cur = Math.min(myWeekFives, target);
+          percent = Math.round((cur / target) * 100);
+          isDone = myWeekFives >= target;
+          statusLabel = isDone ? `Выполнено! (${myWeekFives}/${target}) ✅` : `${myWeekFives} из ${target} пятёрок`;
+        } else if (cType === 'no_twos') {
+          isDone = classWeekTwos === 0;
+          percent = isDone ? 100 : 0;
+          statusLabel = isDone ? `Двоек в классе нет ✅` : `Есть двойки (${classWeekTwos}) ❌`;
+        } else if (cType === 'x1.5_subj') {
+          percent = 100;
+          isDone = true;
+          statusLabel = `Активен множитель ×1.5 (${param || 'Все предметы'}) 🔥`;
+        }
+
+        const card = document.createElement('div');
+        card.className = 'event-card-banner';
+        card.innerHTML = `
+          <div class="event-card-top">
+            <span class="event-title">⚡ ${title}</span>
+            <span class="event-reward-pill">🎁 ${rewardText}</span>
+          </div>
+          ${desc ? `<div class="event-desc">${desc}</div>` : ''}
+          <div class="event-progress-row">
+            <div class="event-progress-track">
+              <div class="event-progress-fill ${isDone ? 'done' : ''}" style="width: ${percent}%;"></div>
+            </div>
+            <span class="event-progress-text">${statusLabel}</span>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    /* КОНСТРУКТОР СОБЫТИЙ В ПРИЛОЖЕНИИ */
+    function updateEventParamPlaceholder() {
+      const type = document.getElementById('ev-cond-type').value;
+      const group = document.getElementById('ev-param-group');
+      const label = document.getElementById('ev-param-label');
+      const input = document.getElementById('ev-param');
+
+      if (type === '3_fives') {
+        group.style.display = 'flex';
+        label.innerText = 'Сколько пятёрок нужно получить?';
+        input.value = '3';
+        input.placeholder = '3';
+      } else if (type === 'x1.5_subj') {
+        group.style.display = 'flex';
+        label.innerText = 'Предметы через запятую (или Все)';
+        input.value = 'Алгебра, Геометрия, Физика';
+        input.placeholder = 'Алгебра, Физика';
+      } else {
+        group.style.display = 'none';
+        input.value = '';
+      }
+    }
+
+    function openEventsManagerModal() {
+      updateEventParamPlaceholder();
+      renderManageEventsList();
+      document.getElementById('events-manager-modal').classList.add('open');
+    }
+
+    function closeEventsManagerModal(e) {
+      if (e && e.target !== e.currentTarget && !e.target.classList.contains('close-btn')) return;
+      document.getElementById('events-manager-modal').classList.remove('open');
+    }
+
+    function renderManageEventsList() {
+      const listEl = document.getElementById('events-manage-list');
+      listEl.innerHTML = '';
+
+      if (!allEvents || allEvents.length === 0) {
+        listEl.innerHTML = '<div style="color:var(--hint); font-size:13px;">Событий пока нет</div>';
+        return;
+      }
+
+      allEvents.slice().reverse().forEach(ev => {
+        const isActive = String(ev['Активно'] || '').trim().toUpperCase() === 'ДА';
+        const row = document.createElement('div');
+        row.className = 'detail-item';
+        row.style.display = 'flex';
+        row.style.justifyContent = 'space-between';
+        row.style.alignItems = 'center';
+        row.style.gap = '8px';
+
+        row.innerHTML = `
+          <div>
+            <div style="font-weight:700; font-size:13px; color:#fff;">${ev['Название']}</div>
+            <div style="font-size:11px; color:var(--hint);">${ev['Описание']} (+${ev['Бонус_XP'] || 0} XP)</div>
+          </div>
+          <button type="button" class="secondary-btn" style="width:auto; margin-top:0; padding:6px 10px; font-size:11px; border-color:${isActive ? 'var(--green)' : 'var(--card-border)'}; color:${isActive ? '#64dfdf' : 'var(--hint)'};" onclick="toggleEventStatus('${ev['ID']}')">
+            ${isActive ? '✅ Активно' : '⏸ Выкл'}
+          </button>
+        `;
+        listEl.appendChild(row);
+      });
+    }
+
+    async function submitNewEvent(e) {
+      e.preventDefault();
+      const btn = document.getElementById('ev-submit-btn');
+      btn.innerText = 'Создание...';
+      btn.disabled = true;
+
+      const payload = {
+        action: 'createEvent',
+        auth: savedAuth,
+        title: document.getElementById('ev-title').value.trim(),
+        description: document.getElementById('ev-desc').value.trim(),
+        condType: document.getElementById('ev-cond-type').value,
+        param: document.getElementById('ev-param').value.trim(),
+        bonusXp: document.getElementById('ev-bonus-xp').value,
+        rewardBg: document.getElementById('ev-reward-bg').value,
+        rewardTheme: document.getElementById('ev-reward-theme').value.trim()
+      };
+
+      try {
+        const res = await fetch(API_URL, {
+          method: 'POST',
+          body: JSON.stringify(payload)
+        });
+        const respData = await res.json();
+
+        if (respData.status === 'success') {
+          allEvents.push({
+            'ID': respData.id || ('ev_' + Date.now()),
+            'Активно': 'ДА',
+            'Название': payload.title,
+            'Описание': payload.description,
+            'Тип_условия': payload.condType,
+            'Параметр': payload.param,
+            'Бонус_XP': payload.bonusXp,
+            'Награда_фон': payload.rewardBg,
+            'Награда_тема': payload.rewardTheme
+          });
+
+          renderActiveEventsBanners();
+          renderManageEventsList();
+          btn.innerText = 'Событие запущено! ✓';
+          setTimeout(() => {
+            btn.innerText = 'Запустить событие';
+            btn.disabled = false;
+            document.getElementById('ev-title').value = '';
+            document.getElementById('ev-desc').value = '';
+          }, 900);
+        } else {
+          alert(respData.message || 'Не удалось создать событие');
+          btn.innerText = 'Запустить событие';
+          btn.disabled = false;
+        }
+      } catch (err) {
+        alert('Ошибка сети при создании события');
+        btn.innerText = 'Запустить событие';
+        btn.disabled = false;
+      }
+    }
+
+    async function toggleEventStatus(evId) {
+      try {
+        await fetch(API_URL, {
+          method: 'POST',
+          body: JSON.stringify({
+            action: 'toggleEvent',
+            auth: savedAuth,
+            id: evId
+          })
+        });
+        const target = allEvents.find(x => String(x['ID']) === String(evId));
+        if (target) {
+          target['Активно'] = String(target['Активно']).toUpperCase() === 'ДА' ? 'НЕТ' : 'ДА';
+        }
+        renderActiveEventsBanners();
+        renderManageEventsList();
+      } catch (err) {
+        alert('Ошибка при переключении статуса события');
+      }
+    }
+
     function appendHwTemplate(text) {
       const el = document.getElementById('t-edit-homework');
       const cur = el.value;
@@ -1771,7 +2360,6 @@
       el.focus();
     }
 
-    /* КОПИРОВАНИЕ ДЗ ДЛЯ ЧАТА КЛАССА */
     function copyDayHomework() {
       if (!selectedDateInfo || currentRenderedDayLessons.length === 0) return;
 
@@ -1843,10 +2431,19 @@
       const managerActionsSec = document.getElementById('manager-actions-section');
       const absHeaderBtn = document.getElementById('absence-header-btn');
       const absBadge = document.getElementById('absence-badge');
+      const activBox = document.getElementById('prof-activ-box');
 
       profBtn.classList.remove('teacher-badge-btn', 'starosta-badge-btn');
 
       if (currentUser) {
+        const userActiv = String(currentUser.activ || '').trim();
+        if (userActiv) {
+          activBox.style.display = 'block';
+          document.getElementById('prof-activ').innerText = userActiv;
+        } else {
+          activBox.style.display = 'none';
+        }
+
         if (currentUser.role === 'teacher') {
           btnText.innerText = currentUser.name.split(' ')[0] || 'Учитель';
           profBtn.classList.add('teacher-badge-btn');
@@ -1907,6 +2504,7 @@
           absBadge.style.display = 'none';
           renderStudentProfileGrades();
         }
+        renderThemeSelector();
       } else {
         btnText.innerText = 'Войти';
         absBadge.style.display = 'none';
@@ -1941,6 +2539,11 @@
           bySubject[subj] = [];
         }
         bySubject[subj].push({ val, numVal, weight, date, author });
+      });
+
+      // Добавляем заработанные бонусы XP за еженедельные события
+      getUserCompletedEvents().forEach(ev => {
+        totalXP += Number(ev['Бонус_XP'] || 0);
       });
 
       document.getElementById('prof-total-xp').innerText = `${totalXP} XP (баллов)`;
@@ -2180,7 +2783,6 @@
             });
           }
 
-          localStorage.removeItem(CACHE_TIME_KEY);
           btn.innerText = 'Дежурные назначены! ✓';
           setTimeout(() => {
             closeTeacherDutyModal();
@@ -2260,18 +2862,23 @@
       }
     }
 
+    /* СОЗДАНИЕ ОБЪЯВЛЕНИЙ ДЛЯ КЛАССОВ И ШКОЛЬНЫХ АКТИВОВ */
     function openTeacherAnnouncementModal() {
       const selectEl = document.getElementById('t-news-class');
       selectEl.innerHTML = '';
 
       if (isStarosta()) {
         const c = normalizeClassStr(currentUser.className || '8А');
-        const opt = document.createElement('option');
-        opt.value = c;
-        opt.innerText = `Только ${c} классу`;
-        selectEl.appendChild(opt);
+        const optClass = document.createElement('option');
+        optClass.value = c;
+        optClass.innerText = `Только ${c} классу`;
+        selectEl.appendChild(optClass);
       } else {
-        selectEl.innerHTML = '<option value="ВСЕ">Всем классам (общая новость)</option>';
+        const optAll = document.createElement('option');
+        optAll.value = 'ВСЕ';
+        optAll.innerText = 'Всем классам (общая новость)';
+        selectEl.appendChild(optAll);
+
         allSchoolClasses.forEach(c => {
           const opt = document.createElement('option');
           opt.value = c;
@@ -2279,6 +2886,16 @@
           selectEl.appendChild(opt);
         });
       }
+
+      const optGroup = document.createElement('optgroup');
+      optGroup.label = 'Школьные активы (вся школа)';
+      SCHOOL_ACTIVS.forEach(act => {
+        const opt = document.createElement('option');
+        opt.value = `АКТИВ:${act.id}`;
+        opt.innerText = act.label;
+        optGroup.appendChild(opt);
+      });
+      selectEl.appendChild(optGroup);
 
       document.getElementById('teacher-announcement-modal').classList.add('open');
     }
@@ -2321,7 +2938,6 @@
             'Текст': `${payload.text}\n— ${authorLabel}`
           });
           updateNewsBadge();
-          localStorage.removeItem(CACHE_TIME_KEY);
 
           btn.innerText = 'Опубликовано! ✓';
           setTimeout(() => {
@@ -2443,7 +3059,6 @@
       document.getElementById('teacher-absences-modal').classList.remove('open');
     }
 
-    /* ЛИДЕРБОРД + БИТВА КЛАССОВ + ЛЕНТА (СКРЫТА ОТ ОБЫЧНЫХ УЧЕНИКОВ) */
     function setLeaderboardFilter(mode) {
       if (mode === 'logs' && !isManager()) {
         mode = 'all';
@@ -2480,7 +3095,6 @@
       const listEl = document.getElementById('leaderboard-list');
       listEl.innerHTML = '';
 
-      // 1. ЛЕНТА НАЧИСЛЕНИЙ (ТОЛЬКО СТАРОСТА)
       if (currentLeaderboardMode === 'logs' && isManager()) {
         const recent = allGrades.slice().reverse().slice(0, 30);
         if (recent.length === 0) {
@@ -2513,7 +3127,6 @@
 
       const myClass = normalizeClassStr(currentUser ? currentUser.className : '');
 
-      // 2. БИТВА КЛАССОВ (ПРЕДРАССЧИТАНО НА СЕРВЕРЕ ПО ВСЕЙ ШКОЛЕ)
       if (currentLeaderboardMode === 'classes') {
         if (!globalClassBattle || globalClassBattle.length === 0) {
           listEl.innerHTML = '<div class="empty-state">Классы пока не добавлены</div>';
@@ -2543,7 +3156,6 @@
         return;
       }
 
-      // 3. МОЙ КЛАСС (ПОЛНЫЙ СПИСОК ОДНОКЛАССНИКОВ ИЗ ДАННЫХ КЛАССА)
       if (currentLeaderboardMode === 'my') {
         const classScores = {};
         allStudents.forEach(st => {
@@ -2606,7 +3218,6 @@
         return;
       }
 
-      // 4. ТОП-50 ШКОЛЫ (ПРЕДРАССЧИТАНО НА СЕРВЕРЕ)
       if (!globalTop50 || globalTop50.length === 0) {
         listEl.innerHTML = '<div class="empty-state">Рейтинг школы пока пуст</div>';
         return;
@@ -2639,9 +3250,12 @@
       document.getElementById('leaderboard-modal').classList.remove('open');
     }
 
-    /* СЕРВЕРНАЯ АВТОРИЗАЦИЯ */
     function checkAuth() {
-      if (!currentUser) {
+      if (!currentUser || !savedAuth) {
+        currentUser = null;
+        savedAuth = null;
+        localStorage.removeItem('diary_current_user');
+        localStorage.removeItem('diary_auth_creds');
         document.getElementById('loader').style.display = 'none';
         document.getElementById('login-modal').classList.add('open');
       } else {
@@ -2701,8 +3315,6 @@
       if (!confirm('Выйти из профиля?')) return;
       localStorage.removeItem('diary_current_user');
       localStorage.removeItem('diary_auth_creds');
-      localStorage.removeItem(CACHE_KEY);
-      localStorage.removeItem(CACHE_TIME_KEY);
       currentUser = null;
       savedAuth = null;
       closeProfileModal();
@@ -2710,7 +3322,7 @@
     }
 
     function openProfileModal() {
-      if (!currentUser) {
+      if (!currentUser || !savedAuth) {
         checkAuth();
         return;
       }
@@ -2761,11 +3373,25 @@
     }
 
     function matchesCurrentClass(item, allowAll = false) {
-      const rawClass = normalizeClassStr(item['Класс'] || item['класс'] || '');
-      if (!rawClass) return true; 
-      if (allowAll && (rawClass === 'ВСЕ' || rawClass === 'ОБЩЕЕ')) return true;
+      const rawClass = String(item['Класс'] || item['класс'] || '').trim();
+      if (!rawClass) return true;
+
+      // Проверка объявлений для школьных активов (АКТИВ:Биоритм, АКТИВ:Движение Первых, АКТИВ:Юнармия)
+      if (rawClass.toUpperCase().startsWith('АКТИВ:')) {
+        if (isTeacher()) return true;
+        const targetActiv = rawClass.slice(6).trim().toLowerCase();
+        const userActivs = String((currentUser && currentUser.activ) || '')
+          .toLowerCase()
+          .split(',')
+          .map(s => s.trim())
+          .filter(Boolean);
+        return userActivs.includes(targetActiv);
+      }
+
+      const normClass = normalizeClassStr(rawClass);
+      if (allowAll && (normClass === 'ВСЕ' || normClass === 'ОБЩЕЕ')) return true;
       const targetClass = normalizeClassStr((currentUser && currentUser.className) ? currentUser.className : '8А');
-      return rawClass === targetClass;
+      return normClass === targetClass;
     }
 
     function getFilteredNews() {
@@ -2934,6 +3560,7 @@
       allStudents = data.students || [];
       allGrades = data.grades || [];
       allAbsences = data.absences || [];
+      allEvents = data.events || [];
       globalTop50 = data.globalTop50 || [];
       globalClassBattle = data.globalClassBattle || [];
       allSchoolClasses = data.allClasses || [];
@@ -2949,14 +3576,10 @@
 
           currentUser.role = updatedRole;
           currentUser.className = normalizeClassStr(freshRecord['Класс'] || freshRecord['класс'] || currentUser.className);
+          currentUser.activ = String(freshRecord['Актив'] || freshRecord['актив'] || currentUser.activ || '').trim();
           localStorage.setItem('diary_current_user', JSON.stringify(currentUser));
         }
       }
-
-      checkAuth();
-      updateNewsBadge();
-      updateVacationCountdown();
-      checkBirthdays();
 
       twoWeeks = generate14Days();
 
@@ -2971,6 +3594,11 @@
         }
       }
 
+      checkAuth();
+      updateNewsBadge();
+      updateVacationCountdown();
+      checkBirthdays();
+      renderActiveEventsBanners();
       updateBellTimer();
       updateWeekButtons();
       renderDaysGrid();
@@ -2978,7 +3606,7 @@
     }
 
     async function loadData(force = false) {
-      if (!currentUser) {
+      if (!currentUser || !savedAuth) {
         checkAuth();
         return;
       }
@@ -3057,11 +3685,19 @@
         filteredNews.forEach(item => {
           const date = cleanDateStr(item['Дата'] || item['дата'] || item['Date'] || '');
           const text = item['Текст'] || item['текст'] || item['Объявление'] || item['Заголовок'] || '';
+          const rawC = String(item['Класс'] || item['класс'] || '').trim();
+          const isActivNews = rawC.toUpperCase().startsWith('АКТИВ:');
+          const activBadgeHtml = isActivNews
+            ? `<span class="activ-tag-badge">🏅 ${rawC.slice(6).trim()}</span>`
+            : '';
 
           const card = document.createElement('div');
           card.className = 'news-card';
           card.innerHTML = `
-            ${date ? `<div class="news-date">📌 ${date}</div>` : ''}
+            <div class="news-header-row">
+              ${date ? `<span class="news-date">📌 ${date}</span>` : '<span></span>'}
+              ${activBadgeHtml}
+            </div>
             <div class="news-text">${text}</div>
           `;
           list.appendChild(card);
@@ -3411,6 +4047,8 @@
             }
           });
 
+          renderActiveEventsBanners();
+
           btn.innerText = 'Оценки сохранены! ✓';
           setTimeout(() => {
             closeGradeBookModal();
@@ -3719,8 +4357,9 @@
       updateHomeworkProgressBar(dayLessons.length, completedTasksCount);
     }
 
+    applyThemeAndParticles();
     loadData();
     setInterval(updateBellTimer, 30000);
   </script>
 </body>
-</html>
+  </html>
