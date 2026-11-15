@@ -90,7 +90,7 @@
     .leaf:nth-child(4) { left: 65%; font-size: 22px; animation-duration: 16s, 4.5s; animation-delay: 1s; opacity: 0.3; }
     .leaf:nth-child(5) { left: 85%; font-size: 19px; animation-duration: 15s, 4s; animation-delay: 4s; }
 
-    .header-top, .info-banners, .week-segmented, .days-grid, #cards-container, #loader, #duty-banner, #progress-wrapper {
+    .header-top, .info-banners, .week-segmented, .days-grid, #cards-container, #loader, #duty-banner, #progress-wrapper, #share-hw-wrapper {
       position: relative;
       z-index: 1;
     }
@@ -355,7 +355,7 @@
       border: 1px solid var(--card-border);
       border-radius: 12px;
       padding: 10px 14px;
-      margin-bottom: 14px;
+      margin-bottom: 10px;
     }
 
     .progress-header {
@@ -386,6 +386,29 @@
     .progress-bar-fill.all-done {
       background: linear-gradient(90deg, #2a9d8f, #52b788);
       box-shadow: 0 0 10px var(--green-glow);
+    }
+
+    .share-hw-btn {
+      width: 100%;
+      background: #1c1719;
+      border: 1px solid var(--card-border);
+      color: var(--gold);
+      font-size: 12px;
+      font-weight: 700;
+      padding: 8px 12px;
+      border-radius: 10px;
+      cursor: pointer;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: transform 0.15s, border-color 0.2s;
+    }
+
+    .share-hw-btn:active {
+      transform: scale(0.98);
+      border-color: var(--gold);
     }
 
     .loader {
@@ -842,6 +865,7 @@
     }
 
     .submit-btn:active { transform: scale(0.97); }
+    .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
     .secondary-btn {
       background: #221c1f;
@@ -1203,6 +1227,12 @@
     </div>
   </div>
 
+  <div id="share-hw-wrapper" style="display: none;">
+    <button type="button" id="share-hw-btn" class="share-hw-btn" onclick="copyDayHomework()">
+      📋 Скопировать ДЗ на этот день (для чата класса)
+    </button>
+  </div>
+
   <div id="loader" class="loader">Синхронизация с таблицей...</div>
 
   <div id="cards-container" class="cards-container"></div>
@@ -1252,7 +1282,7 @@
           <div id="prof-extra-val" class="detail-val">—</div>
         </div>
 
-        <!-- ПАНЕЛЬ УПРАВЛЕНИЯ СТАРОСТЫ / УЧИТЕЛЯ -->
+        <!-- ПАНЕЛЬ УПРАВЛЕНИЯ СТАРОСТЫ -->
         <div id="manager-actions-section" style="display: none;">
           <button class="teacher-action-btn" onclick="closeProfileModal(); openTeacherAnnouncementModal();">
             📢 Создать объявление
@@ -1312,7 +1342,7 @@
         </div>
         <div class="form-group">
           <label>Дата дежурства</label>
-          <input type="text" id="t-duty-date" class="form-input" placeholder="Например: 13 ноября" required>
+          <input type="text" id="t-duty-date" class="form-input" placeholder="Например: 16 ноября" required>
         </div>
         <div class="form-group">
           <label>Фамилии дежурных</label>
@@ -1440,7 +1470,7 @@
     </div>
   </div>
 
-  <!-- ЛИДЕРБОРД + БИТВА КЛАССОВ + ЛЕНТА (ТОЛЬКО ДЛЯ СТАРОСТЫ) -->
+  <!-- ЛИДЕРБОРД + БИТВА КЛАССОВ + ЛЕНТА (СКРЫТА ОТ ОБЫЧНЫХ УЧЕНИКОВ) -->
   <div id="leaderboard-modal" class="modal-overlay" onclick="closeLeaderboardModal(event)">
     <div class="modal-sheet" onclick="event.stopPropagation()">
       <div class="modal-header">
@@ -1450,7 +1480,7 @@
       <div style="font-size: 12px; color: var(--hint); margin-bottom: 10px;" id="lb-subtitle">Баллы = Оценка × Вес. Суммируются все оценки за учебный период!</div>
 
       <div class="leaderboard-filter-tabs">
-        <div id="lb-tab-all" class="leaderboard-filter-tab active" onclick="setLeaderboardFilter('all')">Все ученики</div>
+        <div id="lb-tab-all" class="leaderboard-filter-tab active" onclick="setLeaderboardFilter('all')">Топ школы</div>
         <div id="lb-tab-my" class="leaderboard-filter-tab" onclick="setLeaderboardFilter('my')">Мой класс</div>
         <div id="lb-tab-classes" class="leaderboard-filter-tab" onclick="setLeaderboardFilter('classes')">⚔️ Классы</div>
         <div id="lb-tab-logs" class="leaderboard-filter-tab" style="display: none;" onclick="setLeaderboardFilter('logs')">📜 Лента</div>
@@ -1604,7 +1634,7 @@
         </div>
         <div class="form-group">
           <label>Когда не будет в школе?</label>
-          <input type="text" id="abs-date" class="form-input" placeholder="Сегодня / 12 ноября" required>
+          <input type="text" id="abs-date" class="form-input" placeholder="Сегодня / 16 ноября" required>
         </div>
         <div class="form-group">
           <label>Причина</label>
@@ -1617,9 +1647,9 @@
 
   <script>
     const API_URL = 'https://script.google.com/macros/s/AKfycbzoRZ_Fd9Yv2FJq79lpF4HPg-NETJm4gSCqLVxU7_6pp2CHNON2A09U1X0eYRE4cyQ5/exec';
-    const CACHE_KEY = 'diary_cached_data_v8';
-    const CACHE_TIME_KEY = 'diary_cache_timestamp_v8';
-    const CACHE_TTL = 3 * 60 * 1000;
+    const CACHE_KEY = 'diary_cached_data_v10';
+    const CACHE_TIME_KEY = 'diary_cache_timestamp_v10';
+    const CACHE_TTL = 2 * 60 * 1000;
 
     const BELL_SCHEDULE = [
       { num: 1, start: '08:30', end: '09:10', startM: 8 * 60 + 30, endM: 9 * 60 + 10 },
@@ -1641,9 +1671,14 @@
     let allStudents = [];
     let allGrades = [];
     let allAbsences = [];
+    let globalTop50 = [];
+    let globalClassBattle = [];
+    let allSchoolClasses = [];
+
     let twoWeeks = [];
     let currentWeekIndex = 0;
     let selectedDateInfo = null;
+    let currentRenderedDayLessons = [];
     let currentEditingLessonKey = null;
     let currentTeacherLessonItem = null;
     let currentLeaderboardMode = 'all';
@@ -1656,6 +1691,7 @@
     let selectedFeedbackRating = 5;
 
     let currentUser = JSON.parse(localStorage.getItem('diary_current_user') || 'null');
+    let savedAuth = JSON.parse(localStorage.getItem('diary_auth_creds') || 'null');
 
     function isTeacher() {
       return currentUser && currentUser.role === 'teacher';
@@ -1733,6 +1769,71 @@
       const el = document.getElementById('t-edit-homework');
       el.value = text;
       el.focus();
+    }
+
+    /* КОПИРОВАНИЕ ДЗ ДЛЯ ЧАТА КЛАССА */
+    function copyDayHomework() {
+      if (!selectedDateInfo || currentRenderedDayLessons.length === 0) return;
+
+      const monthsRu = [
+        'января', 'февраля', 'марта', 'апреля', 'мая', 'июня',
+        'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'
+      ];
+      const dateTitle = `${selectedDateInfo.dayNumber} ${monthsRu[selectedDateInfo.dateObj.getMonth()]} (${selectedDateInfo.name})`;
+      const cls = currentUser && currentUser.className ? currentUser.className : '';
+
+      let lines = [`📚 ДЗ ${cls ? cls + ' ' : ''}на ${dateTitle}:\n`];
+
+      currentRenderedDayLessons.forEach((item, idx) => {
+        const subj = item['Предмет'] || item['предмет'] || 'Урок';
+        const hw = String(item['Задание'] || item['задание'] || 'Не задано').trim();
+        const grp = String(item['Группа'] || item['группа'] || '').trim();
+        const gnd = String(item['Пол'] || item['пол'] || '').trim().toLowerCase();
+
+        let tag = '';
+        if (grp && grp !== '0') tag = ` (${grp} гр.)`;
+        else if (gnd === 'м') tag = ` (юноши)`;
+        else if (gnd === 'ж') tag = ` (девушки)`;
+
+        lines.push(`${idx + 1}. ${subj}${tag} — ${hw}`);
+      });
+
+      const finalText = lines.join('\n');
+      const btn = document.getElementById('share-hw-btn');
+
+      function showCopiedSuccess() {
+        const oldText = btn.innerText;
+        btn.innerText = '✅ Скопировано! Можно вставлять в чат';
+        btn.style.borderColor = 'var(--green)';
+        btn.style.color = '#64dfdf';
+        setTimeout(() => {
+          btn.innerText = oldText;
+          btn.style.borderColor = '';
+          btn.style.color = '';
+        }, 2000);
+      }
+
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(finalText).then(showCopiedSuccess).catch(() => fallbackCopy(finalText, showCopiedSuccess));
+      } else {
+        fallbackCopy(finalText, showCopiedSuccess);
+      }
+    }
+
+    function fallbackCopy(text, callback) {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.left = '-9999px';
+      document.body.appendChild(ta);
+      ta.select();
+      try {
+        document.execCommand('copy');
+        callback();
+      } catch (e) {
+        alert('Не удалось скопировать текст');
+      }
+      document.body.removeChild(ta);
     }
 
     function updateProfileUI() {
@@ -1936,8 +2037,6 @@
 
       fetch(API_URL, {
         method: 'POST',
-        mode: 'no-cors',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           action: 'sendFeedback',
           userName: currentUser ? currentUser.name : 'Ученик',
@@ -2022,14 +2121,8 @@
         opt.innerText = `${c} класс`;
         selectEl.appendChild(opt);
       } else {
-        const classesSet = new Set();
-        allStudents.forEach(s => {
-          const c = normalizeClassStr(s['Класс'] || s['класс'] || '');
-          if (c) classesSet.add(c);
-        });
-        if (classesSet.size === 0) classesSet.add('8А');
-
-        Array.from(classesSet).sort().forEach(c => {
+        const classes = allSchoolClasses.length > 0 ? allSchoolClasses : ['8А'];
+        classes.forEach(c => {
           const opt = document.createElement('option');
           opt.value = c;
           opt.innerText = `${c} класс`;
@@ -2059,44 +2152,50 @@
 
       const payload = {
         action: 'setDuty',
+        auth: savedAuth,
         className: document.getElementById('t-duty-class').value,
         date: document.getElementById('t-duty-date').value.trim(),
         dutyNames: document.getElementById('t-duty-names').value.trim()
       };
 
       try {
-        await fetch(API_URL, {
+        const res = await fetch(API_URL, {
           method: 'POST',
-          mode: 'no-cors',
-          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
         });
+        const respData = await res.json();
 
-        const existingIdx = allDuty.findIndex(d =>
-          normalizeClassStr(d['Класс'] || '') === payload.className &&
-          cleanDateStr(d['Дата'] || '').toLowerCase() === payload.date.toLowerCase()
-        );
-        if (existingIdx !== -1) {
-          allDuty[existingIdx]['Дежурные'] = payload.dutyNames;
+        if (respData.status === 'success') {
+          const existingIdx = allDuty.findIndex(d =>
+            normalizeClassStr(d['Класс'] || '') === payload.className &&
+            cleanDateStr(d['Дата'] || '').toLowerCase() === payload.date.toLowerCase()
+          );
+          if (existingIdx !== -1) {
+            allDuty[existingIdx]['Дежурные'] = payload.dutyNames;
+          } else {
+            allDuty.push({
+              'Дата': payload.date,
+              'Класс': payload.className,
+              'Дежурные': payload.dutyNames
+            });
+          }
+
+          localStorage.removeItem(CACHE_TIME_KEY);
+          btn.innerText = 'Дежурные назначены! ✓';
+          setTimeout(() => {
+            closeTeacherDutyModal();
+            btn.innerText = 'Сохранить дежурных';
+            btn.disabled = false;
+            document.getElementById('t-duty-names').value = '';
+            renderLessons();
+          }, 900);
         } else {
-          allDuty.push({
-            'Дата': payload.date,
-            'Класс': payload.className,
-            'Дежурные': payload.dutyNames
-          });
-        }
-
-        localStorage.removeItem(CACHE_TIME_KEY);
-        btn.innerText = 'Дежурные назначены! ✓';
-        setTimeout(() => {
-          closeTeacherDutyModal();
+          alert(respData.message || 'Ошибка доступа');
           btn.innerText = 'Сохранить дежурных';
           btn.disabled = false;
-          document.getElementById('t-duty-names').value = '';
-          renderLessons();
-        }, 1000);
+        }
       } catch (err) {
-        alert('Ошибка при сохранении дежурных');
+        alert('Ошибка сети при сохранении дежурных');
         btn.innerText = 'Сохранить дежурных';
         btn.disabled = false;
       }
@@ -2145,8 +2244,6 @@
       try {
         await fetch(API_URL, {
           method: 'POST',
-          mode: 'no-cors',
-          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
         });
 
@@ -2155,7 +2252,7 @@
           closeFeedbackModal();
           btn.innerText = 'Отправить отзыв';
           btn.disabled = false;
-        }, 1100);
+        }, 1000);
       } catch (err) {
         alert('Не удалось отправить отзыв');
         btn.innerText = 'Отправить отзыв';
@@ -2175,12 +2272,7 @@
         selectEl.appendChild(opt);
       } else {
         selectEl.innerHTML = '<option value="ВСЕ">Всем классам (общая новость)</option>';
-        const classesSet = new Set();
-        allStudents.forEach(s => {
-          const c = normalizeClassStr(s['Класс'] || s['класс'] || '');
-          if (c) classesSet.add(c);
-        });
-        Array.from(classesSet).sort().forEach(c => {
+        allSchoolClasses.forEach(c => {
           const opt = document.createElement('option');
           opt.value = c;
           opt.innerText = `Только ${c} классу`;
@@ -2209,37 +2301,42 @@
 
       const payload = {
         action: 'addAnnouncement',
+        auth: savedAuth,
         date: todayStr,
         targetClass: document.getElementById('t-news-class').value,
-        text: document.getElementById('t-news-text').value.trim(),
-        author: authorLabel
+        text: document.getElementById('t-news-text').value.trim()
       };
 
       try {
-        await fetch(API_URL, {
+        const res = await fetch(API_URL, {
           method: 'POST',
-          mode: 'no-cors',
-          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
         });
+        const respData = await res.json();
 
-        allNews.unshift({
-          'Дата': payload.date,
-          'Класс': payload.targetClass,
-          'Текст': `${payload.text}\n— ${payload.author}`
-        });
-        updateNewsBadge();
-        localStorage.removeItem(CACHE_TIME_KEY);
+        if (respData.status === 'success') {
+          allNews.unshift({
+            'Дата': payload.date,
+            'Класс': payload.targetClass,
+            'Текст': `${payload.text}\n— ${authorLabel}`
+          });
+          updateNewsBadge();
+          localStorage.removeItem(CACHE_TIME_KEY);
 
-        btn.innerText = 'Опубликовано! ✓';
-        setTimeout(() => {
-          closeTeacherAnnouncementModal();
+          btn.innerText = 'Опубликовано! ✓';
+          setTimeout(() => {
+            closeTeacherAnnouncementModal();
+            btn.innerText = 'Опубликовать объявление';
+            btn.disabled = false;
+            document.getElementById('t-news-text').value = '';
+          }, 900);
+        } else {
+          alert(respData.message || 'Ошибка при публикации');
           btn.innerText = 'Опубликовать объявление';
           btn.disabled = false;
-          document.getElementById('t-news-text').value = '';
-        }, 1000);
+        }
       } catch (err) {
-        alert('Ошибка при отправке объявления');
+        alert('Ошибка сети при отправке объявления');
         btn.innerText = 'Опубликовать объявление';
         btn.disabled = false;
       }
@@ -2361,9 +2458,11 @@
       if (mode === 'classes') {
         sub.innerText = 'Суммарные очки XP всех учеников каждого класса!';
       } else if (mode === 'logs') {
-        sub.innerText = 'Журнал последних начислений XP (кто и кому поставил).';
+        sub.innerText = 'Журнал последних начислений XP в классе (кто и кому поставил).';
+      } else if (mode === 'my') {
+        sub.innerText = 'Рейтинг учеников внутри вашего класса.';
       } else {
-        sub.innerText = 'Баллы = Оценка × Вес. Суммируются все оценки за учебный период!';
+        sub.innerText = 'Топ-50 лучших учеников по всей школе!';
       }
 
       renderLeaderboard();
@@ -2381,6 +2480,7 @@
       const listEl = document.getElementById('leaderboard-list');
       listEl.innerHTML = '';
 
+      // 1. ЛЕНТА НАЧИСЛЕНИЙ (ТОЛЬКО СТАРОСТА)
       if (currentLeaderboardMode === 'logs' && isManager()) {
         const recent = allGrades.slice().reverse().slice(0, 30);
         if (recent.length === 0) {
@@ -2412,66 +2512,15 @@
       }
 
       const myClass = normalizeClassStr(currentUser ? currentUser.className : '');
-      const scores = {};
 
-      allStudents.forEach(st => {
-        const rawRole = String(st['Роль'] || st['роль'] || '').trim().toLowerCase();
-        if (rawRole === 'teacher' || rawRole === 'учитель') return;
-
-        const rawName = String(st['Имя'] || st['имя'] || st['ФИО'] || '').trim();
-        if (!rawName || rawName.length < 2) return;
-
-        const stClass = normalizeClassStr(st['Класс'] || st['класс'] || '');
-        const normKey = normalizePersonName(rawName) + '_' + stClass;
-        scores[normKey] = {
-          name: rawName,
-          normName: normalizePersonName(rawName),
-          className: stClass || '—',
-          score: 0
-        };
-      });
-
-      allGrades.forEach(g => {
-        const rawStudent = String(g['Ученик'] || g['ученик'] || '').trim();
-        if (!rawStudent || rawStudent.length < 2) return;
-
-        const gradeVal = Number(g['Оценка'] || g['оценка']);
-        const weight = Number(g['Вес'] || g['вес'] || 5);
-        const gClass = normalizeClassStr(g['Класс'] || g['класс'] || '');
-
-        if (!isNaN(gradeVal)) {
-          const add = gradeVal * weight;
-          const normStudent = normalizePersonName(rawStudent);
-
-          for (const key in scores) {
-            const item = scores[key];
-            const classMatches = !gClass || item.className === '—' || item.className === gClass;
-            if (classMatches && (item.normName === normStudent || item.normName.includes(normStudent) || normStudent.includes(item.normName))) {
-              item.score += add;
-              break;
-            }
-          }
-        }
-      });
-
+      // 2. БИТВА КЛАССОВ (ПРЕДРАССЧИТАНО НА СЕРВЕРЕ ПО ВСЕЙ ШКОЛЕ)
       if (currentLeaderboardMode === 'classes') {
-        const classTotals = {};
-        Object.values(scores).forEach(st => {
-          if (!st.className || st.className === '—') return;
-          if (!classTotals[st.className]) {
-            classTotals[st.className] = { className: st.className, totalScore: 0, studentCount: 0 };
-          }
-          classTotals[st.className].totalScore += st.score;
-          classTotals[st.className].studentCount += 1;
-        });
-
-        const sortedClasses = Object.values(classTotals).sort((a, b) => b.totalScore - a.totalScore);
-        if (sortedClasses.length === 0) {
+        if (!globalClassBattle || globalClassBattle.length === 0) {
           listEl.innerHTML = '<div class="empty-state">Классы пока не добавлены</div>';
           return;
         }
 
-        sortedClasses.forEach((cls, idx) => {
+        globalClassBattle.forEach((cls, idx) => {
           const isMyClass = myClass && cls.className === myClass;
           const row = document.createElement('div');
           row.className = `leaderboard-row ${idx === 0 && cls.totalScore > 0 ? 'top-1' : ''} ${isMyClass ? 'my-row' : ''}`;
@@ -2494,17 +2543,47 @@
         return;
       }
 
-      let leadersArr = Object.values(scores);
-      if (currentLeaderboardMode === 'my' && myClass) {
-        leadersArr = leadersArr.filter(l => l.className === myClass);
-      }
+      // 3. МОЙ КЛАСС (ПОЛНЫЙ СПИСОК ОДНОКЛАССНИКОВ ИЗ ДАННЫХ КЛАССА)
+      if (currentLeaderboardMode === 'my') {
+        const classScores = {};
+        allStudents.forEach(st => {
+          const rawRole = String(st['Роль'] || st['роль'] || '').trim().toLowerCase();
+          if (rawRole === 'teacher' || rawRole === 'учитель') return;
+          const rawName = String(st['Имя'] || st['имя'] || st['ФИО'] || '').trim();
+          if (!rawName || rawName.length < 2) return;
 
-      const sortedLeaders = leadersArr.sort((a, b) => b.score - a.score);
+          const normKey = normalizePersonName(rawName);
+          classScores[normKey] = {
+            name: rawName,
+            normName: normKey,
+            className: myClass || '—',
+            score: 0
+          };
+        });
 
-      if (sortedLeaders.length === 0) {
-        listEl.innerHTML = '<div class="empty-state">Ученики в этой категории не найдены</div>';
-      } else {
-        sortedLeaders.forEach((leader, idx) => {
+        allGrades.forEach(g => {
+          const rawStudent = String(g['Ученик'] || g['ученик'] || '').trim();
+          const gradeVal = Number(g['Оценка'] || g['оценка']);
+          const weight = Number(g['Вес'] || g['вес'] || 5);
+          if (!isNaN(gradeVal)) {
+            const add = gradeVal * weight;
+            const normStud = normalizePersonName(rawStudent);
+            for (const key in classScores) {
+              if (key === normStud || key.includes(normStud) || normStud.includes(key)) {
+                classScores[key].score += add;
+                break;
+              }
+            }
+          }
+        });
+
+        const sortedClass = Object.values(classScores).sort((a, b) => b.score - a.score);
+        if (sortedClass.length === 0) {
+          listEl.innerHTML = '<div class="empty-state">Ученики класса не найдены</div>';
+          return;
+        }
+
+        sortedClass.forEach((leader, idx) => {
           const isMe = currentUser && normalizePersonName(leader.name) === normalizePersonName(currentUser.name);
           const row = document.createElement('div');
           row.className = `leaderboard-row ${idx === 0 && leader.score > 0 ? 'top-1' : ''} ${isMe ? 'my-row' : ''}`;
@@ -2524,7 +2603,35 @@
           `;
           listEl.appendChild(row);
         });
+        return;
       }
+
+      // 4. ТОП-50 ШКОЛЫ (ПРЕДРАССЧИТАНО НА СЕРВЕРЕ)
+      if (!globalTop50 || globalTop50.length === 0) {
+        listEl.innerHTML = '<div class="empty-state">Рейтинг школы пока пуст</div>';
+        return;
+      }
+
+      globalTop50.forEach((leader, idx) => {
+        const isMe = currentUser && normalizePersonName(leader.name) === normalizePersonName(currentUser.name) && leader.className === myClass;
+        const row = document.createElement('div');
+        row.className = `leaderboard-row ${idx === 0 && leader.score > 0 ? 'top-1' : ''} ${isMe ? 'my-row' : ''}`;
+
+        let medal = `${idx + 1}`;
+        if (idx === 0 && leader.score > 0) medal = '🥇';
+        if (idx === 1 && leader.score > 0) medal = '🥈';
+        if (idx === 2 && leader.score > 0) medal = '🥉';
+
+        row.innerHTML = `
+          <div class="leader-rank">${medal}</div>
+          <div class="leader-info">
+            <span class="leader-name">${leader.name} ${isMe ? '⭐' : ''}</span>
+            <span class="leader-class">${leader.className} класс</span>
+          </div>
+          <div class="leader-score">${leader.score} XP</div>
+        `;
+        listEl.appendChild(row);
+      });
     }
 
     function closeLeaderboardModal(e) {
@@ -2532,8 +2639,10 @@
       document.getElementById('leaderboard-modal').classList.remove('open');
     }
 
+    /* СЕРВЕРНАЯ АВТОРИЗАЦИЯ */
     function checkAuth() {
       if (!currentUser) {
+        document.getElementById('loader').style.display = 'none';
         document.getElementById('login-modal').classList.add('open');
       } else {
         document.getElementById('login-modal').classList.remove('open');
@@ -2541,54 +2650,61 @@
       }
     }
 
-    function handleLogin(e) {
+    async function handleLogin(e) {
       e.preventDefault();
-      const login = document.getElementById('login-user').value.trim().toLowerCase();
+      const login = document.getElementById('login-user').value.trim();
       const pass = document.getElementById('login-pass').value.trim();
       const errEl = document.getElementById('login-error');
+      const btn = document.getElementById('login-submit-btn');
 
-      if (!allStudents || allStudents.length === 0) {
-        alert('Данные еще загружаются из таблицы, подожди пару секунд...');
-        return;
-      }
+      errEl.style.display = 'none';
+      btn.innerText = 'Проверка...';
+      btn.disabled = true;
 
-      const found = allStudents.find(s => {
-        const u = String(s['Логин'] || s['логин'] || '').trim().toLowerCase();
-        const p = String(s['Пароль'] || s['пароль'] || '').trim();
-        return u === login && p === pass;
-      });
+      try {
+        const res = await fetch(API_URL, {
+          method: 'POST',
+          body: JSON.stringify({
+            action: 'login',
+            login: login,
+            pass: pass
+          })
+        });
+        const data = await res.json();
 
-      if (found) {
-        errEl.style.display = 'none';
-        const rawRole = String(found['Роль'] || found['роль'] || found['Role'] || '').trim().toLowerCase();
-        let role = 'student';
-        if (rawRole === 'teacher' || rawRole === 'учитель') role = 'teacher';
-        else if (rawRole === 'starosta' || rawRole === 'староста') role = 'starosta';
+        if (data.status === 'success' && data.user) {
+          currentUser = data.user;
+          savedAuth = { login: login, pass: pass };
+          localStorage.setItem('diary_current_user', JSON.stringify(currentUser));
+          localStorage.setItem('diary_auth_creds', JSON.stringify(savedAuth));
 
-        currentUser = {
-          name: String(found['Имя'] || found['имя'] || found['ФИО'] || login).trim(),
-          className: normalizeClassStr(found['Класс'] || found['класс'] || ''),
-          role: role,
-          subjects: String(found['Предмет'] || found['предмет'] || '').trim().toLowerCase(),
-          gender: String(found['Пол'] || found['пол'] || 'м').trim().toLowerCase(),
-          group: String(found['Группа'] || found['группа'] || '1').trim()
-        };
-        localStorage.setItem('diary_current_user', JSON.stringify(currentUser));
-        document.getElementById('login-modal').classList.remove('open');
-        updateProfileUI();
-        updateNewsBadge();
-        checkBirthdays();
-        updateBellTimer();
-        renderLessons();
-      } else {
+          document.getElementById('login-modal').classList.remove('open');
+          btn.innerText = 'Войти';
+          btn.disabled = false;
+
+          await loadData(true);
+        } else {
+          errEl.innerText = data.message || 'Неверный логин или пароль';
+          errEl.style.display = 'block';
+          btn.innerText = 'Войти';
+          btn.disabled = false;
+        }
+      } catch (err) {
+        errEl.innerText = 'Ошибка соединения с сервером';
         errEl.style.display = 'block';
+        btn.innerText = 'Войти';
+        btn.disabled = false;
       }
     }
 
     function handleLogout() {
       if (!confirm('Выйти из профиля?')) return;
       localStorage.removeItem('diary_current_user');
+      localStorage.removeItem('diary_auth_creds');
+      localStorage.removeItem(CACHE_KEY);
+      localStorage.removeItem(CACHE_TIME_KEY);
       currentUser = null;
+      savedAuth = null;
       closeProfileModal();
       checkAuth();
     }
@@ -2811,25 +2927,17 @@
     }
 
     function applyDataToApp(data) {
-      if (Array.isArray(data)) {
-        allItems = data;
-        allNews = [];
-        allDuty = [];
-        allBirthdays = [];
-        allStudents = [];
-        allGrades = [];
-        allAbsences = [];
-      } else {
-        allItems = data.schedule || [];
-        allNews = data.announcements || [];
-        allDuty = data.duty || [];
-        allBirthdays = data.birthdays || [];
-        allStudents = data.students || [];
-        allGrades = data.grades || [];
-        allAbsences = data.absences || [];
-      }
+      allItems = data.schedule || [];
+      allNews = data.announcements || [];
+      allDuty = data.duty || [];
+      allBirthdays = data.birthdays || [];
+      allStudents = data.students || [];
+      allGrades = data.grades || [];
+      allAbsences = data.absences || [];
+      globalTop50 = data.globalTop50 || [];
+      globalClassBattle = data.globalClassBattle || [];
+      allSchoolClasses = data.allClasses || [];
 
-      // Автообновление роли и класса пользователя при синхронизации с таблицей
       if (currentUser && allStudents.length > 0) {
         const myNorm = normalizePersonName(currentUser.name);
         const freshRecord = allStudents.find(s => normalizePersonName(s['Имя'] || s['имя'] || s['ФИО'] || '') === myNorm);
@@ -2870,10 +2978,18 @@
     }
 
     async function loadData(force = false) {
+      if (!currentUser) {
+        checkAuth();
+        return;
+      }
+
       updateProfileUI();
       const loader = document.getElementById('loader');
-      const cached = localStorage.getItem(CACHE_KEY);
-      const cacheTime = localStorage.getItem(CACHE_TIME_KEY);
+      const userClass = normalizeClassStr(currentUser.className || '');
+      const scopedCacheKey = `${CACHE_KEY}_${userClass}`;
+      const scopedTimeKey = `${CACHE_TIME_KEY}_${userClass}`;
+      const cached = localStorage.getItem(scopedCacheKey);
+      const cacheTime = localStorage.getItem(scopedTimeKey);
       const now = Date.now();
 
       if (!force && cached && cacheTime && (now - Number(cacheTime) < CACHE_TTL)) {
@@ -2885,13 +3001,16 @@
         } catch (e) {}
       }
 
+      loader.style.display = 'block';
+
       try {
-        const res = await fetch(API_URL);
+        const url = `${API_URL}?class=${encodeURIComponent(userClass)}`;
+        const res = await fetch(url);
         const data = await res.json();
         loader.style.display = 'none';
 
-        localStorage.setItem(CACHE_KEY, JSON.stringify(data));
-        localStorage.setItem(CACHE_TIME_KEY, String(Date.now()));
+        localStorage.setItem(scopedCacheKey, JSON.stringify(data));
+        localStorage.setItem(scopedTimeKey, String(Date.now()));
 
         applyDataToApp(data);
       } catch (err) {
@@ -2977,6 +3096,7 @@
       btn.disabled = true;
 
       const payload = {
+        action: 'addAbsence',
         className: (currentUser && currentUser.className) ? currentUser.className : '8А',
         name: document.getElementById('abs-name').value.trim(),
         date: document.getElementById('abs-date').value.trim(),
@@ -2986,8 +3106,6 @@
       try {
         await fetch(API_URL, {
           method: 'POST',
-          mode: 'no-cors',
-          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
         });
 
@@ -2998,7 +3116,6 @@
           'Причина': payload.reason
         });
 
-        localStorage.removeItem(CACHE_TIME_KEY);
         updateProfileUI();
 
         btn.innerText = 'Успешно отправлено! ✓';
@@ -3007,7 +3124,7 @@
           btn.innerText = 'Отправить старосте';
           btn.disabled = false;
           document.getElementById('absence-form').reset();
-        }, 1200);
+        }, 1000);
       } catch (err) {
         alert('Ошибка при отправке.');
         btn.innerText = 'Отправить старосте';
@@ -3103,6 +3220,7 @@
 
       const payload = {
         action: 'updateLesson',
+        auth: savedAuth,
         className: targetClass,
         subject: subject,
         date: date,
@@ -3113,28 +3231,31 @@
       };
 
       try {
-        await fetch(API_URL, {
+        const res = await fetch(API_URL, {
           method: 'POST',
-          mode: 'no-cors',
-          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
         });
+        const respData = await res.json();
 
-        currentTeacherLessonItem['Тема'] = payload.topic;
-        currentTeacherLessonItem['Задание'] = payload.homework;
-        currentTeacherLessonItem['Тип'] = payload.type;
+        if (respData.status === 'success') {
+          currentTeacherLessonItem['Тема'] = payload.topic;
+          currentTeacherLessonItem['Задание'] = payload.homework;
+          currentTeacherLessonItem['Тип'] = payload.type;
 
-        localStorage.removeItem(CACHE_TIME_KEY);
-
-        btn.innerText = 'Сохранено! ✓';
-        setTimeout(() => {
-          closeTeacherEditModal();
+          btn.innerText = 'Сохранено! ✓';
+          setTimeout(() => {
+            closeTeacherEditModal();
+            btn.innerText = 'Сохранить в расписание';
+            btn.disabled = false;
+            renderLessons();
+          }, 900);
+        } else {
+          alert(respData.message || 'Не удалось обновить урок');
           btn.innerText = 'Сохранить в расписание';
           btn.disabled = false;
-          renderLessons();
-        }, 1000);
+        }
       } catch (err) {
-        alert('Ошибка при сохранении в таблицу');
+        alert('Ошибка сети при сохранении в таблицу');
         btn.innerText = 'Сохранить в расписание';
         btn.disabled = false;
       }
@@ -3248,59 +3369,62 @@
 
       const payload = {
         action: 'saveGrades',
+        auth: savedAuth,
         className: targetClass,
         subject: subject,
         date: date,
         weight: weight,
-        author: authorName,
         grades: gradesData
       };
 
       try {
-        await fetch(API_URL, {
+        const res = await fetch(API_URL, {
           method: 'POST',
-          mode: 'no-cors',
-          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
         });
+        const respData = await res.json();
 
-        gradesData.forEach(item => {
-          const normStud = normalizePersonName(item.studentName);
-          const idx = allGrades.findIndex(g =>
-            normalizeClassStr(g['Класс'] || '') === targetClass &&
-            String(g['Предмет'] || '').toLowerCase() === subject.toLowerCase() &&
-            cleanDateStr(g['Дата'] || '') === date &&
-            normalizePersonName(g['Ученик'] || '') === normStud
-          );
+        if (respData.status === 'success') {
+          gradesData.forEach(item => {
+            const normStud = normalizePersonName(item.studentName);
+            const idx = allGrades.findIndex(g =>
+              normalizeClassStr(g['Класс'] || '') === targetClass &&
+              String(g['Предмет'] || '').toLowerCase() === subject.toLowerCase() &&
+              cleanDateStr(g['Дата'] || '') === date &&
+              normalizePersonName(g['Ученик'] || '') === normStud
+            );
 
-          if (idx !== -1) {
-            allGrades[idx]['Оценка'] = item.grade;
-            allGrades[idx]['Вес'] = weight;
-            allGrades[idx]['Выставил'] = authorName;
-          } else {
-            allGrades.push({
-              'Дата': date,
-              'Класс': targetClass,
-              'Предмет': subject,
-              'Ученик': item.studentName,
-              'Оценка': item.grade,
-              'Вес': weight,
-              'Выставил': authorName
-            });
-          }
-        });
+            if (idx !== -1) {
+              allGrades[idx]['Оценка'] = item.grade;
+              allGrades[idx]['Вес'] = weight;
+              allGrades[idx]['Выставил'] = authorName;
+            } else {
+              allGrades.push({
+                'Дата': date,
+                'Класс': targetClass,
+                'Предмет': subject,
+                'Ученик': item.studentName,
+                'Оценка': item.grade,
+                'Вес': weight,
+                'Выставил': authorName
+              });
+            }
+          });
 
-        localStorage.removeItem(CACHE_TIME_KEY);
-
-        btn.innerText = 'Оценки сохранены! ✓';
-        setTimeout(() => {
-          closeGradeBookModal();
+          btn.innerText = 'Оценки сохранены! ✓';
+          setTimeout(() => {
+            closeGradeBookModal();
+            btn.innerText = 'Сохранить оценки';
+            btn.disabled = false;
+            renderLessons();
+          }, 900);
+        } else {
+          alert(respData.message || 'Ошибка при выставлении оценок');
           btn.innerText = 'Сохранить оценки';
           btn.disabled = false;
-          renderLessons();
-        }, 1200);
+        }
       } catch (err) {
-        alert('Ошибка при сохранении оценок');
+        alert('Ошибка сети при сохранении оценок');
         btn.innerText = 'Сохранить оценки';
         btn.disabled = false;
       }
@@ -3425,6 +3549,7 @@
 
     function renderLessons() {
       const container = document.getElementById('cards-container');
+      const shareWrapper = document.getElementById('share-hw-wrapper');
       container.innerHTML = '';
 
       const monthsRu = [
@@ -3466,10 +3591,12 @@
         return datePattern.test(rawDate) || paddedPattern.test(rawDate);
       });
 
+      currentRenderedDayLessons = dayLessons;
       const currentClassName = (currentUser && currentUser.className) ? currentUser.className : '8А';
 
       if (dayLessons.length === 0) {
         updateHomeworkProgressBar(0, 0);
+        shareWrapper.style.display = 'none';
         const dayOfWeek = selectedDateInfo.dateObj.getDay();
         if (dayOfWeek === 6 || dayOfWeek === 0) {
           container.innerHTML = `<div class="weekend-state">Выходной! Отдыхаем 🎉🍂</div>`;
@@ -3478,6 +3605,8 @@
         }
         return;
       }
+
+      shareWrapper.style.display = 'block';
 
       const now = new Date();
       const isTodaySelected = selectedDateInfo.isToday;
