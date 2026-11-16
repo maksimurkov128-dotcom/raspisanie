@@ -17,14 +17,17 @@
   <style>
     :root {
       --bg: #141113;
+      --bg-glow: rgba(231, 111, 81, 0.08);
       --card-bg: #1e191b;
       --card-border: #322829;
       --text: #f7ede2;
       --hint: #9e8d89;
       --accent: #e76f51;
+      --accent-dark: #d45d3e;
       --accent-glow: rgba(231, 111, 81, 0.45);
       --gold: #f4a261;
       --gold-glow: rgba(244, 162, 97, 0.4);
+      --btn-text: #ffffff;
       --danger: #e63946;
       --green: #2a9d8f;
       --green-glow: rgba(42, 157, 143, 0.4);
@@ -44,14 +47,14 @@
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, sans-serif;
       background-color: var(--bg);
-      background-image: radial-gradient(circle at 50% 0%, rgba(231, 111, 81, 0.08), transparent 70%);
+      background-image: radial-gradient(circle at 50% 0%, var(--bg-glow), transparent 70%);
       color: var(--text);
       margin: 0;
       padding: 16px 12px 40px 12px;
       min-height: 100vh;
       position: relative;
       width: 100%;
-      transition: background-color 0.3s ease;
+      transition: background-color 0.3s ease, color 0.3s ease;
     }
 
     .leaves-container {
@@ -69,7 +72,7 @@
       position: absolute;
       top: -40px;
       user-select: none;
-      opacity: 0.35;
+      opacity: 0.4;
       animation-name: fallAnimation, swayAnimation;
       animation-iteration-count: infinite;
       animation-timing-function: linear, ease-in-out;
@@ -86,9 +89,9 @@
     }
 
     .leaf:nth-child(1) { left: 8%; font-size: 18px; animation-duration: 14s, 4s; }
-    .leaf:nth-child(2) { left: 25%; font-size: 24px; animation-duration: 18s, 5s; animation-delay: 2s; opacity: 0.25; }
+    .leaf:nth-child(2) { left: 25%; font-size: 24px; animation-duration: 18s, 5s; animation-delay: 2s; opacity: 0.3; }
     .leaf:nth-child(3) { left: 45%; font-size: 16px; animation-duration: 13s, 3.5s; animation-delay: 5s; }
-    .leaf:nth-child(4) { left: 65%; font-size: 22px; animation-duration: 16s, 4.5s; animation-delay: 1s; opacity: 0.3; }
+    .leaf:nth-child(4) { left: 65%; font-size: 22px; animation-duration: 16s, 4.5s; animation-delay: 1s; opacity: 0.35; }
     .leaf:nth-child(5) { left: 85%; font-size: 19px; animation-duration: 15s, 4s; animation-delay: 4s; }
 
     .header-top, .info-banners, .week-segmented, .days-grid, #cards-container, #loader, #duty-banner, #progress-wrapper, #share-hw-wrapper, #events-banner-container {
@@ -114,8 +117,8 @@
     }
 
     .profile-btn {
-      background: linear-gradient(145deg, #2b2123, #1e181a);
-      border: 1px solid rgba(244, 162, 97, 0.4);
+      background: linear-gradient(145deg, var(--card-bg), var(--bg));
+      border: 1px solid var(--gold);
       color: var(--gold);
       font-weight: 700;
       font-size: 13px;
@@ -126,7 +129,7 @@
       align-items: center;
       gap: 6px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.4);
-      transition: transform 0.15s;
+      transition: transform 0.15s, border-color 0.3s, color 0.3s;
       user-select: none;
       max-width: 100%;
       white-space: nowrap;
@@ -140,9 +143,9 @@
     }
 
     .profile-btn.starosta-badge-btn {
-      border-color: #ffd166;
-      color: #ffd166;
-      box-shadow: 0 0 10px rgba(255, 209, 102, 0.25);
+      border-color: var(--gold);
+      color: var(--gold);
+      box-shadow: 0 0 10px var(--gold-glow);
     }
 
     #profile-btn-text {
@@ -190,9 +193,9 @@
       top: -4px;
       right: -4px;
       background: var(--accent);
-      color: #fff;
+      color: var(--btn-text);
       font-size: 10px;
-      font-weight: 700;
+      font-weight: 800;
       padding: 2px 6px;
       border-radius: 10px;
       border: 2px solid var(--bg);
@@ -230,39 +233,38 @@
     }
 
     .lesson-timer-banner {
-      background: linear-gradient(90deg, rgba(42, 157, 143, 0.15), rgba(244, 162, 97, 0.12));
+      background: linear-gradient(90deg, rgba(42, 157, 143, 0.15), var(--bg-glow));
       border: 1px solid rgba(42, 157, 143, 0.35);
-      color: #e8f7f5;
+      color: var(--text);
     }
 
     .vacation-banner {
-      background: linear-gradient(90deg, rgba(231, 111, 81, 0.15), rgba(244, 162, 97, 0.1));
-      border: 1px solid rgba(244, 162, 97, 0.25);
+      background: linear-gradient(90deg, var(--bg-glow), rgba(255, 255, 255, 0.03));
+      border: 1px solid var(--card-border);
     }
 
     .bday-banner {
-      background: linear-gradient(90deg, rgba(244, 162, 97, 0.18), rgba(231, 111, 81, 0.12));
-      border: 1px solid rgba(244, 162, 97, 0.35);
-      color: #ffeedb;
+      background: linear-gradient(90deg, var(--bg-glow), rgba(255, 255, 255, 0.03));
+      border: 1px solid var(--gold);
+      color: var(--text);
       display: none;
     }
 
     .bday-banner.today-bday {
-      background: linear-gradient(135deg, #e76f51, #d45d3e);
-      border-color: #f4a261;
-      color: #fff;
+      background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+      border-color: var(--gold);
+      color: var(--btn-text);
       box-shadow: 0 0 16px var(--accent-glow);
       font-weight: 600;
     }
 
-    /* КАРТОЧКА ЕЖЕНЕДЕЛЬНОГО СОБЫТИЯ */
     .event-card-banner {
-      background: linear-gradient(135deg, rgba(255, 209, 102, 0.14), rgba(231, 111, 81, 0.12));
-      border: 1px solid rgba(255, 209, 102, 0.4);
+      background: linear-gradient(135deg, var(--card-bg), var(--bg));
+      border: 1px solid var(--gold);
       border-radius: 14px;
       padding: 11px 13px;
       margin-bottom: 12px;
-      box-shadow: 0 3px 12px rgba(0, 0, 0, 0.25);
+      box-shadow: 0 3px 12px rgba(0, 0, 0, 0.35), 0 0 12px var(--bg-glow);
     }
 
     .event-card-top {
@@ -276,15 +278,15 @@
     .event-title {
       font-size: 13px;
       font-weight: 800;
-      color: #ffd166;
+      color: var(--gold);
     }
 
     .event-reward-pill {
       font-size: 10px;
       font-weight: 700;
-      background: rgba(255, 209, 102, 0.18);
-      border: 1px solid rgba(255, 209, 102, 0.45);
-      color: #ffd166;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--gold);
+      color: var(--gold);
       padding: 2px 7px;
       border-radius: 8px;
       white-space: nowrap;
@@ -292,7 +294,8 @@
 
     .event-desc {
       font-size: 12px;
-      color: #ebd9ce;
+      color: var(--text);
+      opacity: 0.9;
       line-height: 1.35;
       margin-bottom: 7px;
     }
@@ -306,14 +309,14 @@
     .event-progress-track {
       flex: 1;
       height: 6px;
-      background: rgba(0, 0, 0, 0.35);
+      background: rgba(0, 0, 0, 0.45);
       border-radius: 6px;
       overflow: hidden;
     }
 
     .event-progress-fill {
       height: 100%;
-      background: linear-gradient(90deg, #ffd166, #e76f51);
+      background: linear-gradient(90deg, var(--gold), var(--accent));
       border-radius: 6px;
       transition: width 0.35s ease;
     }
@@ -337,7 +340,7 @@
 
     .week-segmented {
       display: flex;
-      background: #1a1517;
+      background: var(--card-bg);
       border: 1px solid var(--card-border);
       border-radius: 12px;
       padding: 4px;
@@ -359,10 +362,10 @@
     }
 
     .week-btn.active {
-      background: #2b2123;
+      background: var(--bg);
       color: var(--gold);
-      border: 1px solid rgba(244, 162, 97, 0.25);
-      box-shadow: 0 0 14px var(--gold-glow);
+      border: 1px solid var(--gold);
+      box-shadow: 0 0 12px var(--gold-glow);
     }
 
     .days-grid {
@@ -400,16 +403,18 @@
     }
 
     .day-cell.active {
-      background: linear-gradient(145deg, #e76f51, #d45d3e);
-      border-color: #f4a261;
+      background: linear-gradient(145deg, var(--accent), var(--accent-dark));
+      border-color: var(--gold);
       box-shadow: 0 0 18px var(--accent-glow);
     }
 
-    .day-cell.active .day-name, .day-cell.active .day-num { color: #fff; }
+    .day-cell.active .day-name, .day-cell.active .day-num {
+      color: var(--btn-text);
+    }
 
     .duty-card {
-      background: #1c181a;
-      border: 1px dashed rgba(244, 162, 97, 0.3);
+      background: var(--card-bg);
+      border: 1px dashed var(--gold);
       border-radius: 12px;
       padding: 8px 12px;
       font-size: 13px;
@@ -417,7 +422,7 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      color: #ebdcd5;
+      color: var(--text);
     }
 
     .duty-card span.names {
@@ -426,7 +431,7 @@
     }
 
     .progress-box {
-      background: #1c1719;
+      background: var(--card-bg);
       border: 1px solid var(--card-border);
       border-radius: 12px;
       padding: 10px 14px;
@@ -439,13 +444,13 @@
       font-size: 12px;
       font-weight: 600;
       margin-bottom: 6px;
-      color: #ddd;
+      color: var(--text);
     }
 
     .progress-track {
       width: 100%;
       height: 8px;
-      background: #2a2225;
+      background: var(--bg);
       border-radius: 10px;
       overflow: hidden;
     }
@@ -453,7 +458,7 @@
     .progress-bar-fill {
       height: 100%;
       width: 0%;
-      background: linear-gradient(90deg, #f4a261, #e76f51);
+      background: linear-gradient(90deg, var(--gold), var(--accent));
       border-radius: 10px;
       transition: width 0.35s ease, background 0.35s ease;
     }
@@ -465,7 +470,7 @@
 
     .share-hw-btn {
       width: 100%;
-      background: #1c1719;
+      background: var(--card-bg);
       border: 1px solid var(--card-border);
       color: var(--gold);
       font-size: 12px;
@@ -519,7 +524,7 @@
 
     .card.has-note {
       border: 1px solid var(--gold);
-      box-shadow: 0 0 14px rgba(244, 162, 97, 0.25);
+      box-shadow: 0 0 14px var(--gold-glow);
     }
 
     .card.is-exam-card {
@@ -578,7 +583,7 @@
     .subject {
       font-size: 16px;
       font-weight: 700;
-      color: #ffffff;
+      color: var(--text);
       display: flex;
       align-items: center;
       gap: 6px;
@@ -594,7 +599,8 @@
       font-size: 10px;
       background: rgba(255, 255, 255, 0.08);
       border: 1px solid rgba(255, 255, 255, 0.16);
-      color: #d6ccc8;
+      color: var(--text);
+      opacity: 0.85;
       padding: 1px 6px;
       border-radius: 6px;
       font-weight: 600;
@@ -620,10 +626,10 @@
     }
 
     .exam-badge.sr {
-      background: rgba(244, 162, 97, 0.2);
-      border: 1px solid rgba(244, 162, 97, 0.7);
-      color: #f4a261;
-      box-shadow: 0 0 10px rgba(244, 162, 97, 0.3);
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--gold);
+      color: var(--gold);
+      box-shadow: 0 0 10px var(--gold-glow);
     }
 
     .my-grade-badge {
@@ -658,9 +664,9 @@
 
     .class-tag-badge {
       font-size: 11px;
-      color: #f4a261;
-      background: rgba(244, 162, 97, 0.15);
-      border: 1px solid rgba(244, 162, 97, 0.35);
+      color: var(--gold);
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--gold);
       padding: 2px 7px;
       border-radius: 8px;
       font-weight: 700;
@@ -677,9 +683,9 @@
     }
 
     .edit-lesson-btn {
-      background: rgba(255, 209, 102, 0.16);
-      border: 1px solid rgba(255, 209, 102, 0.45);
-      color: #ffd166;
+      background: var(--bg);
+      border: 1px solid var(--gold);
+      color: var(--gold);
       font-size: 11px;
       font-weight: 700;
       padding: 3px 8px;
@@ -735,7 +741,8 @@
     .homework-text {
       font-size: 14px;
       line-height: 1.5;
-      color: #e8ded8;
+      color: var(--text);
+      opacity: 0.92;
       white-space: pre-line;
     }
 
@@ -765,8 +772,8 @@
       color: var(--gold);
       font-size: 15px;
       font-weight: 600;
-      background: linear-gradient(145deg, rgba(244, 162, 97, 0.08), rgba(231, 111, 81, 0.05));
-      border: 1px dashed rgba(244, 162, 97, 0.35);
+      background: var(--card-bg);
+      border: 1px dashed var(--gold);
       border-radius: 14px;
     }
 
@@ -794,8 +801,8 @@
     }
 
     .modal-sheet {
-      background: #191417;
-      border: 1px solid #3c3033;
+      background: var(--bg);
+      border: 1px solid var(--card-border);
       border-radius: 20px;
       width: 100%;
       max-width: 440px;
@@ -803,7 +810,7 @@
       padding: 20px 18px;
       display: flex;
       flex-direction: column;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.8), 0 0 20px rgba(231, 111, 81, 0.15);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.85), 0 0 20px var(--bg-glow);
       transform: scale(0.92);
       transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
@@ -820,11 +827,11 @@
     .modal-header h3 {
       margin: 0;
       font-size: 18px;
-      color: #fff;
+      color: var(--text);
     }
 
     .close-btn {
-      background: #2b2225;
+      background: var(--card-bg);
       border: 1px solid var(--card-border);
       color: var(--hint);
       width: 32px;
@@ -834,7 +841,7 @@
     }
 
     .detail-item {
-      background: #221c1f;
+      background: var(--card-bg);
       border: 1px solid var(--card-border);
       border-radius: 12px;
       padding: 12px;
@@ -851,7 +858,7 @@
 
     .detail-val {
       font-size: 14px;
-      color: #fff;
+      color: var(--text);
       line-height: 1.4;
       white-space: pre-line;
     }
@@ -873,11 +880,11 @@
     .note-textarea {
       width: 100%;
       height: 70px;
-      background: #141113;
+      background: var(--bg);
       border: 1px solid var(--card-border);
       border-radius: 10px;
       padding: 8px 10px;
-      color: #fff;
+      color: var(--text);
       font-family: inherit;
       font-size: 13px;
       resize: none;
@@ -895,7 +902,7 @@
     }
 
     .hw-chip {
-      background: #2b2225;
+      background: var(--card-bg);
       border: 1px solid var(--card-border);
       color: var(--gold);
       font-size: 11px;
@@ -908,7 +915,7 @@
     }
 
     .hw-chip:active {
-      background: rgba(244, 162, 97, 0.2);
+      border-color: var(--gold);
     }
 
     .form-group {
@@ -925,11 +932,11 @@
     }
 
     .form-input {
-      background: #221c1f;
+      background: var(--card-bg);
       border: 1px solid var(--card-border);
       border-radius: 10px;
       padding: 10px 12px;
-      color: #fff;
+      color: var(--text);
       font-size: 14px;
       outline: none;
     }
@@ -937,25 +944,26 @@
     .form-input:focus { border-color: var(--gold); }
 
     .submit-btn {
-      background: linear-gradient(145deg, #e76f51, #d45d3e);
+      background: linear-gradient(145deg, var(--accent), var(--accent-dark));
       border: none;
-      color: #fff;
-      font-weight: 700;
+      color: var(--btn-text);
+      font-weight: 800;
       padding: 12px;
       border-radius: 12px;
       cursor: pointer;
       margin-top: 8px;
       box-shadow: 0 0 14px var(--accent-glow);
       width: 100%;
+      transition: background 0.3s ease, color 0.3s ease, transform 0.15s;
     }
 
     .submit-btn:active { transform: scale(0.97); }
     .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
     .secondary-btn {
-      background: #221c1f;
+      background: var(--card-bg);
       border: 1px solid var(--card-border);
-      color: #fff;
+      color: var(--text);
       font-weight: 600;
       padding: 10px;
       border-radius: 10px;
@@ -965,9 +973,9 @@
     }
 
     .teacher-action-btn {
-      background: rgba(255, 209, 102, 0.12);
-      border: 1px solid rgba(255, 209, 102, 0.35);
-      color: #ffd166;
+      background: var(--card-bg);
+      border: 1px solid var(--gold);
+      color: var(--gold);
       font-weight: 700;
       padding: 11px;
       border-radius: 12px;
@@ -981,7 +989,7 @@
     }
 
     .logout-btn {
-      background: #2b2123;
+      background: var(--card-bg);
       border: 1px solid var(--danger);
       color: var(--danger);
       font-weight: 700;
@@ -993,7 +1001,7 @@
     }
 
     .news-card {
-      background: #221c1f;
+      background: var(--card-bg);
       border: 1px solid var(--card-border);
       border-radius: 12px;
       padding: 14px;
@@ -1016,7 +1024,7 @@
     .news-text {
       font-size: 14px;
       line-height: 1.45;
-      color: #f7ede2;
+      color: var(--text);
       white-space: pre-wrap;
     }
 
@@ -1029,7 +1037,7 @@
     }
 
     .grade-select {
-      background: #141113;
+      background: var(--bg);
       border: 1px solid var(--card-border);
       color: var(--gold);
       padding: 6px 10px;
@@ -1040,7 +1048,7 @@
 
     .leaderboard-filter-tabs {
       display: flex;
-      background: #151012;
+      background: var(--card-bg);
       border: 1px solid var(--card-border);
       border-radius: 10px;
       padding: 3px;
@@ -1063,9 +1071,9 @@
     }
 
     .leaderboard-filter-tab.active {
-      background: #2b2123;
+      background: var(--bg);
       color: var(--gold);
-      border: 1px solid rgba(244, 162, 97, 0.25);
+      border: 1px solid var(--gold);
     }
 
     .leaderboard-row {
@@ -1074,14 +1082,14 @@
       align-items: center;
       padding: 10px 12px;
       border-radius: 12px;
-      background: #221c1f;
+      background: var(--card-bg);
       border: 1px solid var(--card-border);
       margin-bottom: 8px;
     }
 
     .leaderboard-row.top-1 {
-      border-color: #ffd166;
-      background: linear-gradient(90deg, rgba(255, 209, 102, 0.15), #221c1f);
+      border-color: var(--gold);
+      box-shadow: 0 0 12px var(--gold-glow);
     }
 
     .leaderboard-row.my-row {
@@ -1106,7 +1114,7 @@
     .leader-name {
       font-size: 14px;
       font-weight: 700;
-      color: #fff;
+      color: var(--text);
     }
 
     .leader-class {
@@ -1124,7 +1132,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: #181315;
+      background: var(--bg);
       border: 1px solid var(--card-border);
       border-radius: 10px;
       padding: 10px 12px;
@@ -1164,9 +1172,9 @@
     .sim-g-btn {
       flex: 1;
       padding: 8px 0;
-      background: #141113;
+      background: var(--bg);
       border: 1px solid var(--card-border);
-      color: #fff;
+      color: var(--text);
       font-weight: 700;
       border-radius: 8px;
       cursor: pointer;
@@ -1175,6 +1183,7 @@
     .sim-g-btn.selected {
       background: var(--accent);
       border-color: var(--gold);
+      color: var(--btn-text);
     }
 
     .sim-tags-container {
@@ -1185,8 +1194,8 @@
     }
 
     .sim-tag {
-      background: rgba(244, 162, 97, 0.15);
-      border: 1px solid rgba(244, 162, 97, 0.35);
+      background: var(--bg);
+      border: 1px solid var(--gold);
       color: var(--gold);
       font-size: 12px;
       font-weight: 700;
@@ -1199,7 +1208,7 @@
     }
 
     .absence-item-card {
-      background: #221c1f;
+      background: var(--card-bg);
       border: 1px solid var(--card-border);
       border-left: 3px solid #58a6ff;
       border-radius: 12px;
@@ -1217,7 +1226,7 @@
     .absence-student-name {
       font-weight: 700;
       font-size: 14px;
-      color: #fff;
+      color: var(--text);
     }
 
     .absence-date-pill {
@@ -1229,7 +1238,8 @@
 
     .absence-reason-text {
       font-size: 13px;
-      color: #d6ccc8;
+      color: var(--text);
+      opacity: 0.85;
       line-height: 1.4;
     }
 
@@ -1252,9 +1262,9 @@
     }
 
     .theme-option-btn {
-      background: #141113;
+      background: var(--bg);
       border: 1px solid var(--card-border);
-      color: #ddd;
+      color: var(--text);
       font-size: 12px;
       font-weight: 600;
       padding: 6px 10px;
@@ -1265,7 +1275,8 @@
     .theme-option-btn.active {
       border-color: var(--gold);
       color: var(--gold);
-      background: #2b2123;
+      background: var(--card-bg);
+      box-shadow: 0 0 8px var(--gold-glow);
     }
   </style>
 </head>
@@ -1407,7 +1418,7 @@
 
         <!-- ПЕРЕКЛЮЧАТЕЛЬ ТЕМ И ЭФФЕКТОВ ФОНА -->
         <div class="detail-item">
-          <div class="detail-label">🎨 Оформление и эффекты</div>
+          <div class="detail-label">🎨 Оформление и эффекты (за события)</div>
           <div id="theme-options-container" class="theme-selector-grid"></div>
           <div id="particles-options-container" class="theme-selector-grid" style="margin-top: 8px;"></div>
         </div>
@@ -1430,7 +1441,7 @@
 
         <!-- УСПЕВАЕМОСТЬ И КАЛЬКУЛЯТОР УЧЕНИКА -->
         <div id="student-grades-section" style="display: none;">
-          <div class="detail-item" style="background: linear-gradient(135deg, rgba(244,162,97,0.12), rgba(231,111,81,0.08)); border-color: rgba(244,162,97,0.3);">
+          <div class="detail-item" style="border-color: var(--gold);">
             <div class="detail-label">🏆 Мои баллы в рейтинге:</div>
             <div id="prof-total-xp" class="detail-val gold-text" style="font-size: 20px;">0 баллов</div>
           </div>
@@ -1450,7 +1461,7 @@
             <button type="button" class="secondary-btn" style="margin-top: 0; font-size: 12px; flex: 1;" onclick="closeProfileModal(); openFeedbackModal();">
               ⭐ Оставить отзыв
             </button>
-            <a href="https://t.me/ТВОЙ_ЮЗЕРНЕЙМ_В_ТГ" target="_blank" class="secondary-btn" style="margin-top: 0; font-size: 12px; flex: 1; text-align: center; text-decoration: none; display: flex; align-items: center; justify-content: center;">
+            <a href="https://max.ru/u/f9LHodD0cOKI48hDsSOHvyiussj9Gpb-hJtcdE91LPpdrNOpi6jPEgRZbXs" target="_blank" class="secondary-btn" style="margin-top: 0; font-size: 12px; flex: 1; text-align: center; text-decoration: none; display: flex; align-items: center; justify-content: center;">
               💬 Разработчик
             </a>
           </div>
@@ -1473,12 +1484,12 @@
         <form onsubmit="submitNewEvent(event)">
           <div class="form-group">
             <label>Название события</label>
-            <input type="text" id="ev-title" class="form-input" placeholder="Например: Спринт отличника" required>
+            <input type="text" id="ev-title" class="form-input" placeholder="Например: Звёздный спринт" required>
           </div>
 
           <div class="form-group">
             <label>Описание для учеников</label>
-            <input type="text" id="ev-desc" class="form-input" placeholder="Получи 3 пятёрки за эту неделю!" required>
+            <input type="text" id="ev-desc" class="form-input" placeholder="Получи 3 пятёрки за неделю и открой тему со звёздами!" required>
           </div>
 
           <div class="form-group">
@@ -1504,16 +1515,16 @@
             <label>Награда: эффект фона (необязательно)</label>
             <select id="ev-reward-bg" class="form-input">
               <option value="">Без нового фона</option>
+              <option value="⭐,✨,💫">⭐ Звёздный дождь</option>
               <option value="❄️,☃️,🌨️">❄️ Зимний снегопад</option>
               <option value="🔥,✨,⚡">🔥 Огненные искры</option>
-              <option value="⭐,✨,💫">⭐ Звёздный дождь</option>
               <option value="1,0,1,0">💻 Матрица (0 и 1)</option>
             </select>
           </div>
 
           <div class="form-group">
-            <label>Награда: код темы (если уже создана в коде)</label>
-            <input type="text" id="ev-reward-theme" class="form-input" placeholder="Оставь пустым, если пока без темы">
+            <label>Награда: код темы (например: star_gold)</label>
+            <input type="text" id="ev-reward-theme" class="form-input" placeholder="star_gold">
           </div>
 
           <button type="submit" id="ev-submit-btn" class="submit-btn">Запустить событие</button>
@@ -1631,7 +1642,7 @@
     </div>
   </div>
 
-  <!-- СОЗДАНИЕ ОБЪЯВЛЕНИЯ (КЛАССЫ И ШКОЛЬНЫЕ АКТИВЫ) -->
+  <!-- СОЗДАНИЕ ОБЪЯВЛЕНИЯ -->
   <div id="teacher-announcement-modal" class="modal-overlay" onclick="closeTeacherAnnouncementModal(event)">
     <div class="modal-sheet" onclick="event.stopPropagation()">
       <div class="modal-header">
@@ -1844,42 +1855,47 @@
 
   <script>
     const API_URL = 'https://script.google.com/macros/s/AKfycbzoRZ_Fd9Yv2FJq79lpF4HPg-NETJm4gSCqLVxU7_6pp2CHNON2A09U1X0eYRE4cyQ5/exec';
-    const CACHE_KEY = 'diary_cached_data_v11';
-    const CACHE_TIME_KEY = 'diary_cache_timestamp_v11';
+    const CACHE_KEY = 'diary_cached_data_v12';
+    const CACHE_TIME_KEY = 'diary_cache_timestamp_v12';
     const CACHE_TTL = 2 * 60 * 1000;
 
-    // РЕЕСТР ТЕМ ОФОРМЛЕНИЯ (сюда можно добавлять новые темы в любой момент)
+    // РЕЕСТР ТЕМ ОФОРМЛЕНИЯ
     const THEMES_REGISTRY = {
       default: {
         name: '🍁 Стандартная (Осень)',
         vars: {
           '--bg': '#141113',
+          '--bg-glow': 'rgba(231, 111, 81, 0.08)',
           '--card-bg': '#1e191b',
           '--card-border': '#322829',
           '--text': '#f7ede2',
           '--hint': '#9e8d89',
           '--accent': '#e76f51',
+          '--accent-dark': '#d45d3e',
           '--accent-glow': 'rgba(231, 111, 81, 0.45)',
           '--gold': '#f4a261',
-          '--gold-glow': 'rgba(244, 162, 97, 0.4)'
+          '--gold-glow': 'rgba(244, 162, 97, 0.4)',
+          '--btn-text': '#ffffff'
         }
       },
       star_gold: {
         name: '⭐ Звёздный статус',
         vars: {
-          '--bg': '#0a0906',
-          '--card-bg': '#15130d',
-          '--card-border': '#332c16',
+          '--bg': '#090805',
+          '--bg-glow': 'rgba(250, 204, 21, 0.12)',
+          '--card-bg': '#14120b',
+          '--card-border': '#383014',
           '--text': '#fefce8',
           '--hint': '#a89f81',
           '--accent': '#eab308',
+          '--accent-dark': '#ca8a04',
           '--accent-glow': 'rgba(234, 179, 8, 0.45)',
           '--gold': '#fde047',
-          '--gold-glow': 'rgba(253, 224, 71, 0.45)'
+          '--gold-glow': 'rgba(253, 224, 71, 0.45)',
+          '--btn-text': '#141105'
         }
       }
     };
-
 
     const SCHOOL_ACTIVS = [
       { id: 'Биоритм', label: '🏅 Волонтеры «Биоритм»' },
@@ -1944,8 +1960,51 @@
       return isTeacher() || isStarosta();
     }
 
-    /* УПРАВЛЕНИЕ ТЕМАМИ И ФОНОМ */
+    /* УПРАВЛЕНИЕ ТЕМАМИ И ФОНОМ (РАЗБЛОКИРУЮТСЯ ТОЛЬКО ЗА СОБЫТИЯ) */
+    function getUnlockedRewardsSet() {
+      const userKey = currentUser ? normalizePersonName(currentUser.name) : 'guest';
+      const savedThemes = new Set(JSON.parse(localStorage.getItem(`diary_unlocked_themes_${userKey}`) || '["default"]'));
+      const savedBgs = new Set(JSON.parse(localStorage.getItem(`diary_unlocked_bgs_${userKey}`) || '["default","off"]'));
+
+      savedThemes.add('default');
+      savedBgs.add('default');
+      savedBgs.add('off');
+
+      const completedEvents = getUserCompletedEvents();
+      let changed = false;
+
+      completedEvents.forEach(ev => {
+        const tId = String(ev['Награда_тема'] || '').trim();
+        const bgVal = String(ev['Награда_фон'] || '').trim();
+        if (tId && THEMES_REGISTRY[tId] && !savedThemes.has(tId)) {
+          savedThemes.add(tId);
+          changed = true;
+        }
+        if (bgVal && !savedBgs.has(bgVal)) {
+          savedBgs.add(bgVal);
+          changed = true;
+        }
+      });
+
+      if (changed && currentUser) {
+        localStorage.setItem(`diary_unlocked_themes_${userKey}`, JSON.stringify(Array.from(savedThemes)));
+        localStorage.setItem(`diary_unlocked_bgs_${userKey}`, JSON.stringify(Array.from(savedBgs)));
+      }
+
+      return { themes: savedThemes, bgs: savedBgs };
+    }
+
     function applyThemeAndParticles() {
+      const unlocked = getUnlockedRewardsSet();
+      if (!unlocked.themes.has(selectedThemeId)) {
+        selectedThemeId = 'default';
+        localStorage.setItem('diary_selected_theme', 'default');
+      }
+      if (!unlocked.bgs.has(selectedParticlesStr)) {
+        selectedParticlesStr = 'default';
+        localStorage.setItem('diary_selected_particles', 'default');
+      }
+
       const themeObj = THEMES_REGISTRY[selectedThemeId] || THEMES_REGISTRY.default;
       const root = document.documentElement;
       Object.entries(themeObj.vars).forEach(([k, v]) => {
@@ -1989,18 +2048,11 @@
       const partBox = document.getElementById('particles-options-container');
       if (!themeBox || !partBox) return;
 
+      const unlocked = getUnlockedRewardsSet();
       themeBox.innerHTML = '';
-      const unlockedThemes = new Set(['default']);
-
-      // Проверяем разблокированные темы из выполненных или активных событий
-      const completedEvents = getUserCompletedEvents();
-      completedEvents.forEach(ev => {
-        const tId = String(ev['Награда_тема'] || '').trim();
-        if (tId && THEMES_REGISTRY[tId]) unlockedThemes.add(tId);
-      });
 
       Object.keys(THEMES_REGISTRY).forEach(tKey => {
-        if (!unlockedThemes.has(tKey) && !isManager()) return;
+        if (!unlocked.themes.has(tKey)) return;
         const btn = document.createElement('button');
         btn.type = 'button';
         btn.className = `theme-option-btn ${selectedThemeId === tKey ? 'active' : ''}`;
@@ -2015,12 +2067,10 @@
         { id: 'off', label: '🚫 Без анимации' }
       ];
 
-      // Добавляем фоны, разблокированные за события (или все доступные для старосты при тесте)
       allEvents.forEach(ev => {
         const bgVal = String(ev['Награда_фон'] || '').trim();
         if (!bgVal) return;
-        const isUnlocked = isManager() || completedEvents.some(ce => ce['ID'] === ev['ID']);
-        if (isUnlocked && !bgOptions.some(o => o.id === bgVal)) {
+        if (unlocked.bgs.has(bgVal) && !bgOptions.some(o => o.id === bgVal)) {
           const preview = bgVal.split(',')[0] || '✨';
           bgOptions.push({ id: bgVal, label: `${preview} ${ev['Название'] || 'Эффект'}` });
         }
@@ -2077,6 +2127,35 @@
         .join(' ');
     }
 
+    function normalizeDateToDDMM(val) {
+      if (!val) return '';
+      let s = String(val).trim().toLowerCase().replace(/\.$/, '');
+      if (s.includes('t')) {
+        const d = new Date(s);
+        if (!isNaN(d.getTime())) {
+          return `${String(d.getDate()).padStart(2, '0')}.${String(d.getMonth() + 1).padStart(2, '0')}`;
+        }
+      }
+      const months = {
+        'января': '01', 'февраля': '02', 'марта': '03', 'апреля': '04',
+        'мая': '05', 'июня': '06', 'июля': '07', 'августа': '08',
+        'сентября': '09', 'октября': '10', 'ноября': '11', 'декабря': '12'
+      };
+      for (const [word, num] of Object.entries(months)) {
+        if (s.includes(word)) {
+          const dayMatch = s.match(/(\d{1,2})/);
+          if (dayMatch) {
+            return dayMatch[1].padStart(2, '0') + '.' + num;
+          }
+        }
+      }
+      const dotMatch = s.match(/(\d{1,2})\.(\d{1,2})/);
+      if (dotMatch) {
+        return dotMatch[1].padStart(2, '0') + '.' + dotMatch[2].padStart(2, '0');
+      }
+      return s;
+    }
+
     function cleanDateStr(dStr) {
       if (!dStr) return '';
       let s = String(dStr).trim();
@@ -2105,7 +2184,7 @@
 
       let myWeekFives = 0;
       allGrades.forEach(g => {
-        const gDate = cleanDateStr(g['Дата'] || g['дата'] || '');
+        const gDate = normalizeDateToDDMM(g['Дата'] || g['дата'] || '');
         const gStud = normalizePersonName(g['Ученик'] || g['ученик'] || '');
         const gVal = Number(g['Оценка'] || g['оценка']);
         if (weekSet.has(gDate) && gStud === myNormName && gVal === 5) {
@@ -2115,7 +2194,7 @@
 
       let classWeekTwos = 0;
       allGrades.forEach(g => {
-        const gDate = cleanDateStr(g['Дата'] || g['дата'] || '');
+        const gDate = normalizeDateToDDMM(g['Дата'] || g['дата'] || '');
         const gVal = Number(g['Оценка'] || g['оценка']);
         if (weekSet.has(gDate) && gVal === 2) {
           classWeekTwos++;
@@ -2148,7 +2227,7 @@
 
       let myWeekFives = 0;
       allGrades.forEach(g => {
-        const gDate = cleanDateStr(g['Дата'] || g['дата'] || '');
+        const gDate = normalizeDateToDDMM(g['Дата'] || g['дата'] || '');
         const gStud = normalizePersonName(g['Ученик'] || g['ученик'] || '');
         const gVal = Number(g['Оценка'] || g['оценка']);
         if (weekSet.has(gDate) && gStud === myNormName && gVal === 5) {
@@ -2158,7 +2237,7 @@
 
       let classWeekTwos = 0;
       allGrades.forEach(g => {
-        const gDate = cleanDateStr(g['Дата'] || g['дата'] || '');
+        const gDate = normalizeDateToDDMM(g['Дата'] || g['дата'] || '');
         const gVal = Number(g['Оценка'] || g['оценка']);
         if (weekSet.has(gDate) && gVal === 2) {
           classWeekTwos++;
@@ -2172,10 +2251,12 @@
         const param = String(ev['Параметр'] || '').trim();
         const bonusXp = Number(ev['Бонус_XP'] || 0);
         const rewardBg = String(ev['Награда_фон'] || '').trim();
+        const rewardTheme = String(ev['Награда_тема'] || '').trim();
 
         let rewardParts = [];
         if (bonusXp > 0) rewardParts.push(`+${bonusXp} XP`);
-        if (rewardBg) rewardParts.push(`Фон ${rewardBg.split(',')[0]}`);
+        if (rewardTheme && THEMES_REGISTRY[rewardTheme]) rewardParts.push(THEMES_REGISTRY[rewardTheme].name);
+        else if (rewardBg) rewardParts.push(`Фон ${rewardBg.split(',')[0]}`);
         const rewardText = rewardParts.length > 0 ? rewardParts.join(' • ') : 'Событие';
 
         let percent = 0;
@@ -2217,7 +2298,6 @@
       });
     }
 
-    /* КОНСТРУКТОР СОБЫТИЙ В ПРИЛОЖЕНИИ */
     function updateEventParamPlaceholder() {
       const type = document.getElementById('ev-cond-type').value;
       const group = document.getElementById('ev-param-group');
@@ -2271,7 +2351,7 @@
 
         row.innerHTML = `
           <div>
-            <div style="font-weight:700; font-size:13px; color:#fff;">${ev['Название']}</div>
+            <div style="font-weight:700; font-size:13px; color:var(--text);">${ev['Название']}</div>
             <div style="font-size:11px; color:var(--hint);">${ev['Описание']} (+${ev['Бонус_XP'] || 0} XP)</div>
           </div>
           <button type="button" class="secondary-btn" style="width:auto; margin-top:0; padding:6px 10px; font-size:11px; border-color:${isActive ? 'var(--green)' : 'var(--card-border)'}; color:${isActive ? '#64dfdf' : 'var(--hint)'};" onclick="toggleEventStatus('${ev['ID']}')">
@@ -2320,6 +2400,7 @@
             'Награда_тема': payload.rewardTheme
           });
 
+          applyThemeAndParticles();
           renderActiveEventsBanners();
           renderManageEventsList();
           btn.innerText = 'Событие запущено! ✓';
@@ -2355,6 +2436,7 @@
         if (target) {
           target['Активно'] = String(target['Активно']).toUpperCase() === 'ДА' ? 'НЕТ' : 'ДА';
         }
+        applyThemeAndParticles();
         renderActiveEventsBanners();
         renderManageEventsList();
       } catch (err) {
@@ -2556,7 +2638,6 @@
         bySubject[subj].push({ val, numVal, weight, date, author });
       });
 
-      // Добавляем заработанные бонусы XP за еженедельные события
       getUserCompletedEvents().forEach(ev => {
         totalXP += Number(ev['Бонус_XP'] || 0);
       });
@@ -2598,7 +2679,7 @@
         card.onclick = () => openSubjectCalcModal(subj, items);
         card.innerHTML = `
           <div>
-            <div style="font-weight: 700; font-size: 14px; color: #fff;">${subj}</div>
+            <div style="font-weight: 700; font-size: 14px; color: var(--text);">${subj}</div>
             <div style="font-size: 11px; color: var(--hint);">Оценок: ${items.length} • Нажми для прогноза</div>
           </div>
           <div class="avg-pill ${badgeClass}">${avg}</div>
@@ -2877,7 +2958,6 @@
       }
     }
 
-    /* СОЗДАНИЕ ОБЪЯВЛЕНИЙ ДЛЯ КЛАССОВ И ШКОЛЬНЫХ АКТИВОВ */
     function openTeacherAnnouncementModal() {
       const selectEl = document.getElementById('t-news-class');
       selectEl.innerHTML = '';
@@ -3391,7 +3471,6 @@
       const rawClass = String(item['Класс'] || item['класс'] || '').trim();
       if (!rawClass) return true;
 
-      // Проверка объявлений для школьных активов (АКТИВ:Биоритм, АКТИВ:Движение Первых, АКТИВ:Юнармия)
       if (rawClass.toUpperCase().startsWith('АКТИВ:')) {
         if (isTeacher()) return true;
         const targetActiv = rawClass.slice(6).trim().toLowerCase();
@@ -3609,6 +3688,7 @@
         }
       }
 
+      applyThemeAndParticles();
       checkAuth();
       updateNewsBadge();
       updateVacationCountdown();
@@ -4062,6 +4142,7 @@
             }
           });
 
+          applyThemeAndParticles();
           renderActiveEventsBanners();
 
           btn.innerText = 'Оценки сохранены! ✓';
@@ -4377,4 +4458,4 @@
     setInterval(updateBellTimer, 30000);
   </script>
 </body>
-  </html>
+</html>
