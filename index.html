@@ -725,7 +725,7 @@
         <div id="lb-tab-all" class="leaderboard-filter-tab active" onclick="setLeaderboardFilter('all')">Топ школы</div>
         <div id="lb-tab-my" class="leaderboard-filter-tab" onclick="setLeaderboardFilter('my')">Мой класс</div>
         <div id="lb-tab-classes" class="leaderboard-filter-tab" onclick="setLeaderboardFilter('classes')">⚔️ Классы</div>
-        <div id="lb-tab-logs" class="leaderboard-filter-tab" onclick="setLeaderboardFilter('logs')">📜 Лента</div>
+        <div id="lb-tab-logs" class="leaderboard-filter-tab" style="display: none;" onclick="setLeaderboardFilter('logs')">📜 Лента</div>
       </div>
 
       <div id="leaderboard-list" style="overflow-y: auto; max-height: 50vh;"></div>
@@ -2634,30 +2634,46 @@
       }
 
       const now = new Date();
-      const currentDay = now.getDate();
-      const currentMonth = now.getMonth() + 1;
-      const todayStr = `${String(currentDay).padStart(2, '0')}.${String(currentMonth).padStart(2, '0')}`;
+      const todayZero = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
-      const todayBday = classBirthdays.find(b => {
+      // Вычисляем, сколько дней осталось до каждого ДР
+      const parsedList = classBirthdays.map(b => {
         const rawDate = cleanDateStr(b['Дата'] || b['дата'] || '');
-        return rawDate.startsWith(todayStr) || rawDate.startsWith(`${currentDay}.${currentMonth}`);
-      });
+        const ddmm = normalizeDateToDDMM(rawDate);
+        const parts = ddmm.split('.');
+        let daysUntil = 9999;
+        let displayDate = rawDate;
 
+        if (parts.length === 2 && !isNaN(Number(parts[0])) && !isNaN(Number(parts[1]))) {
+          const day = Number(parts[0]);
+          const month = Number(parts[1]) - 1;
+          let nextBday = new Date(todayZero.getFullYear(), month, day);
+          if (nextBday < todayZero) {
+            nextBday = new Date(todayZero.getFullYear() + 1, month, day);
+          }
+          daysUntil = Math.round((nextBday - todayZero) / (1000 * 60 * 60 * 24));
+          displayDate = `${String(day).padStart(2, '0')}.${String(month + 1).padStart(2, '0')}`;
+        }
+
+        return {
+          name: b['Имя'] || b['ФИО'] || 'Ученик',
+          displayDate: displayDate,
+          daysUntil: daysUntil
+        };
+      }).sort((a, b) => a.daysUntil - b.daysUntil);
+
+      const nearest = parsedList[0];
       banner.style.display = 'flex';
       const className = (currentUser && currentUser.className) ? currentUser.className : '8А';
-      if (todayBday) {
+
+      if (nearest.daysUntil === 0) {
         banner.className = 'banner-pill bday-banner today-bday';
-        const name = todayBday['Имя'] || todayBday['ФИО'] || 'Одноклассника';
-        textEl.innerHTML = `🎉 Сегодня день рождения у: <b>${name}</b>! 🎂🎈`;
+        textEl.innerHTML = `🎉 Сегодня день рождения у: <b>${nearest.name}</b>! 🎂🎈`;
       } else {
         banner.className = 'banner-pill bday-banner';
-        const first = classBirthdays[0];
-        const date = cleanDateStr(first['Дата'] || first['дата'] || '');
-        const name = first['Имя'] || first['ФИО'] || '';
-        textEl.innerHTML = `🎂 Ближайший ДР (${className}): <b>${name}</b> (${date})`;
+        textEl.innerHTML = `🎂 Ближайший ДР (${className}): <b>${nearest.name}</b> (${nearest.displayDate})`;
       }
     }
-
     function generate14Days() {
       const now = new Date();
       const currentDay = now.getDay();
