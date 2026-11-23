@@ -47,23 +47,8 @@
       width: 100%;
     }
 
-    .leaves-container {
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: 0;
-      overflow: hidden;
-      contain: strict;
-    }
-
-    .leaf {
-      position: absolute;
-      top: 0;
-      user-select: none;
-      opacity: 0.35;
-      will-change: transform;
-      animation: fallGpu linear infinite;
-    }
+    .leaves-container { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; contain: strict; }
+    .leaf { position: absolute; top: 0; user-select: none; opacity: 0.35; will-change: transform; animation: fallGpu linear infinite; }
 
     @keyframes fallGpu {
       0% { transform: translate3d(0, -40px, 0) rotate(0deg); }
@@ -76,29 +61,15 @@
     .leaf:nth-child(3) { left: 58%; font-size: 16px; animation-duration: 13s; animation-delay: -8s; }
     .leaf:nth-child(4) { left: 82%; font-size: 20px; animation-duration: 16s; animation-delay: -2s; opacity: 0.3; }
 
-    .header-top, .info-banners, .week-segmented, .days-grid, #cards-container, #loader, #duty-banner, #progress-wrapper, #share-hw-wrapper, #events-banner-container {
-      position: relative;
-      z-index: 1;
-    }
+    .header-top, .info-banners, .week-segmented, .days-grid, #cards-container, #loader, #duty-banner, #progress-wrapper, #share-hw-wrapper, #events-banner-container { position: relative; z-index: 1; }
 
     .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding: 0 4px; gap: 8px; width: 100%; }
     .header-left { display: flex; align-items: center; min-width: 0; flex: 1; gap: 6px; }
 
     .profile-btn {
-      background: var(--card-bg);
-      border: 1px solid var(--gold);
-      color: var(--gold);
-      font-weight: 700;
-      font-size: 13px;
-      padding: 6px 10px;
-      border-radius: 12px;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      user-select: none;
-      max-width: 100%;
-      white-space: nowrap;
+      background: var(--card-bg); border: 1px solid var(--gold); color: var(--gold);
+      font-weight: 700; font-size: 13px; padding: 6px 10px; border-radius: 12px; cursor: pointer;
+      display: inline-flex; align-items: center; gap: 6px; user-select: none; max-width: 100%; white-space: nowrap;
     }
     .profile-btn:active { transform: scale(0.94); }
     .profile-btn.teacher-badge-btn { border-color: #58a6ff; color: #79c0ff; }
@@ -106,15 +77,7 @@
 
     #profile-btn-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 120px; }
 
-    .sync-status-tag {
-      font-size: 10px;
-      color: var(--hint);
-      background: rgba(255, 255, 255, 0.04);
-      padding: 3px 7px;
-      border-radius: 8px;
-      white-space: nowrap;
-      transition: color 0.2s;
-    }
+    .sync-status-tag { font-size: 10px; color: var(--hint); background: rgba(255, 255, 255, 0.04); padding: 3px 7px; border-radius: 8px; white-space: nowrap; transition: color 0.2s; }
     .sync-status-tag.synced { color: #52b788; }
 
     .top-actions { display: flex; gap: 6px; flex-shrink: 0; }
@@ -262,6 +225,104 @@
     .changelog-date { font-size: 11px; color: var(--hint); font-weight: 600; }
     .changelog-list { margin: 0; padding-left: 18px; font-size: 13px; line-height: 1.5; color: var(--text); opacity: 0.92; }
 
+    /* СТИЛИ ЦВЕТОВ ИМЁН (КУПЛЕННЫХ В МАГАЗИНЕ XP) */
+    .name-color-cyber {
+      color: #38bdf8 !important;
+      text-shadow: 0 0 8px rgba(56, 189, 248, 0.55);
+    }
+    .name-color-fire {
+      background: linear-gradient(90deg, #ff512f, #f09819);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-weight: 800;
+    }
+    .name-color-gold {
+      background: linear-gradient(90deg, #fde047, #f59e0b, #fef08a);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-weight: 800;
+    }
+    .name-color-rgb {
+      background: linear-gradient(90deg, #ff4d4d, #f9cb28, #4ade80, #38bdf8, #c084fc);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-weight: 800;
+    }
+
+    /* СТИЛИ МАГАЗИНА XP */
+    .shop-balance-banner {
+      background: linear-gradient(135deg, var(--card-bg), var(--bg));
+      border: 1px solid var(--gold);
+      border-radius: 12px;
+      padding: 10px 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .shop-item-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 11px 12px;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .shop-buy-btn {
+      background: linear-gradient(145deg, var(--accent), var(--accent-dark));
+      border: none;
+      color: var(--btn-text);
+      font-weight: 800;
+      font-size: 12px;
+      padding: 7px 12px;
+      border-radius: 9px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .shop-buy-btn.owned {
+      background: var(--bg);
+      border: 1px solid var(--green);
+      color: #64dfdf;
+    }
+
+    .shop-buy-btn.equipped {
+      background: var(--bg);
+      border: 1px solid var(--gold);
+      color: var(--gold);
+    }
+
+    .shop-buy-btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    /* ТАБЕЛЬ ЧЕТВЕРТИ */
+    .tabel-row {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 11px 12px;
+      margin-bottom: 8px;
+    }
+
+    .tabel-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+
+    .tabel-hint {
+      font-size: 11px;
+      color: var(--hint);
+    }
+
     .grades-table-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.06); }
     .grade-select { background: var(--bg); border: 1px solid var(--card-border); color: var(--gold); padding: 6px 10px; border-radius: 8px; font-weight: 700; outline: none; }
 
@@ -308,32 +369,14 @@
     .theme-option-btn.active { border-color: var(--gold); color: var(--gold); background: var(--card-bg); }
 
     .toast-container {
-      position: fixed;
-      bottom: 18px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 2000;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      width: 92%;
-      max-width: 400px;
-      pointer-events: none;
+      position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%); z-index: 2000;
+      display: flex; flex-direction: column; gap: 8px; width: 92%; max-width: 400px; pointer-events: none;
     }
 
     .toast-pill {
-      background: var(--card-bg);
-      border: 1px solid var(--gold);
-      color: var(--text);
-      padding: 11px 14px;
-      border-radius: 14px;
-      font-size: 13px;
-      font-weight: 600;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.75);
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      animation: toastSlideUp 0.3s ease;
+      background: var(--card-bg); border: 1px solid var(--gold); color: var(--text); padding: 11px 14px;
+      border-radius: 14px; font-size: 13px; font-weight: 600; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.75);
+      display: flex; align-items: center; gap: 8px; animation: toastSlideUp 0.3s ease;
     }
 
     @keyframes toastSlideUp {
@@ -468,8 +511,18 @@
           <div id="prof-extra-val" class="detail-val">—</div>
         </div>
 
+        <!-- МАГАЗИН XP И ТАБЕЛЬ ЧЕТВЕРТИ -->
+        <div style="display: flex; gap: 8px; margin-bottom: 10px;" id="student-tools-row">
+          <button type="button" class="teacher-action-btn" style="margin-top: 0; flex: 1; font-size: 12px;" onclick="closeProfileModal(); openShopModal();">
+            🛒 Магазин XP
+          </button>
+          <button type="button" class="teacher-action-btn" style="margin-top: 0; flex: 1; font-size: 12px;" onclick="closeProfileModal(); openQuarterTabelModal();">
+            📑 Табель четверти
+          </button>
+        </div>
+
         <div class="detail-item">
-          <div class="detail-label">🎨 Оформление и эффекты (за события)</div>
+          <div class="detail-label">🎨 Мои темы и эффекты</div>
           <div id="theme-options-container" class="theme-selector-grid"></div>
           <div id="particles-options-container" class="theme-selector-grid" style="margin-top: 8px;"></div>
         </div>
@@ -496,8 +549,8 @@
         <!-- УСПЕВАЕМОСТЬ И КАЛЬКУЛЯТОР УЧЕНИКА -->
         <div id="student-grades-section" style="display: none;">
           <div class="detail-item" style="border-color: var(--gold);">
-            <div class="detail-label">🏆 Мои баллы в рейтинге:</div>
-            <div id="prof-total-xp" class="detail-val gold-text" style="font-size: 20px;">0 баллов</div>
+            <div class="detail-label">🏆 Мои баллы (Рейтинг / Баланс магазина):</div>
+            <div id="prof-total-xp" class="detail-val gold-text" style="font-size: 18px;">0 XP</div>
           </div>
 
           <div class="detail-item">
@@ -523,6 +576,48 @@
 
         <button class="logout-btn" onclick="handleLogout()">Выйти из профиля</button>
       </div>
+    </div>
+  </div>
+
+  <!-- МОДАЛКА: МАГАЗИН XP -->
+  <div id="shop-modal" class="modal-overlay" onclick="closeShopModal(event)">
+    <div class="modal-sheet" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <h3>🛒 Магазин XP</h3>
+        <button class="close-btn" onclick="closeShopModal()">✕</button>
+      </div>
+
+      <div class="shop-balance-banner">
+        <div>
+          <div style="font-size: 11px; color: var(--hint);">Доступно для покупок:</div>
+          <div id="shop-balance-val" class="gold-text" style="font-size: 18px;">0 XP</div>
+        </div>
+        <div style="font-size: 11px; color: var(--hint); text-align: right; max-width: 170px;">
+          Покупки не понижают твоё место в рейтинге!
+        </div>
+      </div>
+
+      <div style="overflow-y: auto; max-height: 58vh; padding-right: 2px;">
+        <div class="detail-label" style="margin-bottom: 6px;">🎨 Темы оформления дневника</div>
+        <div id="shop-themes-list"></div>
+
+        <div class="detail-label" style="margin: 12px 0 6px 0;">✨ Цвет имени в рейтинге (видят все)</div>
+        <div id="shop-colors-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- МОДАЛКА: ТАБЕЛЬ ЧЕТВЕРТИ -->
+  <div id="tabel-modal" class="modal-overlay" onclick="closeQuarterTabelModal(event)">
+    <div class="modal-sheet" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <h3>📑 Табель четверти</h3>
+        <button class="close-btn" onclick="closeQuarterTabelModal()">✕</button>
+      </div>
+      <div style="font-size: 12px; color: var(--hint); margin-bottom: 10px;">
+        Автоматический прогноз итоговой оценки за четверть и расчёт, сколько пятёрок нужно для повышения балла.
+      </div>
+      <div id="tabel-subjects-list" style="overflow-y: auto; max-height: 62vh; padding-right: 2px;"></div>
     </div>
   </div>
 
@@ -965,23 +1060,30 @@
     </div>
   </div>
 
-  <!-- КОНТЕЙНЕР ВСПЛЫВАЮЩИХ УВЕДОМЛЕНИЙ -->
   <div id="toast-container" class="toast-container"></div>
 
   <script>
     const API_URL = 'https://script.google.com/macros/s/AKfycbzoRZ_Fd9Yv2FJq79lpF4HPg-NETJm4gSCqLVxU7_6pp2CHNON2A09U1X0eYRE4cyQ5/exec';
     const EVENT_CREATOR_LOGIN = 'yurkov998';
-    const CACHE_KEY = 'diary_cached_data_v17';
+    const CACHE_KEY = 'diary_cached_data_v18';
 
     const APP_CHANGELOG = [
+      {
+        version: 'v2.6 — Магазин XP и Табель четверти',
+        date: '23.11.2026',
+        changes: [
+          'Открыт Магазин XP: можно покупать темы (Неон, Сакура, Ч/Б) и цветные ники в рейтинге!',
+          'Покупки в магазине не понижают твоё место в рейтинге школы и класса.',
+          'Добавлен «Табель четверти» с прогнозом итоговых оценок и подсказкой, сколько пятёрок нужно до повышения балла.'
+        ]
+      },
       {
         version: 'v2.5 — Офлайн-режим и Уведомления',
         date: '23.11.2026',
         changes: [
           'Добавлен офлайн-режим (Service Worker): дневник открывается в браузере даже без интернета.',
           'Добавлены всплывающие уведомления о новых оценках, заменах уроков и объявлениях.',
-          'Мгновенная загрузка из памяти телефона с тихой синхронизацией в фоне.',
-          'Отметка об отсутствии «Н» больше не имеет веса и не влияет на средний балл.'
+          'Мгновенная загрузка из памяти телефона с тихой синхронизацией в фоне.'
         ]
       },
       {
@@ -992,21 +1094,14 @@
           'Старосты могут заменять уроки, менять кабинеты и добавлять замены.',
           'Добавлена рассылка объявлений по школьным активам («Биоритм», «Движение Первых», «Юнармия»).'
         ]
-      },
-      {
-        version: 'v2.2 — Калькулятор оценок и Битва классов',
-        date: '15.11.2026',
-        changes: [
-          'Добавлен симулятор оценок в профиле для прогноза среднего балла.',
-          'Запущен общешкольный рейтинг и «Битва классов» по очкам XP.',
-          'Добавлена кнопка копирования ДЗ на день для отправки в чат класса.'
-        ]
       }
     ];
 
     const THEMES_REGISTRY = {
       default: {
         name: '🍁 Стандартная (Осень)',
+        price: 0,
+        shopDesc: 'Базовая тёплая палитра',
         vars: {
           '--bg': '#141113',
           '--bg-glow': 'rgba(231, 111, 81, 0.08)',
@@ -1024,6 +1119,8 @@
       },
       star_gold: {
         name: '⭐ Звёздный статус',
+        price: 0, // Награда за событие
+        shopDesc: 'Эксклюзив за выполнение события',
         vars: {
           '--bg': '#090805',
           '--bg-glow': 'rgba(250, 204, 21, 0.12)',
@@ -1038,8 +1135,75 @@
           '--gold-glow': 'rgba(253, 224, 71, 0.45)',
           '--btn-text': '#141105'
         }
+      },
+      neon: {
+        name: '🌌 Неоновый киберпанк',
+        price: 150,
+        shopDesc: 'Кислотно-розовый и неоново-голубой стиль',
+        particles: '⚡,💠,✨,🔮',
+        vars: {
+          '--bg': '#090714',
+          '--bg-glow': 'rgba(236, 72, 153, 0.14)',
+          '--card-bg': '#120e26',
+          '--card-border': '#2e2259',
+          '--text': '#f3e8ff',
+          '--hint': '#9d8ec7',
+          '--accent': '#ec4899',
+          '--accent-dark': '#be185d',
+          '--accent-glow': 'rgba(236, 72, 153, 0.5)',
+          '--gold': '#22d3ee',
+          '--gold-glow': 'rgba(34, 211, 238, 0.45)',
+          '--btn-text': '#ffffff'
+        }
+      },
+      sakura: {
+        name: '🌸 Сакура',
+        price: 200,
+        shopDesc: 'Ночное цветение и лепестки сакуры',
+        particles: '🌸,💮,🌸,🍃',
+        vars: {
+          '--bg': '#170d12',
+          '--bg-glow': 'rgba(244, 114, 182, 0.12)',
+          '--card-bg': '#24141c',
+          '--card-border': '#4a2538',
+          '--text': '#fdf2f8',
+          '--hint': '#c49ab0',
+          '--accent': '#f472b6',
+          '--accent-dark': '#db2777',
+          '--accent-glow': 'rgba(244, 114, 182, 0.45)',
+          '--gold': '#fbcfe8',
+          '--gold-glow': 'rgba(251, 207, 232, 0.4)',
+          '--btn-text': '#1f0914'
+        }
+      },
+      mono_bw: {
+        name: '🏁 Чёрно-белый стиль',
+        price: 250,
+        shopDesc: 'Строгий контрастный монохром',
+        particles: '◽,◾,▫️,▪️',
+        vars: {
+          '--bg': '#080808',
+          '--bg-glow': 'rgba(255, 255, 255, 0.06)',
+          '--card-bg': '#141414',
+          '--card-border': '#333333',
+          '--text': '#ffffff',
+          '--hint': '#999999',
+          '--accent': '#ffffff',
+          '--accent-dark': '#cccccc',
+          '--accent-glow': 'rgba(255, 255, 255, 0.35)',
+          '--gold': '#e5e5e5',
+          '--gold-glow': 'rgba(229, 229, 229, 0.3)',
+          '--btn-text': '#080808'
+        }
       }
     };
+
+    const NAME_COLORS_SHOP = [
+      { id: 'color_cyber', name: '⚡ Кибер-неон', desc: 'Ярко-голубой ник с неоновым свечением', price: 100, cssClass: 'name-color-cyber' },
+      { id: 'color_fire',  name: '🔥 Пламенный градиент', desc: 'Огненный красно-оранжевый перелив', price: 150, cssClass: 'name-color-fire' },
+      { id: 'color_gold',  name: '👑 Золотой слиток', desc: 'Сияющий золотой ник в рейтинге', price: 200, cssClass: 'name-color-gold' },
+      { id: 'color_rgb',   name: '🌈 Радужный перелив', desc: 'Легендарный многоцветный градиент', price: 300, cssClass: 'name-color-rgb' }
+    ];
 
     const SCHOOL_ACTIVS = [
       { id: 'Биоритм', label: '🏅 Волонтеры «Биоритм»' },
@@ -1068,6 +1232,7 @@
     let allGrades = [];
     let allAbsences = [];
     let allEvents = [];
+    let allPurchases = [];
     let globalTop50 = [];
     let globalClassBattle = [];
     let allSchoolClasses = [];
@@ -1178,6 +1343,296 @@
       }
     }
 
+    /* РАСЧЁТ ЗАРАБОТАННЫХ И ПОТРАЧЕННЫХ XP ДЛЯ МАГАЗИНА */
+    function getMyTotalEarnedXP() {
+      if (!currentUser || isTeacher()) return 0;
+      let totalXP = 0;
+      allGrades.forEach(g => {
+        if (!isSamePerson(currentUser.name, g['Ученик'] || g['ученик'] || '')) return;
+        const val = String(g['Оценка'] || g['оценка'] || '').trim().toUpperCase();
+        if (val === 'Н' || val === 'H' || !val) return;
+        const numVal = Number(val);
+        const weight = Number(g['Вес'] || g['вес'] || 5);
+        if (!isNaN(numVal)) totalXP += numVal * weight;
+      });
+      getUserCompletedEvents().forEach(ev => {
+        totalXP += Number(ev['Бонус_XP'] || 0);
+      });
+      return totalXP;
+    }
+
+    function getMyShopState() {
+      const ownedItems = new Set(['default']);
+      let spentXP = 0;
+      let activeColorId = '';
+
+      if (currentUser) {
+        allPurchases.forEach(p => {
+          if (!isSamePerson(currentUser.name, p['Ученик'] || '')) return;
+          const itemId = String(p['Товар'] || '').trim();
+          const price = Number(p['Цена'] || 0);
+          const color = String(p['Активный_цвет'] || '').trim();
+          if (itemId && itemId !== 'init' && !ownedItems.has(itemId)) {
+            ownedItems.add(itemId);
+            spentXP += price;
+          }
+          if (color !== undefined) {
+            activeColorId = color;
+          }
+        });
+      }
+
+      const earnedXP = getMyTotalEarnedXP();
+      const availableXP = Math.max(0, earnedXP - spentXP);
+      return { ownedItems, spentXP, earnedXP, availableXP, activeColorId };
+    }
+
+    function getNameColorCssClass(colorId) {
+      const found = NAME_COLORS_SHOP.find(c => c.id === colorId);
+      return found ? found.cssClass : '';
+    }
+
+    /* МАГАЗИН XP */
+    function openShopModal() {
+      renderShopContent();
+      document.getElementById('shop-modal').classList.add('open');
+    }
+
+    function closeShopModal(e) {
+      if (e && e.target !== e.currentTarget && !e.target.classList.contains('close-btn')) return;
+      document.getElementById('shop-modal').classList.remove('open');
+    }
+
+    function renderShopContent() {
+      const shopState = getMyShopState();
+      document.getElementById('shop-balance-val').innerText = `${shopState.availableXP} XP`;
+
+      const themesBox = document.getElementById('shop-themes-list');
+      themesBox.innerHTML = '';
+
+      ['neon', 'sakura', 'mono_bw'].forEach(tKey => {
+        const tObj = THEMES_REGISTRY[tKey];
+        const isOwned = shopState.ownedItems.has(tKey);
+        const isEquipped = selectedThemeId === tKey;
+        const canAfford = shopState.availableXP >= tObj.price;
+
+        let btnHtml = '';
+        if (isEquipped) {
+          btnHtml = `<button type="button" class="shop-buy-btn equipped" disabled>Активна ✓</button>`;
+        } else if (isOwned) {
+          btnHtml = `<button type="button" class="shop-buy-btn owned" onclick="selectUserTheme('${tKey}'); renderShopContent();">Применить</button>`;
+        } else {
+          btnHtml = `<button type="button" class="shop-buy-btn" ${!canAfford ? 'disabled' : ''} onclick="buyShopItem('${tKey}', ${tObj.price})">${tObj.price} XP</button>`;
+        }
+
+        const card = document.createElement('div');
+        card.className = 'shop-item-card';
+        card.innerHTML = `
+          <div>
+            <div style="font-weight: 700; font-size: 14px; color: var(--text);">${tObj.name}</div>
+            <div style="font-size: 11px; color: var(--hint);">${tObj.shopDesc}</div>
+          </div>
+          ${btnHtml}
+        `;
+        themesBox.appendChild(card);
+      });
+
+      const colorsBox = document.getElementById('shop-colors-list');
+      colorsBox.innerHTML = '';
+
+      NAME_COLORS_SHOP.forEach(col => {
+        const isOwned = shopState.ownedItems.has(col.id);
+        const isEquipped = shopState.activeColorId === col.id;
+        const canAfford = shopState.availableXP >= col.price;
+
+        let btnHtml = '';
+        if (isEquipped) {
+          btnHtml = `<button type="button" class="shop-buy-btn equipped" onclick="equipNameColor('')">Снять</button>`;
+        } else if (isOwned) {
+          btnHtml = `<button type="button" class="shop-buy-btn owned" onclick="equipNameColor('${col.id}')">Надеть</button>`;
+        } else {
+          btnHtml = `<button type="button" class="shop-buy-btn" ${!canAfford ? 'disabled' : ''} onclick="buyShopItem('${col.id}', ${col.price})">${col.price} XP</button>`;
+        }
+
+        const card = document.createElement('div');
+        card.className = 'shop-item-card';
+        card.innerHTML = `
+          <div>
+            <div style="font-weight: 800; font-size: 14px;" class="${col.cssClass}">${col.name}</div>
+            <div style="font-size: 11px; color: var(--hint);">${col.desc}</div>
+          </div>
+          ${btnHtml}
+        `;
+        colorsBox.appendChild(card);
+      });
+    }
+
+    async function buyShopItem(itemId, price) {
+      const shopState = getMyShopState();
+      if (shopState.availableXP < price) {
+        alert('Недостаточно баллов XP!');
+        return;
+      }
+
+      try {
+        const res = await fetch(API_URL, {
+          method: 'POST',
+          body: JSON.stringify({
+            action: 'buyShopItem',
+            auth: savedAuth,
+            itemId: itemId,
+            price: price
+          })
+        });
+        const respData = await res.json();
+
+        if (respData.status === 'success') {
+          const isColor = itemId.startsWith('color_');
+          allPurchases.push({
+            'Ученик': currentUser.name,
+            'Класс': normalizeClassStr(currentUser.className),
+            'Товар': itemId,
+            'Цена': price,
+            'Активный_цвет': isColor ? itemId : shopState.activeColorId
+          });
+
+          if (isColor) {
+            allPurchases.forEach(p => {
+              if (isSamePerson(currentUser.name, p['Ученик'] || '')) p['Активный_цвет'] = itemId;
+            });
+          } else if (THEMES_REGISTRY[itemId]) {
+            selectUserTheme(itemId);
+            if (THEMES_REGISTRY[itemId].particles) {
+              selectUserParticles(THEMES_REGISTRY[itemId].particles);
+            }
+          }
+
+          syncSnapshotFromMemory();
+          updateProfileUI();
+          renderShopContent();
+          showToastNotification(`🎉 Покупка успешно активирована!`);
+        } else {
+          alert(respData.message || 'Не удалось совершить покупку');
+        }
+      } catch (err) {
+        alert('Ошибка сети при покупке');
+      }
+    }
+
+    async function equipNameColor(colorId) {
+      try {
+        await fetch(API_URL, {
+          method: 'POST',
+          body: JSON.stringify({
+            action: 'equipNameColor',
+            auth: savedAuth,
+            colorId: colorId
+          })
+        });
+
+        let found = false;
+        allPurchases.forEach(p => {
+          if (isSamePerson(currentUser.name, p['Ученик'] || '')) {
+            p['Активный_цвет'] = colorId;
+            found = true;
+          }
+        });
+        if (!found) {
+          allPurchases.push({
+            'Ученик': currentUser.name,
+            'Класс': normalizeClassStr(currentUser.className),
+            'Товар': 'init',
+            'Цена': 0,
+            'Активный_цвет': colorId
+          });
+        }
+
+        syncSnapshotFromMemory();
+        updateProfileUI();
+        renderShopContent();
+      } catch (err) {
+        alert('Ошибка при смене цвета имени');
+      }
+    }
+
+    /* ТАБЕЛЬ ЧЕТВЕРТИ И РАСЧЁТ «СКОЛЬКО ПЯТЁРОК ДО ПЯТЁРКИ» */
+    function openQuarterTabelModal() {
+      const listEl = document.getElementById('tabel-subjects-list');
+      listEl.innerHTML = '';
+
+      if (!currentUser || isTeacher()) return;
+      const myGrades = allGrades.filter(g => isSamePerson(currentUser.name, g['Ученик'] || g['ученик'] || ''));
+
+      const bySubject = {};
+      myGrades.forEach(g => {
+        const subj = String(g['Предмет'] || g['предмет'] || 'Предмет').trim();
+        const val = String(g['Оценка'] || g['оценка'] || '').trim().toUpperCase();
+        const isAbs = val === 'Н' || val === 'H';
+        const weight = isAbs ? 0 : Number(g['Вес'] || g['вес'] || 5);
+        const numVal = Number(val);
+
+        if (!bySubject[subj]) bySubject[subj] = { sum: 0, weights: 0, count: 0 };
+        if (!isAbs && !isNaN(numVal) && weight > 0) {
+          bySubject[subj].sum += numVal * weight;
+          bySubject[subj].weights += weight;
+          bySubject[subj].count += 1;
+        }
+      });
+
+      const subjects = Object.keys(bySubject).sort();
+      if (subjects.length === 0) {
+        listEl.innerHTML = '<div class="empty-state">Оценок за четверть пока нет ✨</div>';
+        document.getElementById('tabel-modal').classList.add('open');
+        return;
+      }
+
+      subjects.forEach(subj => {
+        const st = bySubject[subj];
+        const avgNum = st.weights > 0 ? (st.sum / st.weights) : 0;
+        const avgStr = st.weights > 0 ? avgNum.toFixed(2) : '—';
+
+        let forecastGrade = 5;
+        let badgeClass = 'avg-5';
+        if (avgNum < 2.5) { forecastGrade = 2; badgeClass = 'avg-2'; }
+        else if (avgNum < 3.5) { forecastGrade = 3; badgeClass = 'avg-3'; }
+        else if (avgNum < 4.5) { forecastGrade = 4; badgeClass = 'avg-4'; }
+
+        let adviceText = '✅ Отличный результат, итоговая 5!';
+        if (st.weights === 0) {
+          adviceText = 'Нет оценок с весом';
+        } else if (forecastGrade < 5) {
+          const targetGrade = forecastGrade + 1;
+          const targetThreshold = targetGrade - 0.5; // 4.50 для пятёрки, 3.50 для четвёрки, 2.50 для тройки
+          // Считаем сколько пятёрок с весом 5 нужно получить подряд
+          const neededFives = Math.ceil((targetThreshold * st.weights - st.sum) / (5 * (5 - targetThreshold)));
+          const countSafe = Math.max(1, neededFives);
+          const wordForm = countSafe === 1 ? 'пятёрка' : (countSafe < 5 ? 'пятёрки' : 'пятёрок');
+          adviceText = `🎯 До итоговой <b>${targetGrade}</b> (${targetThreshold.toFixed(2)}) нужно: <b>${countSafe} ${wordForm}</b> (вес 5)`;
+        }
+
+        const row = document.createElement('div');
+        row.className = 'tabel-row';
+        row.innerHTML = `
+          <div class="tabel-top">
+            <div>
+              <div style="font-weight: 700; font-size: 14px; color: var(--text);">${subj}</div>
+              <div style="font-size: 11px; color: var(--hint);">Средний балл: <b>${avgStr}</b> (оценок: ${st.count})</div>
+            </div>
+            <div class="avg-pill ${badgeClass}">Итог: ${st.weights > 0 ? forecastGrade : '—'}</div>
+          </div>
+          <div class="tabel-hint">${adviceText}</div>
+        `;
+        listEl.appendChild(row);
+      });
+
+      document.getElementById('tabel-modal').classList.add('open');
+    }
+
+    function closeQuarterTabelModal(e) {
+      if (e && e.target !== e.currentTarget && !e.target.classList.contains('close-btn')) return;
+      document.getElementById('tabel-modal').classList.remove('open');
+    }
+
     function openChangelogModal() {
       const list = document.getElementById('changelog-list');
       list.innerHTML = '';
@@ -1211,6 +1666,18 @@
       savedBgs.add('default');
       savedBgs.add('off');
 
+      // Добавляем темы, купленные в Магазине XP
+      const shopState = getMyShopState();
+      shopState.ownedItems.forEach(id => {
+        if (THEMES_REGISTRY[id]) {
+          savedThemes.add(id);
+          if (THEMES_REGISTRY[id].particles) {
+            savedBgs.add(THEMES_REGISTRY[id].particles);
+          }
+        }
+      });
+
+      // Добавляем награды за выполненные события
       const completedEvents = getUserCompletedEvents();
       let changed = false;
 
@@ -1307,6 +1774,13 @@
         { id: 'default', label: '🍁 Осень' },
         { id: 'off', label: '🚫 Без анимации' }
       ];
+
+      Object.keys(THEMES_REGISTRY).forEach(tKey => {
+        const p = THEMES_REGISTRY[tKey].particles;
+        if (p && unlocked.bgs.has(p) && !bgOptions.some(o => o.id === p)) {
+          bgOptions.push({ id: p, label: `${p.split(',')[0]} ${THEMES_REGISTRY[tKey].name.split(' ')[1] || 'Эффект'}` });
+        }
+      });
 
       allEvents.forEach(ev => {
         const bgVal = String(ev['Награда_фон'] || '').trim();
@@ -1825,6 +2299,7 @@
       const profBtn = document.getElementById('profile-btn');
       const studentGradesSec = document.getElementById('student-grades-section');
       const managerActionsSec = document.getElementById('manager-actions-section');
+      const studentToolsRow = document.getElementById('student-tools-row');
       const absHeaderBtn = document.getElementById('absence-header-btn');
       const absBadge = document.getElementById('absence-badge');
       const activBox = document.getElementById('prof-activ-box');
@@ -1856,6 +2331,7 @@
           document.getElementById('prof-extra-val').innerText = currentUser.subjects || 'Все предметы';
 
           studentGradesSec.style.display = 'none';
+          studentToolsRow.style.display = 'none';
           managerActionsSec.style.display = 'block';
           absHeaderBtn.title = 'Журнал отсутствующих';
 
@@ -1879,6 +2355,7 @@
 
           managerActionsSec.style.display = 'block';
           studentGradesSec.style.display = 'block';
+          studentToolsRow.style.display = 'flex';
           absHeaderBtn.title = 'Журнал отсутствующих класса';
 
           const relevantAbs = getManagerRelevantAbsences();
@@ -1901,6 +2378,7 @@
 
           managerActionsSec.style.display = 'none';
           studentGradesSec.style.display = 'block';
+          studentToolsRow.style.display = 'flex';
           absHeaderBtn.title = 'Отметиться об отсутствии';
           absBadge.style.display = 'none';
           renderStudentProfileGrades();
@@ -1916,8 +2394,6 @@
       if (!currentUser || isTeacher()) return;
 
       const myGrades = allGrades.filter(g => isSamePerson(currentUser.name, g['Ученик'] || g['ученик'] || ''));
-
-      let totalXP = 0;
       const bySubject = {};
 
       myGrades.forEach(g => {
@@ -1929,16 +2405,12 @@
         const author = g['Выставил'] || '';
         const numVal = Number(val);
 
-        if (!isAbs && !isNaN(numVal)) totalXP += numVal * weight;
         if (!bySubject[subj]) bySubject[subj] = [];
         bySubject[subj].push({ val, numVal, weight, date, author, isAbs });
       });
 
-      getUserCompletedEvents().forEach(ev => {
-        totalXP += Number(ev['Бонус_XP'] || 0);
-      });
-
-      document.getElementById('prof-total-xp').innerText = `${totalXP} XP (баллов)`;
+      const shopState = getMyShopState();
+      document.getElementById('prof-total-xp').innerText = `${shopState.earnedXP} XP (Баланс: ${shopState.availableXP} XP)`;
 
       const subjListEl = document.getElementById('prof-subjects-list');
       subjListEl.innerHTML = '';
@@ -2484,6 +2956,7 @@
       }
 
       const myClass = normalizeClassStr(currentUser ? currentUser.className : '');
+      const myShopState = getMyShopState();
 
       if (currentLeaderboardMode === 'classes') {
         if (!globalClassBattle || globalClassBattle.length === 0) {
@@ -2523,7 +2996,15 @@
           if (!rawName || rawName.length < 3) return;
 
           const normKey = normalizePersonName(rawName);
-          classScores[normKey] = { name: rawName, normName: normKey, className: myClass || '—', score: 0 };
+          const isMe = currentUser && isSamePerson(rawName, currentUser.name);
+          const colorId = isMe ? myShopState.activeColorId : (st['ЦветИмени'] || '');
+          classScores[normKey] = {
+            name: rawName,
+            normName: normKey,
+            className: myClass || '—',
+            score: 0,
+            colorClass: getNameColorCssClass(colorId)
+          };
         });
 
         allGrades.forEach(g => {
@@ -2563,7 +3044,7 @@
           row.innerHTML = `
             <div class="leader-rank">${medal}</div>
             <div class="leader-info">
-              <span class="leader-name">${leader.name} ${isMe ? '⭐' : ''}</span>
+              <span class="leader-name ${leader.colorClass}">${leader.name} ${isMe ? '⭐' : ''}</span>
               <span class="leader-class">${leader.className} класс</span>
             </div>
             <div class="leader-score">${leader.score} XP</div>
@@ -2580,6 +3061,8 @@
 
       globalTop50.forEach((leader, idx) => {
         const isMe = currentUser && isSamePerson(leader.name, currentUser.name) && leader.className === myClass;
+        const colorId = isMe ? myShopState.activeColorId : (leader.nameColor || '');
+        const colorClass = getNameColorCssClass(colorId);
         const row = document.createElement('div');
         row.className = `leaderboard-row ${idx === 0 && leader.score > 0 ? 'top-1' : ''} ${isMe ? 'my-row' : ''}`;
 
@@ -2591,7 +3074,7 @@
         row.innerHTML = `
           <div class="leader-rank">${medal}</div>
           <div class="leader-info">
-            <span class="leader-name">${leader.name} ${isMe ? '⭐' : ''}</span>
+            <span class="leader-name ${colorClass}">${leader.name} ${isMe ? '⭐' : ''}</span>
             <span class="leader-class">${leader.className} класс</span>
           </div>
           <div class="leader-score">${leader.score} XP</div>
@@ -2899,6 +3382,7 @@
         grades: allGrades,
         absences: allAbsences,
         events: allEvents,
+        purchases: allPurchases,
         globalTop50: globalTop50,
         globalClassBattle: globalClassBattle,
         allClasses: allSchoolClasses
@@ -2914,6 +3398,7 @@
       allGrades = data.grades || [];
       allAbsences = data.absences || [];
       allEvents = data.events || [];
+      allPurchases = data.purchases || [];
       globalTop50 = data.globalTop50 || [];
       globalClassBattle = data.globalClassBattle || [];
       allSchoolClasses = data.allClasses || [];
@@ -3646,4 +4131,3 @@
   </script>
 </body>
 </html>
-
