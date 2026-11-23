@@ -2419,7 +2419,7 @@
           profBtn.classList.add('starosta-badge-btn');
           document.getElementById('prof-type-label').innerText = isAdminCreator() ? '👑 Создатель дневника • Староста' : '⭐ Староста класса';
           document.getElementById('prof-name').innerHTML = isAdminCreator()
-            ? `<span class="name-color-dev">${currentUser.name}</span><span class="dev-crown-tag">DEV</span>`
+            ? `<span class="name-color-dev">${currentUser.name}</span>`
             : currentUser.name;
           document.getElementById('prof-class-box').style.display = 'block';
           document.getElementById('prof-class').innerText = currentUser.className;
@@ -3104,7 +3104,7 @@
           if (idx === 1 && leader.score > 0) medal = '🥈';
           if (idx === 2 && leader.score > 0) medal = '🥉';
 
-          const devTag = leader.isDev ? `<span class="dev-crown-tag">DEV</span>` : '';
+          const devTag = '';
 
           row.innerHTML = `
             <div class="leader-rank">${medal}</div>
@@ -4197,4 +4197,5 @@
   </script>
 </body>
 </html>
+
 
