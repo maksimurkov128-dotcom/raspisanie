@@ -225,7 +225,34 @@
     .changelog-date { font-size: 11px; color: var(--hint); font-weight: 600; }
     .changelog-list { margin: 0; padding-left: 18px; font-size: 13px; line-height: 1.5; color: var(--text); opacity: 0.92; }
 
-    /* СТИЛИ ЦВЕТОВ ИМЁН (КУПЛЕННЫХ В МАГАЗИНЕ XP) */
+    /* ЭКСКЛЮЗИВНЫЙ СТИЛЬ НИКА РАЗРАБОТЧИКА + ЦВЕТА ИЗ МАГАЗИНА XP */
+    .name-color-dev {
+      background: linear-gradient(90deg, #fde047, #38bdf8, #f472b6, #fde047);
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-weight: 900;
+      animation: devShimmer 3s linear infinite;
+    }
+
+    @keyframes devShimmer {
+      0% { background-position: 0% center; }
+      100% { background-position: 200% center; }
+    }
+
+    .dev-crown-tag {
+      display: inline-block;
+      background: linear-gradient(135deg, #eab308, #ec4899);
+      color: #ffffff;
+      font-size: 9px;
+      font-weight: 900;
+      padding: 1px 5px;
+      border-radius: 5px;
+      margin-left: 5px;
+      vertical-align: middle;
+      letter-spacing: 0.5px;
+    }
+
     .name-color-cyber {
       color: #38bdf8 !important;
       text-shadow: 0 0 8px rgba(56, 189, 248, 0.55);
@@ -554,7 +581,7 @@
           </div>
 
           <div class="detail-item">
-            <div class="detail-label">📊 Средневзвешенный балл (нажми для прогноза):</div>
+            <div class="detail-label">📊 Средневзвешенный балл (порог N.56):</div>
             <div id="prof-subjects-list" style="margin-top: 8px; display: flex; flex-direction: column; gap: 6px;"></div>
           </div>
         </div>
@@ -611,11 +638,11 @@
   <div id="tabel-modal" class="modal-overlay" onclick="closeQuarterTabelModal(event)">
     <div class="modal-sheet" onclick="event.stopPropagation()">
       <div class="modal-header">
-        <h3>📑 Табель четверти</h3>
+        <h3>📑 Табель четверти (порог N.56)</h3>
         <button class="close-btn" onclick="closeQuarterTabelModal()">✕</button>
       </div>
       <div style="font-size: 12px; color: var(--hint); margin-bottom: 10px;">
-        Автоматический прогноз итоговой оценки за четверть и расчёт, сколько пятёрок нужно для повышения балла.
+        Итоговая оценка повышается от <b>N.56</b> (5 от 4.56, 4 от 3.56, 3 от 2.56). Расчёт показывает, сколько пятёрок нужно для повышения.
       </div>
       <div id="tabel-subjects-list" style="overflow-y: auto; max-height: 62vh; padding-right: 2px;"></div>
     </div>
@@ -801,7 +828,7 @@
       <div style="overflow-y: auto; max-height: 68vh; padding-right: 2px;">
         <div class="detail-item" style="display: flex; justify-content: space-between; align-items: center;">
           <div>
-            <div class="detail-label">Текущий средний балл</div>
+            <div class="detail-label">Текущий средний балл (порог N.56)</div>
             <div style="font-size: 12px; color: var(--hint);" id="calc-formula-info">—</div>
           </div>
           <div id="calc-current-avg" class="avg-pill avg-5" style="font-size: 18px; padding: 6px 12px;">0.00</div>
@@ -1065,16 +1092,24 @@
   <script>
     const API_URL = 'https://script.google.com/macros/s/AKfycbzoRZ_Fd9Yv2FJq79lpF4HPg-NETJm4gSCqLVxU7_6pp2CHNON2A09U1X0eYRE4cyQ5/exec';
     const EVENT_CREATOR_LOGIN = 'yurkov998';
-    const CACHE_KEY = 'diary_cached_data_v18';
+    const DEV_FULL_NAME = 'Юрков Максим';
+    const CACHE_KEY = 'diary_cached_data_v19';
+
+    // Пороги итоговых оценок (система N.56)
+    const GRADE_THRESHOLDS = {
+      5: 4.56,
+      4: 3.56,
+      3: 2.56
+    };
 
     const APP_CHANGELOG = [
       {
-        version: 'v2.6 — Магазин XP и Табель четверти',
+        version: 'v2.7 — Система оценок N.56 и Магазин XP',
         date: '23.11.2026',
         changes: [
+          'Настроен точный порог итоговых оценок N.56 (пятёрка от 4.56, четвёрка от 3.56, тройка от 2.56).',
           'Открыт Магазин XP: можно покупать темы (Неон, Сакура, Ч/Б) и цветные ники в рейтинге!',
-          'Покупки в магазине не понижают твоё место в рейтинге школы и класса.',
-          'Добавлен «Табель четверти» с прогнозом итоговых оценок и подсказкой, сколько пятёрок нужно до повышения балла.'
+          'Добавлен «Табель четверти» с расчётом, сколько пятёрок нужно до повышения балла.'
         ]
       },
       {
@@ -1119,7 +1154,7 @@
       },
       star_gold: {
         name: '⭐ Звёздный статус',
-        price: 0, // Награда за событие
+        price: 0,
         shopDesc: 'Эксклюзив за выполнение события',
         vars: {
           '--bg': '#090805',
@@ -1261,6 +1296,14 @@
     function isStarosta() { return currentUser && currentUser.role === 'starosta'; }
     function isManager() { return isTeacher() || isStarosta(); }
     function isAdminCreator() { return savedAuth && String(savedAuth.login || '').trim().toLowerCase() === EVENT_CREATOR_LOGIN.toLowerCase(); }
+    function isDevAccount(personName) { return isSamePerson(personName, DEV_FULL_NAME); }
+
+    function getGradePillClass(numAvg) {
+      if (numAvg < GRADE_THRESHOLDS[3]) return 'avg-2';
+      if (numAvg < GRADE_THRESHOLDS[4]) return 'avg-3';
+      if (numAvg < GRADE_THRESHOLDS[5]) return 'avg-4';
+      return 'avg-5';
+    }
 
     function showToastNotification(message) {
       const container = document.getElementById('toast-container');
@@ -1364,7 +1407,7 @@
     function getMyShopState() {
       const ownedItems = new Set(['default']);
       let spentXP = 0;
-      let activeColorId = '';
+      let activeColorId = isAdminCreator() ? 'color_dev' : '';
 
       if (currentUser) {
         allPurchases.forEach(p => {
@@ -1376,7 +1419,7 @@
             ownedItems.add(itemId);
             spentXP += price;
           }
-          if (color !== undefined) {
+          if (color) {
             activeColorId = color;
           }
         });
@@ -1387,7 +1430,10 @@
       return { ownedItems, spentXP, earnedXP, availableXP, activeColorId };
     }
 
-    function getNameColorCssClass(colorId) {
+    function getNameColorCssClass(colorId, personName = '') {
+      if (colorId === 'color_dev' || (!colorId && isDevAccount(personName))) {
+        return 'name-color-dev';
+      }
       const found = NAME_COLORS_SHOP.find(c => c.id === colorId);
       return found ? found.cssClass : '';
     }
@@ -1412,7 +1458,7 @@
 
       ['neon', 'sakura', 'mono_bw'].forEach(tKey => {
         const tObj = THEMES_REGISTRY[tKey];
-        const isOwned = shopState.ownedItems.has(tKey);
+        const isOwned = isAdminCreator() || shopState.ownedItems.has(tKey);
         const isEquipped = selectedThemeId === tKey;
         const canAfford = shopState.availableXP >= tObj.price;
 
@@ -1440,8 +1486,12 @@
       const colorsBox = document.getElementById('shop-colors-list');
       colorsBox.innerHTML = '';
 
-      NAME_COLORS_SHOP.forEach(col => {
-        const isOwned = shopState.ownedItems.has(col.id);
+      const availableColors = isAdminCreator()
+        ? [{ id: 'color_dev', name: '👑 DEV • Создатель', desc: 'Эксклюзивный переливающийся стиль разработчика', price: 0, cssClass: 'name-color-dev' }, ...NAME_COLORS_SHOP]
+        : NAME_COLORS_SHOP;
+
+      availableColors.forEach(col => {
+        const isOwned = col.id === 'color_dev' || shopState.ownedItems.has(col.id);
         const isEquipped = shopState.activeColorId === col.id;
         const canAfford = shopState.availableXP >= col.price;
 
@@ -1555,7 +1605,7 @@
       }
     }
 
-    /* ТАБЕЛЬ ЧЕТВЕРТИ И РАСЧЁТ «СКОЛЬКО ПЯТЁРОК ДО ПЯТЁРКИ» */
+    /* ТАБЕЛЬ ЧЕТВЕРТИ ПО ПОРОГУ N.56 (4.56 / 3.56 / 2.56) */
     function openQuarterTabelModal() {
       const listEl = document.getElementById('tabel-subjects-list');
       listEl.innerHTML = '';
@@ -1593,17 +1643,16 @@
 
         let forecastGrade = 5;
         let badgeClass = 'avg-5';
-        if (avgNum < 2.5) { forecastGrade = 2; badgeClass = 'avg-2'; }
-        else if (avgNum < 3.5) { forecastGrade = 3; badgeClass = 'avg-3'; }
-        else if (avgNum < 4.5) { forecastGrade = 4; badgeClass = 'avg-4'; }
+        if (avgNum < GRADE_THRESHOLDS[3]) { forecastGrade = 2; badgeClass = 'avg-2'; }
+        else if (avgNum < GRADE_THRESHOLDS[4]) { forecastGrade = 3; badgeClass = 'avg-3'; }
+        else if (avgNum < GRADE_THRESHOLDS[5]) { forecastGrade = 4; badgeClass = 'avg-4'; }
 
-        let adviceText = '✅ Отличный результат, итоговая 5!';
+        let adviceText = `✅ Отличный результат (≥ ${GRADE_THRESHOLDS[5]}), итоговая 5!`;
         if (st.weights === 0) {
           adviceText = 'Нет оценок с весом';
         } else if (forecastGrade < 5) {
           const targetGrade = forecastGrade + 1;
-          const targetThreshold = targetGrade - 0.5; // 4.50 для пятёрки, 3.50 для четвёрки, 2.50 для тройки
-          // Считаем сколько пятёрок с весом 5 нужно получить подряд
+          const targetThreshold = GRADE_THRESHOLDS[targetGrade];
           const neededFives = Math.ceil((targetThreshold * st.weights - st.sum) / (5 * (5 - targetThreshold)));
           const countSafe = Math.max(1, neededFives);
           const wordForm = countSafe === 1 ? 'пятёрка' : (countSafe < 5 ? 'пятёрки' : 'пятёрок');
@@ -1666,7 +1715,19 @@
       savedBgs.add('default');
       savedBgs.add('off');
 
-      // Добавляем темы, купленные в Магазине XP
+      // Разработчику (yurkov998) доступны все темы и фоны сразу
+      if (isAdminCreator()) {
+        Object.keys(THEMES_REGISTRY).forEach(k => {
+          savedThemes.add(k);
+          if (THEMES_REGISTRY[k].particles) savedBgs.add(THEMES_REGISTRY[k].particles);
+        });
+        savedBgs.add('⭐,✨,💫');
+        savedBgs.add('❄️,☃️,🌨️');
+        savedBgs.add('🔥,✨,⚡');
+        savedBgs.add('1,0,1,0');
+        return { themes: savedThemes, bgs: savedBgs };
+      }
+
       const shopState = getMyShopState();
       shopState.ownedItems.forEach(id => {
         if (THEMES_REGISTRY[id]) {
@@ -1677,7 +1738,6 @@
         }
       });
 
-      // Добавляем награды за выполненные события
       const completedEvents = getUserCompletedEvents();
       let changed = false;
 
@@ -1781,6 +1841,17 @@
           bgOptions.push({ id: p, label: `${p.split(',')[0]} ${THEMES_REGISTRY[tKey].name.split(' ')[1] || 'Эффект'}` });
         }
       });
+
+      if (isAdminCreator()) {
+        [
+          { id: '⭐,✨,💫', label: '⭐ Звёзды' },
+          { id: '❄️,☃️,🌨️', label: '❄️ Зима' },
+          { id: '🔥,✨,⚡', label: '🔥 Огонь' },
+          { id: '1,0,1,0', label: '💻 Матрица' }
+        ].forEach(extra => {
+          if (!bgOptions.some(o => o.id === extra.id)) bgOptions.push(extra);
+        });
+      }
 
       allEvents.forEach(ev => {
         const bgVal = String(ev['Награда_фон'] || '').trim();
@@ -2344,10 +2415,12 @@
             absBadge.style.display = 'none';
           }
         } else if (currentUser.role === 'starosta') {
-          btnText.innerText = `⭐ ${currentUser.name.split(' ')[0] || 'Староста'}`;
+          btnText.innerText = isAdminCreator() ? `👑 ${currentUser.name.split(' ')[0]}` : `⭐ ${currentUser.name.split(' ')[0] || 'Староста'}`;
           profBtn.classList.add('starosta-badge-btn');
-          document.getElementById('prof-type-label').innerText = '⭐ Староста класса';
-          document.getElementById('prof-name').innerText = currentUser.name;
+          document.getElementById('prof-type-label').innerText = isAdminCreator() ? '👑 Создатель дневника • Староста' : '⭐ Староста класса';
+          document.getElementById('prof-name').innerHTML = isAdminCreator()
+            ? `<span class="name-color-dev">${currentUser.name}</span><span class="dev-crown-tag">DEV</span>`
+            : currentUser.name;
           document.getElementById('prof-class-box').style.display = 'block';
           document.getElementById('prof-class').innerText = currentUser.className;
           document.getElementById('prof-extra-label').innerText = 'Группа по английскому';
@@ -2434,13 +2507,7 @@
         });
 
         const avg = weightsTotal > 0 ? (weightedSum / weightsTotal).toFixed(2) : '—';
-        let badgeClass = 'avg-5';
-        if (avg !== '—') {
-          const numAvg = Number(avg);
-          if (numAvg < 2.5) badgeClass = 'avg-2';
-          else if (numAvg < 3.5) badgeClass = 'avg-3';
-          else if (numAvg < 4.5) badgeClass = 'avg-4';
-        }
+        const badgeClass = avg !== '—' ? getGradePillClass(Number(avg)) : 'avg-5';
 
         const card = document.createElement('div');
         card.className = 'subject-avg-card';
@@ -2533,12 +2600,7 @@
       const avg = weightsTotal > 0 ? (weightedSum / weightsTotal).toFixed(2) : '0.00';
       const avgEl = document.getElementById('calc-current-avg');
       avgEl.innerText = avg;
-
-      avgEl.className = 'avg-pill avg-5';
-      const numAvg = Number(avg);
-      if (numAvg < 2.5) avgEl.className = 'avg-pill avg-2';
-      else if (numAvg < 3.5) avgEl.className = 'avg-pill avg-3';
-      else if (numAvg < 4.5) avgEl.className = 'avg-pill avg-4';
+      avgEl.className = `avg-pill ${getGradePillClass(Number(avg))}`;
 
       document.getElementById('calc-formula-info').innerText = `Сумма баллов: ${weightedSum} / Общий вес: ${weightsTotal}`;
 
@@ -3003,7 +3065,8 @@
             normName: normKey,
             className: myClass || '—',
             score: 0,
-            colorClass: getNameColorCssClass(colorId)
+            colorClass: getNameColorCssClass(colorId, rawName),
+            isDev: isDevAccount(rawName)
           };
         });
 
@@ -3041,10 +3104,12 @@
           if (idx === 1 && leader.score > 0) medal = '🥈';
           if (idx === 2 && leader.score > 0) medal = '🥉';
 
+          const devTag = leader.isDev ? `<span class="dev-crown-tag">DEV</span>` : '';
+
           row.innerHTML = `
             <div class="leader-rank">${medal}</div>
             <div class="leader-info">
-              <span class="leader-name ${leader.colorClass}">${leader.name} ${isMe ? '⭐' : ''}</span>
+              <span class="leader-name ${leader.colorClass}">${leader.name}${devTag} ${isMe ? '⭐' : ''}</span>
               <span class="leader-class">${leader.className} класс</span>
             </div>
             <div class="leader-score">${leader.score} XP</div>
@@ -3062,7 +3127,8 @@
       globalTop50.forEach((leader, idx) => {
         const isMe = currentUser && isSamePerson(leader.name, currentUser.name) && leader.className === myClass;
         const colorId = isMe ? myShopState.activeColorId : (leader.nameColor || '');
-        const colorClass = getNameColorCssClass(colorId);
+        const colorClass = getNameColorCssClass(colorId, leader.name);
+        const devTag = isDevAccount(leader.name) ? `<span class="dev-crown-tag">DEV</span>` : '';
         const row = document.createElement('div');
         row.className = `leaderboard-row ${idx === 0 && leader.score > 0 ? 'top-1' : ''} ${isMe ? 'my-row' : ''}`;
 
@@ -3074,7 +3140,7 @@
         row.innerHTML = `
           <div class="leader-rank">${medal}</div>
           <div class="leader-info">
-            <span class="leader-name ${colorClass}">${leader.name} ${isMe ? '⭐' : ''}</span>
+            <span class="leader-name ${colorClass}">${leader.name}${devTag} ${isMe ? '⭐' : ''}</span>
             <span class="leader-class">${leader.className} класс</span>
           </div>
           <div class="leader-score">${leader.score} XP</div>
