@@ -1,4 +1,4 @@
-const CACHE_NAME = 'school-diary-shell-v2';
+const CACHE_NAME = 'school-diary-shell-v5';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
