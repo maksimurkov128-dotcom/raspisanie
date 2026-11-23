@@ -47,7 +47,6 @@
       width: 100%;
     }
 
-    /* Аппаратно-ускоренные частицы на GPU без нагрузки на процессор */
     .leaves-container {
       position: fixed;
       inset: 0;
@@ -77,7 +76,7 @@
     .leaf:nth-child(3) { left: 58%; font-size: 16px; animation-duration: 13s; animation-delay: -8s; }
     .leaf:nth-child(4) { left: 82%; font-size: 20px; animation-duration: 16s; animation-delay: -2s; opacity: 0.3; }
 
-    .header-top, .info-banners, .week-segmented, .days-grid, #cards-container, #loader, #duty-banner, #progress-wrapper, #share-hw-wrapper, #events-banner-container, #sync-pill {
+    .header-top, .info-banners, .week-segmented, .days-grid, #cards-container, #loader, #duty-banner, #progress-wrapper, #share-hw-wrapper, #events-banner-container {
       position: relative;
       z-index: 1;
     }
@@ -307,6 +306,40 @@
     .theme-selector-grid { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
     .theme-option-btn { background: var(--bg); border: 1px solid var(--card-border); color: var(--text); font-size: 12px; font-weight: 600; padding: 6px 10px; border-radius: 9px; cursor: pointer; }
     .theme-option-btn.active { border-color: var(--gold); color: var(--gold); background: var(--card-bg); }
+
+    .toast-container {
+      position: fixed;
+      bottom: 18px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 2000;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      width: 92%;
+      max-width: 400px;
+      pointer-events: none;
+    }
+
+    .toast-pill {
+      background: var(--card-bg);
+      border: 1px solid var(--gold);
+      color: var(--text);
+      padding: 11px 14px;
+      border-radius: 14px;
+      font-size: 13px;
+      font-weight: 600;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.75);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      animation: toastSlideUp 0.3s ease;
+    }
+
+    @keyframes toastSlideUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
   </style>
 </head>
 <body>
@@ -932,21 +965,23 @@
     </div>
   </div>
 
-  <script>
-    const API_URL = 'https://script.google.com/macros/s/AKfycbzoRZ_Fd9Yv2FJq79lpF4HPg-NETJm4gSCqLVxU7_6pp2CHNON2A09U1X0eYRE4cyQ5/exec';
-    const EVENT_CREATOR_LOGIN = 'yurkov998';
-    const CACHE_KEY = 'diary_cached_data_v16';
+  <!-- КОНТЕЙНЕР ВСПЛЫВАЮЩИХ УВЕДОМЛЕНИЙ -->
+  <div id="toast-container" class="toast-container"></div>
 
-    // РЕЕСТР ОБНОВЛЕНИЙ ДНЕВНИКА (отображается во вкладке "Лог обновлений")
+  <script>
+    const API_URL = 'https://max.ru/u/f9LHodD0cOKI48hDsSOHvyiussj9Gpb-hJtcdE91LPpdrNOpi6jPEgRZbXs';
+    const EVENT_CREATOR_LOGIN = 'yurkov998';
+    const CACHE_KEY = 'diary_cached_data_v17';
+
     const APP_CHANGELOG = [
       {
-        version: 'v2.4 — Ускорение и Лог обновлений',
+        version: 'v2.5 — Офлайн-режим и Уведомления',
         date: '23.11.2026',
         changes: [
-          'Мгновенная загрузка расписания из памяти телефона без ожидания ответа сервера.',
-          'Оптимизирована плавность прокрутки и анимаций на смартфонах.',
-          'Отметка об отсутствии «Н» больше не имеет веса и не портит средний балл.',
-          'Добавлена вкладка «Лог обновлений» в профиле.'
+          'Добавлен офлайн-режим (Service Worker): дневник открывается в браузере даже без интернета.',
+          'Добавлены всплывающие уведомления о новых оценках, заменах уроков и объявлениях.',
+          'Мгновенная загрузка из памяти телефона с тихой синхронизацией в фоне.',
+          'Отметка об отсутствии «Н» больше не имеет веса и не влияет на средний балл.'
         ]
       },
       {
@@ -954,7 +989,7 @@
         date: '20.11.2026',
         changes: [
           'Запущены еженедельные события с наградами XP, темами и эффектами фона.',
-          'Старосты теперь могут заменять уроки, менять кабинеты и добавлять замены.',
+          'Старосты могут заменять уроки, менять кабинеты и добавлять замены.',
           'Добавлена рассылка объявлений по школьным активам («Биоритм», «Движение Первых», «Юнармия»).'
         ]
       },
@@ -1062,6 +1097,61 @@
     function isManager() { return isTeacher() || isStarosta(); }
     function isAdminCreator() { return savedAuth && String(savedAuth.login || '').trim().toLowerCase() === EVENT_CREATOR_LOGIN.toLowerCase(); }
 
+    function showToastNotification(message) {
+      const container = document.getElementById('toast-container');
+      if (!container) return;
+      const pill = document.createElement('div');
+      pill.className = 'toast-pill';
+      pill.innerHTML = message;
+      container.appendChild(pill);
+      setTimeout(() => {
+        pill.style.opacity = '0';
+        pill.style.transition = 'opacity 0.3s';
+        setTimeout(() => pill.remove(), 300);
+      }, 4500);
+    }
+
+    function checkAndNotifyChanges(oldData, newData) {
+      if (!oldData || !newData || !currentUser) return;
+
+      const oldGrades = (oldData.grades || []).filter(g => isSamePerson(g['Ученик'] || '', currentUser.name));
+      const newGrades = (newData.grades || []).filter(g => isSamePerson(g['Ученик'] || '', currentUser.name));
+
+      if (newGrades.length > oldGrades.length) {
+        const latest = newGrades[newGrades.length - 1];
+        const subj = latest['Предмет'] || 'Предмет';
+        const val = latest['Оценка'] || '';
+        const w = latest['Вес'] || 5;
+        if (String(val).toUpperCase() === 'Н') {
+          showToastNotification(`📝 Отмечено отсутствие по предмету: <b>${subj}</b>`);
+        } else {
+          showToastNotification(`⭐ Новая оценка: <b>${val}</b> (вес ${w}) по предмету «${subj}»!`);
+        }
+      }
+
+      const oldSched = oldData.schedule || [];
+      const newSched = newData.schedule || [];
+      if (newSched.length !== oldSched.length) {
+        showToastNotification(`📅 Расписание обновилось (изменилось количество уроков)`);
+      } else {
+        for (let i = 0; i < newSched.length; i++) {
+          const oldSubj = String(oldSched[i]['Предмет'] || '');
+          const newSubj = String(newSched[i]['Предмет'] || '');
+          if (oldSubj && newSubj && oldSubj !== newSubj) {
+            const d = cleanDateStr(newSched[i]['Дата'] || '');
+            showToastNotification(`⚠️ Замена на ${d}: <b>${newSubj}</b> вместо ${oldSubj}`);
+            break;
+          }
+        }
+      }
+
+      const oldNewsCount = (oldData.announcements || []).length;
+      const newNewsCount = (newData.announcements || []).length;
+      if (newNewsCount > oldNewsCount) {
+        showToastNotification(`📢 Опубликовано новое объявление!`);
+      }
+    }
+
     function saveLocalSnapshot(data) {
       if (!currentUser) return;
       const userClass = normalizeClassStr(currentUser.className || '');
@@ -1080,6 +1170,9 @@
         tag.innerText = '✓';
         tag.classList.add('synced');
         setTimeout(() => { if (tag.innerText === '✓') tag.innerText = ''; }, 2500);
+      } else if (status === 'offline') {
+        tag.innerText = 'офлайн';
+        tag.classList.remove('synced');
       } else {
         tag.innerText = '';
       }
@@ -2865,7 +2958,6 @@
       renderLessons();
     }
 
-    /* STALE-WHILE-REVALIDATE: Мгновенный показ кэша с телефона + тихое обновление в фоне */
     async function loadData(force = false) {
       if (!currentUser || !savedAuth) {
         checkAuth();
@@ -2900,13 +2992,18 @@
         const data = await res.json();
 
         loader.style.display = 'none';
+        if (cached) {
+          try { checkAndNotifyChanges(JSON.parse(cached), data); } catch (e) {}
+        }
         saveLocalSnapshot(data);
         applyDataToApp(data);
         updateSyncTag('done');
       } catch (err) {
-        updateSyncTag('');
         if (!hasCachedData) {
-          loader.innerText = 'Не удалось загрузить данные. Проверь интернет.';
+          updateSyncTag('');
+          loader.innerText = 'Нет подключения к интернету и нет сохранённых данных.';
+        } else {
+          updateSyncTag('offline');
         }
       }
     }
@@ -3535,6 +3632,12 @@
       container.innerHTML = '';
       container.appendChild(frag);
       updateHomeworkProgressBar(dayLessons.length, completedTasksCount);
+    }
+
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(() => {});
+      });
     }
 
     applyThemeAndParticles();
