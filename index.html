@@ -18,6 +18,7 @@
     :root {
       --bg: #141113;
       --bg-glow: rgba(231, 111, 81, 0.08);
+      --bg-sunset: none;
       --card-bg: #1e191b;
       --card-border: #322829;
       --text: #f7ede2;
@@ -39,6 +40,7 @@
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, sans-serif;
       background-color: var(--bg);
+      background-image: var(--bg-sunset);
       color: var(--text);
       margin: 0;
       padding: 16px 12px 40px 12px;
@@ -48,7 +50,7 @@
     }
 
     .leaves-container { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; contain: strict; }
-    .leaf { position: absolute; top: 0; user-select: none; opacity: 0.35; will-change: transform; animation: fallGpu linear infinite; }
+    .leaf { position: absolute; top: 0; user-select: none; opacity: 0.38; will-change: transform; animation: fallGpu linear infinite; }
 
     @keyframes fallGpu {
       0% { transform: translate3d(0, -40px, 0) rotate(0deg); }
@@ -57,9 +59,9 @@
     }
 
     .leaf:nth-child(1) { left: 10%; font-size: 18px; animation-duration: 14s; }
-    .leaf:nth-child(2) { left: 32%; font-size: 22px; animation-duration: 18s; animation-delay: -4s; opacity: 0.25; }
+    .leaf:nth-child(2) { left: 32%; font-size: 22px; animation-duration: 18s; animation-delay: -4s; opacity: 0.28; }
     .leaf:nth-child(3) { left: 58%; font-size: 16px; animation-duration: 13s; animation-delay: -8s; }
-    .leaf:nth-child(4) { left: 82%; font-size: 20px; animation-duration: 16s; animation-delay: -2s; opacity: 0.3; }
+    .leaf:nth-child(4) { left: 82%; font-size: 20px; animation-duration: 16s; animation-delay: -2s; opacity: 0.32; }
 
     .header-top, .info-banners, .week-segmented, .days-grid, #cards-container, #loader, #duty-banner, #progress-wrapper, #share-hw-wrapper, #events-banner-container { position: relative; z-index: 1; }
 
@@ -225,7 +227,7 @@
     .changelog-date { font-size: 11px; color: var(--hint); font-weight: 600; }
     .changelog-list { margin: 0; padding-left: 18px; font-size: 13px; line-height: 1.5; color: var(--text); opacity: 0.92; }
 
-    /* ЭКСКЛЮЗИВНЫЙ СТИЛЬ НИКА РАЗРАБОТЧИКА + ЦВЕТА ИЗ МАГАЗИНА XP */
+    /* ЭКСКЛЮЗИВНЫЙ ПЕРЕЛИВ НИКА РАЗРАБОТЧИКА + ЦВЕТА ИЗ МАГАЗИНА XP */
     .name-color-dev {
       background: linear-gradient(90deg, #fde047, #38bdf8, #f472b6, #fde047);
       background-size: 200% auto;
@@ -238,19 +240,6 @@
     @keyframes devShimmer {
       0% { background-position: 0% center; }
       100% { background-position: 200% center; }
-    }
-
-    .dev-crown-tag {
-      display: inline-block;
-      background: linear-gradient(135deg, #eab308, #ec4899);
-      color: #ffffff;
-      font-size: 9px;
-      font-weight: 900;
-      padding: 1px 5px;
-      border-radius: 5px;
-      margin-left: 5px;
-      vertical-align: middle;
-      letter-spacing: 0.5px;
     }
 
     .name-color-cyber {
@@ -276,7 +265,7 @@
       font-weight: 800;
     }
 
-    /* СТИЛИ МАГАЗИНА XP */
+    /* МАГАЗИН XP */
     .shop-balance-banner {
       background: linear-gradient(135deg, var(--card-bg), var(--bg));
       border: 1px solid var(--gold);
@@ -298,6 +287,30 @@
       justify-content: space-between;
       align-items: center;
       gap: 10px;
+    }
+
+    .shop-item-card.vice-exclusive {
+      background: linear-gradient(135deg, #240b36, #140824);
+      border: 1px solid #ff2a85;
+    }
+
+    .vice-title-grad {
+      background: linear-gradient(90deg, #ff2a85, #ff9e00, #00f5d4);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-weight: 900;
+    }
+
+    .exclusive-timer-badge {
+      display: inline-block;
+      margin-top: 4px;
+      font-size: 10px;
+      font-weight: 800;
+      color: #00f5d4;
+      background: rgba(0, 245, 212, 0.12);
+      border: 1px solid rgba(0, 245, 212, 0.4);
+      padding: 2px 6px;
+      border-radius: 6px;
     }
 
     .shop-buy-btn {
@@ -556,6 +569,9 @@
 
         <!-- ПАНЕЛЬ УПРАВЛЕНИЯ СТАРОСТЫ -->
         <div id="manager-actions-section" style="display: none;">
+          <button class="teacher-action-btn" onclick="closeProfileModal(); openDirectGradeBookModal();">
+            📊 Прямой журнал (любая дата)
+          </button>
           <button class="teacher-action-btn" onclick="closeProfileModal(); openAddLessonModal();">
             ➕ Добавить урок / замену
           </button>
@@ -586,7 +602,7 @@
           </div>
         </div>
 
-        <!-- ЛОГ ОБНОВЛЕНИЙ И ТЕСТОВЫЙ РЕЖИМ -->
+        <!-- ЛОГ ОБНОВЛЕНИЙ И СВЯЗЬ С РАЗРАБОТЧИКОМ -->
         <div style="margin-top: 14px; padding-top: 12px; border-top: 1px dashed var(--card-border);">
           <button type="button" class="secondary-btn" style="margin-top: 0; margin-bottom: 8px; font-size: 12px; border-color: var(--gold); color: var(--gold);" onclick="closeProfileModal(); openChangelogModal();">
             📋 Лог обновлений дневника
@@ -625,7 +641,10 @@
       </div>
 
       <div style="overflow-y: auto; max-height: 58vh; padding-right: 2px;">
-        <div class="detail-label" style="margin-bottom: 6px;">🎨 Темы оформления дневника</div>
+        <div class="detail-label" style="margin-bottom: 6px;">🔥 Лимитированный эксклюзив (1 месяц)</div>
+        <div id="shop-exclusive-list"></div>
+
+        <div class="detail-label" style="margin: 12px 0 6px 0;">🎨 Темы оформления дневника</div>
         <div id="shop-themes-list"></div>
 
         <div class="detail-label" style="margin: 12px 0 6px 0;">✨ Цвет имени в рейтинге (видят все)</div>
@@ -1023,7 +1042,48 @@
     </div>
   </div>
 
-  <!-- ЖУРНАЛ ОЦЕНОК -->
+  <!-- ПРЯМОЙ ЖУРНАЛ ОЦЕНОК (ЛЮБАЯ ДАТА И ПРЕДМЕТ) -->
+  <div id="direct-grades-modal" class="modal-overlay" onclick="closeDirectGradeBookModal(event)">
+    <div class="modal-sheet" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <h3>📊 Прямой журнал оценок</h3>
+        <button class="close-btn" onclick="closeDirectGradeBookModal()">✕</button>
+      </div>
+
+      <div style="overflow-y: auto; max-height: 68vh; padding-right: 2px;">
+        <div style="display: flex; gap: 8px;">
+          <div class="form-group" style="flex: 1;">
+            <label>Дата (любая)</label>
+            <input type="date" id="dg-date-picker" class="form-input" onchange="loadExistingDirectGrades()">
+          </div>
+          <div class="form-group" style="flex: 1;">
+            <label>Вес оценки</label>
+            <select id="dg-weight-select" class="form-input">
+              <option value="3">Вес 3 (ДЗ / ответ)</option>
+              <option value="4">Вес 4</option>
+              <option value="5" selected>Вес 5 (Урок)</option>
+              <option value="6">Вес 6</option>
+              <option value="7">Вес 7 (С/Р)</option>
+              <option value="8">Вес 8</option>
+              <option value="9">Вес 9</option>
+              <option value="10">Вес 10 (К/Р)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Предмет (выбери или впиши свой)</label>
+          <input type="text" id="dg-subject-input" list="dg-subjects-datalist" class="form-input" placeholder="Например: Алгебра" oninput="loadExistingDirectGrades()">
+          <datalist id="dg-subjects-datalist"></datalist>
+        </div>
+
+        <div id="dg-students-list" style="margin-bottom: 12px;"></div>
+        <button type="button" class="submit-btn" id="dg-save-btn" onclick="submitDirectGrades()">Сохранить оценки в таблицу</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ЖУРНАЛ ОЦЕНОК К УРОКУ -->
   <div id="grades-modal" class="modal-overlay" onclick="closeGradeBookModal(event)">
     <div class="modal-sheet" onclick="event.stopPropagation()">
       <div class="modal-header">
@@ -1093,7 +1153,7 @@
     const API_URL = 'https://script.google.com/macros/s/AKfycbzoRZ_Fd9Yv2FJq79lpF4HPg-NETJm4gSCqLVxU7_6pp2CHNON2A09U1X0eYRE4cyQ5/exec';
     const EVENT_CREATOR_LOGIN = 'yurkov998';
     const DEV_FULL_NAME = 'Юрков Максим';
-    const CACHE_KEY = 'diary_cached_data_v19';
+    const CACHE_KEY = 'diary_cached_data_v21';
 
     // Пороги итоговых оценок (система N.56)
     const GRADE_THRESHOLDS = {
@@ -1104,12 +1164,12 @@
 
     const APP_CHANGELOG = [
       {
-        version: 'v2.7 — Система оценок N.56 и Магазин XP',
-        date: '23.11.2026',
+        version: 'v2.9 — Эксклюзив GTA VI: Vice City',
+        date: '24.11.2026',
         changes: [
-          'Настроен точный порог итоговых оценок N.56 (пятёрка от 4.56, четвёрка от 3.56, тройка от 2.56).',
-          'Открыт Магазин XP: можно покупать темы (Неон, Сакура, Ч/Б) и цветные ники в рейтинге!',
-          'Добавлен «Табель четверти» с расчётом, сколько пятёрок нужно до повышения балла.'
+          'В Магазин XP добавлена лимитированная тема «🌴 Vice City \'26 (GTA VI)» за 199 XP — доступна для покупки ровно 1 месяц (до 24.12.2026)!',
+          'Добавлен «Прямой журнал» для старост: выставление оценок за любую дату и предмет.',
+          'Настроен порог итоговых оценок N.56 (пятёрка от 4.56, четвёрка от 3.56, тройка от 2.56).'
         ]
       },
       {
@@ -1140,6 +1200,7 @@
         vars: {
           '--bg': '#141113',
           '--bg-glow': 'rgba(231, 111, 81, 0.08)',
+          '--bg-sunset': 'none',
           '--card-bg': '#1e191b',
           '--card-border': '#322829',
           '--text': '#f7ede2',
@@ -1152,6 +1213,29 @@
           '--btn-text': '#ffffff'
         }
       },
+      vice_city: {
+        name: '🌴 Vice City \'26 (GTA VI)',
+        price: 199,
+        exclusive: true,
+        expiresAt: '2026-12-24T23:59:59',
+        shopDesc: 'Закат Оушен-Драйв, неон Вайс-Сити и пальмы',
+        particles: '🌴,🦩,🌅,✨',
+        vars: {
+          '--bg': '#11071c',
+          '--bg-glow': 'rgba(255, 42, 133, 0.18)',
+          '--bg-sunset': 'radial-gradient(circle at 50% -10%, rgba(255, 110, 64, 0.28), rgba(255, 42, 133, 0.16) 40%, rgba(17, 7, 28, 0) 75%)',
+          '--card-bg': '#1c0c2e',
+          '--card-border': '#4a1c6b',
+          '--text': '#fff0f7',
+          '--hint': '#c792df',
+          '--accent': '#ff2a85',
+          '--accent-dark': '#c91865',
+          '--accent-glow': 'rgba(255, 42, 133, 0.55)',
+          '--gold': '#00f5d4',
+          '--gold-glow': 'rgba(0, 245, 212, 0.5)',
+          '--btn-text': '#ffffff'
+        }
+      },
       star_gold: {
         name: '⭐ Звёздный статус',
         price: 0,
@@ -1159,6 +1243,7 @@
         vars: {
           '--bg': '#090805',
           '--bg-glow': 'rgba(250, 204, 21, 0.12)',
+          '--bg-sunset': 'none',
           '--card-bg': '#14120b',
           '--card-border': '#383014',
           '--text': '#fefce8',
@@ -1179,6 +1264,7 @@
         vars: {
           '--bg': '#090714',
           '--bg-glow': 'rgba(236, 72, 153, 0.14)',
+          '--bg-sunset': 'none',
           '--card-bg': '#120e26',
           '--card-border': '#2e2259',
           '--text': '#f3e8ff',
@@ -1199,6 +1285,7 @@
         vars: {
           '--bg': '#170d12',
           '--bg-glow': 'rgba(244, 114, 182, 0.12)',
+          '--bg-sunset': 'none',
           '--card-bg': '#24141c',
           '--card-border': '#4a2538',
           '--text': '#fdf2f8',
@@ -1219,6 +1306,7 @@
         vars: {
           '--bg': '#080808',
           '--bg-glow': 'rgba(255, 255, 255, 0.06)',
+          '--bg-sunset': 'none',
           '--card-bg': '#141414',
           '--card-border': '#333333',
           '--text': '#ffffff',
@@ -1386,7 +1474,6 @@
       }
     }
 
-    /* РАСЧЁТ ЗАРАБОТАННЫХ И ПОТРАЧЕННЫХ XP ДЛЯ МАГАЗИНА */
     function getMyTotalEarnedXP() {
       if (!currentUser || isTeacher()) return 0;
       let totalXP = 0;
@@ -1453,6 +1540,46 @@
       const shopState = getMyShopState();
       document.getElementById('shop-balance-val').innerText = `${shopState.availableXP} XP`;
 
+      // 1. Лимитированный эксклюзив (GTA VI Vice City)
+      const excBox = document.getElementById('shop-exclusive-list');
+      excBox.innerHTML = '';
+      const vcObj = THEMES_REGISTRY.vice_city;
+      const vcOwned = isAdminCreator() || shopState.ownedItems.has('vice_city');
+      const vcEquipped = selectedThemeId === 'vice_city';
+      const now = new Date();
+      const expDate = new Date(vcObj.expiresAt);
+      const isExpired = now > expDate;
+      const daysLeft = Math.max(0, Math.ceil((expDate - now) / (1000 * 60 * 60 * 24)));
+      const canAffordVc = shopState.availableXP >= vcObj.price;
+
+      let vcBtnHtml = '';
+      if (vcEquipped) {
+        vcBtnHtml = `<button type="button" class="shop-buy-btn equipped" disabled>Активна ✓</button>`;
+      } else if (vcOwned) {
+        vcBtnHtml = `<button type="button" class="shop-buy-btn owned" onclick="selectUserTheme('vice_city'); selectUserParticles('${vcObj.particles}'); renderShopContent();">Применить</button>`;
+      } else if (isExpired) {
+        vcBtnHtml = `<button type="button" class="shop-buy-btn" disabled>Завершено</button>`;
+      } else {
+        vcBtnHtml = `<button type="button" class="shop-buy-btn" style="background: linear-gradient(135deg, #ff2a85, #ff9e00);" ${!canAffordVc ? 'disabled' : ''} onclick="buyShopItem('vice_city', ${vcObj.price})">${vcObj.price} XP</button>`;
+      }
+
+      const timerLabel = isExpired
+        ? '⏰ Продажа завершена'
+        : `⏳ Осталось ${daysLeft} дн. (до 24.12.2026)`;
+
+      const excCard = document.createElement('div');
+      excCard.className = 'shop-item-card vice-exclusive';
+      excCard.innerHTML = `
+        <div>
+          <div style="font-size: 15px;" class="vice-title-grad">${vcObj.name}</div>
+          <div style="font-size: 11px; color: #f3e8ff; opacity: 0.9; margin-top: 2px;">${vcObj.shopDesc}</div>
+          <div class="exclusive-timer-badge">${timerLabel}</div>
+        </div>
+        ${vcBtnHtml}
+      `;
+      excBox.appendChild(excCard);
+
+      // 2. Обычные темы магазина
       const themesBox = document.getElementById('shop-themes-list');
       themesBox.innerHTML = '';
 
@@ -1483,11 +1610,12 @@
         themesBox.appendChild(card);
       });
 
+      // 3. Цвета ников
       const colorsBox = document.getElementById('shop-colors-list');
       colorsBox.innerHTML = '';
 
       const availableColors = isAdminCreator()
-        ? [{ id: 'color_dev', name: '👑 • Создатель', desc: 'Эксклюзивный переливающийся стиль разработчика', price: 0, cssClass: 'name-color-dev' }, ...NAME_COLORS_SHOP]
+        ? [{ id: 'color_dev', name: '👑 DEV • Создатель', desc: 'Эксклюзивный переливающийся стиль разработчика', price: 0, cssClass: 'name-color-dev' }, ...NAME_COLORS_SHOP]
         : NAME_COLORS_SHOP;
 
       availableColors.forEach(col => {
@@ -1522,6 +1650,14 @@
       if (shopState.availableXP < price) {
         alert('Недостаточно баллов XP!');
         return;
+      }
+
+      if (itemId === 'vice_city') {
+        const expDate = new Date(THEMES_REGISTRY.vice_city.expiresAt);
+        if (new Date() > expDate && !isAdminCreator()) {
+          alert('Срок эксклюзивной продажи этой темы истёк!');
+          return;
+        }
       }
 
       try {
@@ -1605,7 +1741,7 @@
       }
     }
 
-    /* ТАБЕЛЬ ЧЕТВЕРТИ ПО ПОРОГУ N.56 (4.56 / 3.56 / 2.56) */
+    /* ТАБЕЛЬ ЧЕТВЕРТИ ПО ПОРОГУ N.56 */
     function openQuarterTabelModal() {
       const listEl = document.getElementById('tabel-subjects-list');
       listEl.innerHTML = '';
@@ -1715,7 +1851,6 @@
       savedBgs.add('default');
       savedBgs.add('off');
 
-      // Разработчику (yurkov998) доступны все темы и фоны сразу
       if (isAdminCreator()) {
         Object.keys(THEMES_REGISTRY).forEach(k => {
           savedThemes.add(k);
@@ -1778,6 +1913,9 @@
       Object.entries(themeObj.vars).forEach(([k, v]) => {
         root.style.setProperty(k, v);
       });
+      if (!themeObj.vars['--bg-sunset']) {
+        root.style.setProperty('--bg-sunset', 'none');
+      }
 
       const container = document.getElementById('leaves-container');
       if (selectedParticlesStr === 'off') {
@@ -3065,8 +3203,7 @@
             normName: normKey,
             className: myClass || '—',
             score: 0,
-            colorClass: getNameColorCssClass(colorId, rawName),
-            isDev: isDevAccount(rawName)
+            colorClass: getNameColorCssClass(colorId, rawName)
           };
         });
 
@@ -3104,12 +3241,10 @@
           if (idx === 1 && leader.score > 0) medal = '🥈';
           if (idx === 2 && leader.score > 0) medal = '🥉';
 
-          const devTag = '';
-
           row.innerHTML = `
             <div class="leader-rank">${medal}</div>
             <div class="leader-info">
-              <span class="leader-name ${leader.colorClass}">${leader.name}${devTag} ${isMe ? '⭐' : ''}</span>
+              <span class="leader-name ${leader.colorClass}">${leader.name} ${isMe ? '⭐' : ''}</span>
               <span class="leader-class">${leader.className} класс</span>
             </div>
             <div class="leader-score">${leader.score} XP</div>
@@ -3128,7 +3263,6 @@
         const isMe = currentUser && isSamePerson(leader.name, currentUser.name) && leader.className === myClass;
         const colorId = isMe ? myShopState.activeColorId : (leader.nameColor || '');
         const colorClass = getNameColorCssClass(colorId, leader.name);
-        const devTag = isDevAccount(leader.name) ? `<span class="dev-crown-tag">DEV</span>` : '';
         const row = document.createElement('div');
         row.className = `leaderboard-row ${idx === 0 && leader.score > 0 ? 'top-1' : ''} ${isMe ? 'my-row' : ''}`;
 
@@ -3140,7 +3274,7 @@
         row.innerHTML = `
           <div class="leader-rank">${medal}</div>
           <div class="leader-info">
-            <span class="leader-name ${colorClass}">${leader.name}${devTag} ${isMe ? '⭐' : ''}</span>
+            <span class="leader-name ${colorClass}">${leader.name} ${isMe ? '⭐' : ''}</span>
             <span class="leader-class">${leader.className} класс</span>
           </div>
           <div class="leader-score">${leader.score} XP</div>
@@ -3785,6 +3919,199 @@
       }
     }
 
+    /* ПРЯМОЙ ЖУРНАЛ ОЦЕНОК НА ЛЮБУЮ ДАТУ И ПРЕДМЕТ */
+    function formatPickerDateToRu(isoDateStr) {
+      if (!isoDateStr) return '';
+      const parts = isoDateStr.split('-');
+      if (parts.length !== 3) return isoDateStr;
+      const monthsRu = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
+      const day = Number(parts[2]);
+      const monthIdx = Number(parts[1]) - 1;
+      return `${day} ${monthsRu[monthIdx] || ''}`;
+    }
+
+    function openDirectGradeBookModal() {
+      const picker = document.getElementById('dg-date-picker');
+      const now = new Date();
+      const yyyy = now.getFullYear();
+      const mm = String(now.getMonth() + 1).padStart(2, '0');
+      const dd = String(now.getDate()).padStart(2, '0');
+      picker.value = `${yyyy}-${mm}-${dd}`;
+
+      const subjSet = new Set();
+      allItems.forEach(it => {
+        const s = String(it['Предмет'] || it['предмет'] || '').trim();
+        if (s) subjSet.add(s);
+      });
+      allGrades.forEach(g => {
+        const s = String(g['Предмет'] || g['предмет'] || '').trim();
+        if (s) subjSet.add(s);
+      });
+
+      const datalist = document.getElementById('dg-subjects-datalist');
+      datalist.innerHTML = '';
+      Array.from(subjSet).sort().forEach(s => {
+        const opt = document.createElement('option');
+        opt.value = s;
+        datalist.appendChild(opt);
+      });
+
+      document.getElementById('dg-subject-input').value = '';
+      loadExistingDirectGrades();
+      document.getElementById('direct-grades-modal').classList.add('open');
+    }
+
+    function closeDirectGradeBookModal(e) {
+      if (e && e.target !== e.currentTarget && !e.target.classList.contains('close-btn')) return;
+      document.getElementById('direct-grades-modal').classList.remove('open');
+    }
+
+    function loadExistingDirectGrades() {
+      const targetClass = normalizeClassStr(currentUser ? currentUser.className : '8А');
+      const isoVal = document.getElementById('dg-date-picker').value;
+      const ruDate = formatPickerDateToRu(isoVal);
+      const ddmm = normalizeDateToDDMM(ruDate);
+      const subject = document.getElementById('dg-subject-input').value.trim();
+
+      const classStudents = allStudents.filter(s => {
+        const c = normalizeClassStr(s['Класс'] || s['класс'] || '');
+        const role = String(s['Роль'] || s['роль'] || 'student').toLowerCase();
+        const name = String(s['Имя'] || s['имя'] || s['ФИО'] || '').trim();
+        return c === targetClass && role !== 'teacher' && name.length >= 3;
+      });
+
+      const container = document.getElementById('dg-students-list');
+      container.innerHTML = '';
+
+      if (classStudents.length === 0) {
+        container.innerHTML = '<div style="color:var(--hint); font-size:13px; text-align:center;">Ученики класса не найдены</div>';
+        return;
+      }
+
+      classStudents.forEach(st => {
+        const name = String(st['Имя'] || st['ФИО'] || st['Логин']).trim();
+        const isSelf = currentUser && isSamePerson(name, currentUser.name);
+
+        let curVal = '';
+        if (subject && ddmm) {
+          const existing = allGrades.find(g => {
+            const gClass = normalizeClassStr(g['Класс'] || g['класс'] || '');
+            const gSub = String(g['Предмет'] || g['предмет'] || '').trim().toLowerCase();
+            const gDdmm = normalizeDateToDDMM(g['Дата'] || g['дата'] || '');
+            const gStud = g['Ученик'] || g['ученик'] || '';
+            return gClass === targetClass && gSub === subject.toLowerCase() && gDdmm === ddmm && isSamePerson(gStud, name);
+          });
+          if (existing) curVal = String(existing['Оценка'] || existing['оценка'] || '').trim().toUpperCase();
+        }
+
+        const row = document.createElement('div');
+        row.className = 'grades-table-row';
+        row.innerHTML = `
+          <span>${name} ${isSelf ? '<span style="color:var(--gold); font-size:11px;">(вы)</span>' : ''} ${curVal ? '<span style="color:var(--green); font-size:11px;">(стоит)</span>' : ''}</span>
+          <select class="grade-select dg-grade-select" data-student="${name}">
+            <option value="" ${curVal === '' ? 'selected' : ''}>—</option>
+            <option value="5" ${curVal === '5' ? 'selected' : ''}>5</option>
+            <option value="4" ${curVal === '4' ? 'selected' : ''}>4</option>
+            <option value="3" ${curVal === '3' ? 'selected' : ''}>3</option>
+            <option value="2" ${curVal === '2' ? 'selected' : ''}>2</option>
+            <option value="Н" ${curVal === 'Н' ? 'selected' : ''}>Н (без веса)</option>
+          </select>
+        `;
+        container.appendChild(row);
+      });
+    }
+
+    async function submitDirectGrades() {
+      const subject = document.getElementById('dg-subject-input').value.trim();
+      const isoVal = document.getElementById('dg-date-picker').value;
+      if (!isoVal || !subject) {
+        alert('Выберите дату и укажите предмет');
+        return;
+      }
+
+      const selects = document.querySelectorAll('.dg-grade-select');
+      const gradesData = [];
+      selects.forEach(sel => {
+        if (sel.value) gradesData.push({ studentName: sel.getAttribute('data-student'), grade: sel.value });
+      });
+
+      if (gradesData.length === 0) {
+        alert('Выберите хотя бы одну оценку');
+        return;
+      }
+
+      const btn = document.getElementById('dg-save-btn');
+      btn.innerText = 'Сохранение...';
+      btn.disabled = true;
+
+      const targetClass = normalizeClassStr(currentUser ? currentUser.className : '8А');
+      const ruDate = formatPickerDateToRu(isoVal);
+      const baseWeight = Number(document.getElementById('dg-weight-select').value) || 5;
+
+      try {
+        const res = await fetch(API_URL, {
+          method: 'POST',
+          body: JSON.stringify({
+            action: 'saveGrades',
+            auth: savedAuth,
+            className: targetClass,
+            subject: subject,
+            date: ruDate,
+            weight: baseWeight,
+            grades: gradesData
+          })
+        });
+        const respData = await res.json();
+
+        if (respData.status === 'success') {
+          gradesData.forEach(item => {
+            const gUpper = String(item.grade).trim().toUpperCase();
+            const isAbs = gUpper === 'Н' || gUpper === 'H';
+            const effWeight = isAbs ? 0 : baseWeight;
+            const isSelf = currentUser && isSamePerson(item.studentName, currentUser.name);
+            const authorLabel = currentUser
+              ? (isSelf ? `${currentUser.name} (⚠️ себе)` : `${currentUser.name}${isStarosta() ? ' (староста)' : ''}`)
+              : '';
+
+            const idx = allGrades.findIndex(g =>
+              normalizeClassStr(g['Класс'] || '') === targetClass &&
+              String(g['Предмет'] || '').toLowerCase() === subject.toLowerCase() &&
+              normalizeDateToDDMM(g['Дата'] || '') === normalizeDateToDDMM(ruDate) &&
+              isSamePerson(g['Ученик'] || '', item.studentName)
+            );
+
+            if (idx !== -1) {
+              allGrades[idx]['Оценка'] = gUpper;
+              allGrades[idx]['Вес'] = effWeight;
+              allGrades[idx]['Выставил'] = authorLabel;
+            } else {
+              allGrades.push({ 'Дата': ruDate, 'Класс': targetClass, 'Предмет': subject, 'Ученик': item.studentName, 'Оценка': gUpper, 'Вес': effWeight, 'Выставил': authorLabel });
+            }
+          });
+
+          syncSnapshotFromMemory();
+          applyThemeAndParticles();
+          renderActiveEventsBanners();
+
+          btn.innerText = 'Оценки сохранены! ✓';
+          setTimeout(() => {
+            closeDirectGradeBookModal();
+            btn.innerText = 'Сохранить оценки в таблицу';
+            btn.disabled = false;
+            renderLessons();
+          }, 800);
+        } else {
+          alert(respData.message || 'Ошибка при сохранении');
+          btn.innerText = 'Сохранить оценки в таблицу';
+          btn.disabled = false;
+        }
+      } catch (err) {
+        alert('Ошибка сети');
+        btn.innerText = 'Сохранить оценки в таблицу';
+        btn.disabled = false;
+      }
+    }
+
     function openGradeBookModal() {
       if (!currentTeacherLessonItem) return;
       const targetClass = normalizeClassStr(currentTeacherLessonItem['Класс'] || currentTeacherLessonItem['класс'] || (currentUser ? currentUser.className : '8А'));
@@ -3848,7 +4175,7 @@
     }
 
     async function submitGrades() {
-      const selects = document.querySelectorAll('.grade-select');
+      const selects = document.querySelectorAll('.grade-select:not(.dg-grade-select)');
       const gradesData = [];
 
       selects.forEach(sel => {
@@ -4196,6 +4523,4 @@
     setInterval(updateBellTimer, 30000);
   </script>
 </body>
-</html>
-
-
+  </html>
